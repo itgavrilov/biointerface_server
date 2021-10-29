@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.*;
 import ru.gsa.biointerface.repository.exception.NoConnectionException;
 
@@ -49,6 +50,14 @@ public class DataSource implements Database {
             LOGGER.error("Error connecting to database", e);
             throw new NoConnectionException(e);
         }
+    }
+
+    private void init(){
+        LOGGER.info("DataSource is init");
+    }
+
+    private void destroy(){
+        LOGGER.info("DataSource is destruction");
     }
 
     @Override

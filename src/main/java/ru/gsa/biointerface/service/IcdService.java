@@ -2,9 +2,13 @@ package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.repository.IcdRepository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -12,26 +16,24 @@ import java.util.NoSuchElementException;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class IcdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(IcdService.class);
     private final IcdRepository dao;
 
+    @Autowired
     private IcdService(IcdRepository dao) {
         this.dao = dao;
     }
 
-    public Icd create(String name, int version, String comment) throws Exception {
-        if (name == null)
-            throw new NullPointerException("Name is null");
-        if (name.isBlank())
-            throw new IllegalArgumentException("Name is blank");
-        if (version <= 0)
-            throw new IllegalArgumentException("Version <= 0");
+    @PostConstruct
+    private void init(){
+        LOGGER.info("IcdService is init");
+    }
 
-        Icd entity = new Icd(name, version, comment);
-        LOGGER.info("New icd created");
-
-        return entity;
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("IcdService is destruction");
     }
 
     public List<Icd> getAll() throws Exception {

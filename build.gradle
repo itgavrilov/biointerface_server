@@ -55,6 +55,7 @@ dependencies {
     implementation("org.springframework:spring-core:${springVersion}")
     implementation("org.springframework:spring-beans:${springVersion}")// создание новых обектов для контекста
     implementation("org.springframework:spring-context:${springVersion}")// собственно сам контекст
+    implementation("javax.annotation:javax.annotation-api:1.3.2") // PostConstruct и тд...
 //-----------Tests--------------------------
     testImplementation("org.hibernate:hibernate-core:${hibernateVersion}")
     testImplementation("com.h2database:h2:1.4.200")

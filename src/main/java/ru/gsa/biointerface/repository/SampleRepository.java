@@ -2,6 +2,8 @@ package ru.gsa.biointerface.repository;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.domain.entity.SampleID;
@@ -14,7 +16,9 @@ import java.util.List;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class SampleRepository extends AbstractRepository<Sample, SampleID> {
+    @Autowired
     public SampleRepository(DataSource dataSource) {
         super(dataSource);
     }

@@ -2,33 +2,37 @@ package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.repository.DeviceRepository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class DeviceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
     private final DeviceRepository dao;
 
+    @Autowired
     private DeviceService(DeviceRepository dao) {
         this.dao = dao;
     }
 
-    public Device create(long id, int amountChannels) {
-        if (id <= 0)
-            throw new IllegalArgumentException("Serial number <= 0");
-        if (amountChannels <= 0)
-            throw new IllegalArgumentException("Amount channels <= 0");
+    @PostConstruct
+    private void init(){
+        LOGGER.info("DeviceService is init");
+    }
 
-        Device entity = new Device(id, amountChannels, null);
-        LOGGER.info("New device created");
-
-        return entity;
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("DeviceService is destruction");
     }
 
     public List<Device> getAll() throws Exception {

@@ -45,10 +45,10 @@ public class Device implements Serializable, Comparable<Device> {
         this.examinations = examinations;
     }
 
-    public Device(long id, int amountChannels, String comment) {
+    public Device(long id, int amountChannels) {
         this.id = id;
         this.amountChannels = amountChannels;
-        this.comment = comment;
+        this.comment = null;
         this.examinations = new ArrayList<>();
     }
 

@@ -2,10 +2,13 @@ package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gsa.biointerface.domain.entity.Icd;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.repository.PatientRecordRepository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -15,12 +18,24 @@ import java.util.NoSuchElementException;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class PatientRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientRecordService.class);
     private final PatientRecordRepository dao;
 
+    @Autowired
     private PatientRecordService(PatientRecordRepository dao) {
         this.dao = dao;
+    }
+
+    @PostConstruct
+    private void init(){
+        LOGGER.info("PatientRecordService is init");
+    }
+
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("PatientRecordService is destruction");
     }
 
     private static Calendar localDateToDate(LocalDate localDate) {
@@ -34,50 +49,6 @@ public class PatientRecordService {
         );
 
         return calendar;
-    }
-
-    public PatientRecord create(
-            long id,
-            String secondName,
-            String firstName,
-            String middleName,
-            LocalDate birthday,
-            Icd icd,
-            String comment
-    ) throws Exception {
-        if (id <= 0)
-            throw new IllegalArgumentException("Id <= 0");
-        if (secondName == null)
-            throw new NullPointerException("SecondName is null");
-        if (secondName.isBlank())
-            throw new IllegalArgumentException("SecondName is blank");
-        if (firstName == null)
-            throw new NullPointerException("FirstName is null");
-        if (firstName.isBlank())
-            throw new IllegalArgumentException("FirstName is blank");
-        if (middleName == null)
-            throw new NullPointerException("MiddleName is null");
-        if (middleName.isBlank())
-            throw new IllegalArgumentException("MiddleName is blank");
-        if (birthday == null)
-            throw new NullPointerException("Birthday is null");
-
-        PatientRecord entity = new PatientRecord(
-                id,
-                secondName,
-                firstName,
-                middleName,
-                localDateToDate(birthday),
-                icd,
-                comment);
-
-        if(icd != null) {
-            icd.getPatientRecords().add(entity);
-        }
-
-        LOGGER.info("New patient record created");
-
-        return entity;
     }
 
     public List<PatientRecord> getAll() throws Exception {

@@ -2,34 +2,38 @@ package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.exception.InsertException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class ChannelNameService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelNameService.class);
     private final ChannelNameRepository dao;
 
+    @Autowired
     private ChannelNameService(ChannelNameRepository dao) {
         this.dao = dao;
     }
 
-    public ChannelName create(String name, String comment) throws Exception {
-        if (name == null)
-            throw new NullPointerException("Name is null");
-        if (name.isBlank())
-            throw new IllegalArgumentException("Name is blank");
+    @PostConstruct
+    private void init(){
+        LOGGER.info("ChannelNameService is init");
+    }
 
-        ChannelName entity = new ChannelName(name, comment);
-        LOGGER.info("New channelName created");
-
-        return entity;
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("ChannelNameService is destruction");
     }
 
     public List<ChannelName> getAll() throws Exception {

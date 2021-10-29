@@ -3,10 +3,9 @@ package ru.gsa.biointerface.host;
 import com.fazecast.jSerialComm.SerialPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.PatientRecord;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ru.gsa.biointerface.domain.entity.*;
 import ru.gsa.biointerface.host.cash.Cash;
 import ru.gsa.biointerface.host.cash.DataListener;
 import ru.gsa.biointerface.host.cash.SampleCash;
@@ -27,6 +26,9 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+
+@Component
+@Scope("prototype")
 public class ConnectionHandler implements DataCollector, Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionHandler.class);
     private final SerialPortHost serialPortHost;
@@ -85,7 +87,7 @@ public class ConnectionHandler implements DataCollector, Connection {
             throw new IllegalArgumentException("amountChannels <= 0 or > 8");
 
         if (device == null || device.getId() != serialNumber) {
-            device = deviceService.create(serialNumber, amountChannels);
+            device = new Device(serialNumber, amountChannels);
             examination = null;
             patientRecord = null;
 
@@ -256,7 +258,23 @@ public class ConnectionHandler implements DataCollector, Connection {
             throw new HostNotTransmissionException();
 
         if (!isRecording()) {
-            examination = examinationService.create(patientRecord, device, channelNames, comment);
+            examination = new Examination(
+                    patientRecord,
+                    device,
+                    comment);
+            patientRecord.getExaminations().add(examination);
+            device.getExaminations().add(examination);
+
+            for (int i = 0; i < device.getAmountChannels(); i++) {
+                ChannelName channelName = channelNames.get(i);
+                Channel channel = new Channel(i, examination, channelName);
+                examination.getChannels().add(channel);
+
+                if (channelName != null) {
+                    channelName.getChannels().add(channel);
+                }
+            }
+
             try {
                 deviceService.save(device);
                 examinationService.recordingStart(examination);

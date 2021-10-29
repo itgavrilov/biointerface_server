@@ -2,11 +2,15 @@ package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.*;
 import ru.gsa.biointerface.repository.ChannelRepository;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 import ru.gsa.biointerface.repository.SampleRepository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -15,12 +19,14 @@ import java.util.List;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class ExaminationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExaminationService.class);
     private final ExaminationRepository dao;
     private final ChannelRepository daoChannel;
     private final SampleRepository daoSample;
 
+    @Autowired
     private ExaminationService(
             ExaminationRepository dao,
             ChannelRepository daoChannel,
@@ -31,42 +37,14 @@ public class ExaminationService {
         this. daoSample = daoSample;
     }
 
-    public Examination create(
-            PatientRecord patientRecord,
-            Device device,
-            List<ChannelName> channelNames,
-            String comment
-    ) throws Exception {
-        if (patientRecord == null)
-            throw new NullPointerException("PatientRecord is null");
-        if (device == null)
-            throw new NullPointerException("Device is null");
-        if (channelNames == null)
-            throw new NullPointerException("ChannelNames is null");
-        if (channelNames.size() != device.getAmountChannels())
-            throw new IllegalArgumentException("Amount channelNames differs from amount in device");
+    @PostConstruct
+    private void init(){
+        LOGGER.info("ExaminationService is init");
+    }
 
-        Examination entity = new Examination(
-                Timestamp.valueOf(LocalDateTime.now()),
-                patientRecord,
-                device,
-                comment);
-        patientRecord.getExaminations().add(entity);
-        device.getExaminations().add(entity);
-
-        for (int i = 0; i < device.getAmountChannels(); i++) {
-            ChannelName channelName = channelNames.get(i);
-            Channel channel = new Channel(i, entity, channelName);
-            entity.getChannels().add(channel);
-
-            if(channelName != null) {
-                channelName.getChannels().add(channel);
-            }
-        }
-
-        LOGGER.info("New examination created");
-
-        return entity;
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("ExaminationService is destruction");
     }
 
     public List<Examination> getAll() throws Exception {
