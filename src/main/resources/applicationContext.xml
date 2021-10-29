@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            https://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--    <context:annotation-config/>-->
+<!--    <context:component-scan base-package="ru.gsa.biointerface"/>-->
+    <bean id="dataSource"
+          class="ru.gsa.biointerface.repository.database.DataSource"
+          >
+<!--        <constructor-arg value="true" />-->
+        <constructor-arg value="false" />
+    </bean>
+<!--  Repository  -->
+    <bean id = "icdRepository"
+          class="ru.gsa.biointerface.repository.IcdRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    <bean id = "deviceRepository"
+          class="ru.gsa.biointerface.repository.DeviceRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    <bean id = "channelNameRepository"
+          class="ru.gsa.biointerface.repository.ChannelNameRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    <bean id = "patientRecordRepository"
+          class="ru.gsa.biointerface.repository.PatientRecordRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    <bean id = "examinationRepository"
+          class="ru.gsa.biointerface.repository.ExaminationRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    <bean id = "channelRepository"
+          class="ru.gsa.biointerface.repository.ChannelRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    <bean id = "sampleRepository"
+          class="ru.gsa.biointerface.repository.SampleRepository">
+        <constructor-arg ref="dataSource" />
+    </bean>
+<!--  Service  -->
+    <bean id = "icdService"
+          class="ru.gsa.biointerface.service.IcdService">
+        <constructor-arg ref="icdRepository" />
+    </bean>
+    <bean id = "deviceService"
+          class="ru.gsa.biointerface.service.DeviceService">
+        <constructor-arg ref="deviceRepository" />
+    </bean>
+    <bean id = "channelNameService"
+          class="ru.gsa.biointerface.service.ChannelNameService">
+        <constructor-arg ref="channelNameRepository" />
+    </bean>
+    <bean id = "patientRecordService"
+          class="ru.gsa.biointerface.service.PatientRecordService">
+        <constructor-arg ref="patientRecordRepository" />
+    </bean>
+    <bean id = "examinationService"
+          class="ru.gsa.biointerface.service.ExaminationService">
+        <constructor-arg ref="examinationRepository" />
+        <constructor-arg ref="channelRepository" />
+        <constructor-arg ref="sampleRepository" />
+    </bean>
+</beans>

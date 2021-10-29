@@ -5,6 +5,7 @@ import org.hibernate.query.Query;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.repository.database.AbstractRepository;
+import ru.gsa.biointerface.repository.database.DataSource;
 import ru.gsa.biointerface.repository.exception.InsertException;
 import ru.gsa.biointerface.repository.exception.ReadException;
 import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
@@ -16,21 +17,11 @@ import java.util.List;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 public class ExaminationRepository extends AbstractRepository<Examination, Long> {
-    private static ExaminationRepository dao;
-    private static Session session;
+    private Session session;
 
-    private ExaminationRepository() throws Exception {
-        super();
+    public ExaminationRepository(DataSource dataSource) {
+        super(dataSource);
     }
-
-    public static ExaminationRepository getInstance() throws Exception {
-        if (dao == null) {
-            dao = new ExaminationRepository();
-        }
-
-        return dao;
-    }
-
 
     @Override
     public void insert(Examination entity) throws Exception {

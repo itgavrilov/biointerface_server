@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.services;
+package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +8,6 @@ import ru.gsa.biointerface.repository.PatientRecordRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,19 +17,10 @@ import java.util.NoSuchElementException;
  */
 public class PatientRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientRecordService.class);
-    private static PatientRecordService instance = null;
     private final PatientRecordRepository dao;
 
-    private PatientRecordService() throws Exception {
-        dao = PatientRecordRepository.getInstance();
-    }
-
-    public static PatientRecordService getInstance() throws Exception {
-        if (instance == null) {
-            instance = new PatientRecordService();
-        }
-
-        return instance;
+    private PatientRecordService(PatientRecordRepository dao) {
+        this.dao = dao;
     }
 
     private static Calendar localDateToDate(LocalDate localDate) {
@@ -102,11 +92,13 @@ public class PatientRecordService {
         return entities;
     }
 
-    public PatientRecord getById(long id) throws Exception {
+    public PatientRecord getById(Long id) throws Exception {
+        if(id == null)
+            throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        PatientRecord entity = dao.read(id);
+        PatientRecord entity = dao.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get patientRecord(id={}) from database", entity.getId());
@@ -142,7 +134,7 @@ public class PatientRecordService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        PatientRecord readEntity = dao.read(entity.getId());
+        PatientRecord readEntity = dao.getById(entity.getId());
 
         if (readEntity == null) {
             dao.insert(entity);
@@ -161,7 +153,7 @@ public class PatientRecordService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        PatientRecord readEntity = dao.read(entity.getId());
+        PatientRecord readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.delete(entity);
@@ -196,7 +188,7 @@ public class PatientRecordService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        PatientRecord readEntity = dao.read(entity.getId());
+        PatientRecord readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.update(entity);

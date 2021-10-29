@@ -6,6 +6,7 @@ import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.domain.entity.SampleID;
 import ru.gsa.biointerface.repository.database.AbstractRepository;
+import ru.gsa.biointerface.repository.database.DataSource;
 import ru.gsa.biointerface.repository.exception.ReadException;
 
 import java.util.List;
@@ -14,18 +15,8 @@ import java.util.List;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 public class SampleRepository extends AbstractRepository<Sample, SampleID> {
-    private static SampleRepository dao;
-
-    private SampleRepository() throws Exception {
-        super();
-    }
-
-    public static SampleRepository getInstance() throws Exception {
-        if (dao == null) {
-            dao = new SampleRepository();
-        }
-
-        return dao;
+    public SampleRepository(DataSource dataSource) {
+        super(dataSource);
     }
 
     public List<Sample> getAllByGraph(Channel channel) throws Exception {

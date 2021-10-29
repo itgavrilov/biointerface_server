@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.services;
+package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,6 @@ import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.exception.InsertException;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,19 +14,10 @@ import java.util.List;
  */
 public class ChannelNameService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelNameService.class);
-    private static ChannelNameService instance = null;
     private final ChannelNameRepository dao;
 
-    private ChannelNameService() throws Exception {
-        dao = ChannelNameRepository.getInstance();
-    }
-
-    public static ChannelNameService getInstance() throws Exception {
-        if (instance == null) {
-            instance = new ChannelNameService();
-        }
-
-        return instance;
+    private ChannelNameService(ChannelNameRepository dao) {
+        this.dao = dao;
     }
 
     public ChannelName create(String name, String comment) throws Exception {
@@ -54,11 +44,13 @@ public class ChannelNameService {
         return entities;
     }
 
-    public ChannelName getById(long id) throws Exception {
+    public ChannelName getById(Long id) throws Exception {
+        if(id == null)
+            throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        ChannelName entity = dao.read(id);
+        ChannelName entity = dao.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get channelName(id={}) from database", entity.getId());
@@ -80,7 +72,7 @@ public class ChannelNameService {
         if (entity.getChannels() == null)
             throw new NullPointerException("Channels is null");
 
-        ChannelName readEntity = dao.read(entity.getId());
+        ChannelName readEntity = dao.getById(entity.getId());
 
         if (readEntity == null) {
             dao.insert(entity);
@@ -97,7 +89,7 @@ public class ChannelNameService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        ChannelName readEntity = dao.read(entity.getId());
+        ChannelName readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.delete(entity);
@@ -120,7 +112,7 @@ public class ChannelNameService {
         if (entity.getChannels() == null)
             throw new NullPointerException("Channels is null");
 
-        ChannelName readEntity = dao.read(entity.getId());
+        ChannelName readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.update(entity);

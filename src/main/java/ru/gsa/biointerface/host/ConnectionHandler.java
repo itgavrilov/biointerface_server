@@ -17,9 +17,8 @@ import ru.gsa.biointerface.host.serialport.ControlMessages;
 import ru.gsa.biointerface.host.serialport.DataCollector;
 import ru.gsa.biointerface.host.serialport.SerialPortHandler;
 import ru.gsa.biointerface.host.serialport.SerialPortHost;
-import ru.gsa.biointerface.services.DeviceService;
-import ru.gsa.biointerface.services.ExaminationService;
-import ru.gsa.biointerface.ui.window.metering.Connection;
+import ru.gsa.biointerface.service.DeviceService;
+import ru.gsa.biointerface.service.ExaminationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +30,8 @@ import java.util.Objects;
 public class ConnectionHandler implements DataCollector, Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionHandler.class);
     private final SerialPortHost serialPortHost;
-    private final ExaminationService examinationService;
-    private final DeviceService deviceService;
+    private ExaminationService examinationService;
+    private DeviceService deviceService;
     private final List<Cash> cashList = new ArrayList<>();
     private final List<ChannelName> channelNames = new ArrayList<>();
 
@@ -46,8 +45,8 @@ public class ConnectionHandler implements DataCollector, Connection {
         if (serialPort == null)
             throw new NullPointerException("SerialPort is null");
 
-        examinationService = ExaminationService.getInstance();
-        deviceService = DeviceService.getInstance();
+//        examinationService = ExaminationService.getInstance();
+//        deviceService = DeviceService.getInstance();
         serialPortHost = new SerialPortHost(serialPort);
         serialPortHost.handler(new SerialPortHandler(this));
 

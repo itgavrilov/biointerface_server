@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.services;
+package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +14,10 @@ import java.util.NoSuchElementException;
  */
 public class IcdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(IcdService.class);
-    private static IcdService instance = null;
     private final IcdRepository dao;
 
-    private IcdService() throws Exception {
-        dao = IcdRepository.getInstance();
-    }
-
-    public static IcdService getInstance() throws Exception {
-        if (instance == null) {
-            instance = new IcdService();
-        }
-
-        return instance;
+    private IcdService(IcdRepository dao) {
+        this.dao = dao;
     }
 
     public Icd create(String name, int version, String comment) throws Exception {
@@ -55,11 +46,13 @@ public class IcdService {
         return entities;
     }
 
-    public Icd getById(long id) throws Exception {
+    public Icd getById(Long id) throws Exception {
+        if(id == null)
+            throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd entity = dao.read(id);
+        Icd entity = dao.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get icd(id={}) from database", entity.getId());
@@ -83,7 +76,7 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = dao.read(entity.getId());
+        Icd readEntity = dao.getById(entity.getId());
 
         if (readEntity == null) {
             dao.insert(entity);
@@ -100,7 +93,7 @@ public class IcdService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd readEntity = dao.read(entity.getId());
+        Icd readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.delete(entity);
@@ -125,7 +118,7 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = dao.read(entity.getId());
+        Icd readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.update(entity);
