@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.repository;
 
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.ChannelName;
@@ -12,7 +13,7 @@ import ru.gsa.biointerface.repository.database.DataSource;
 @Component
 public class ChannelNameRepository extends AbstractRepository<ChannelName, Long> {
     @Autowired
-    public ChannelNameRepository(DataSource dataSource) {
-        super(dataSource);
+    public ChannelNameRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 }

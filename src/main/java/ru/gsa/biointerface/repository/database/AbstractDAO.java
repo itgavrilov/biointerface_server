@@ -23,8 +23,8 @@ public abstract class AbstractDAO<Entity, Id> {
     protected final Logger LOGGER = LoggerFactory.getLogger(genericType.getSimpleName() + "Repository");
     protected final SessionFactory sessionFactory;
 
-    protected AbstractDAO(DataSource dataSource) {
-        sessionFactory = dataSource.getSessionFactory();
+    protected AbstractDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void insert(Entity entity) throws Exception {

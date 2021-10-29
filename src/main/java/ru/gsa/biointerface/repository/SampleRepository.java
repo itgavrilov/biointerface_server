@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.repository;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,8 +20,8 @@ import java.util.List;
 @Component
 public class SampleRepository extends AbstractRepository<Sample, SampleID> {
     @Autowired
-    public SampleRepository(DataSource dataSource) {
-        super(dataSource);
+    public SampleRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
     public List<Sample> getAllByGraph(Channel channel) throws Exception {

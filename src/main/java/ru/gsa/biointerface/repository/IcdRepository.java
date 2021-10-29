@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.repository;
 
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Icd;
@@ -12,7 +13,7 @@ import ru.gsa.biointerface.repository.database.DataSource;
 @Component
 public class IcdRepository extends AbstractRepository<Icd, Long> {
     @Autowired
-    public IcdRepository(DataSource dataSource) {
-        super(dataSource);
+    public IcdRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 }

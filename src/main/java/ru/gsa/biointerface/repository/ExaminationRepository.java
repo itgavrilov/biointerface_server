@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.repository;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,8 +24,8 @@ public class ExaminationRepository extends AbstractRepository<Examination, Long>
     private Session session;
 
     @Autowired
-    public ExaminationRepository(DataSource dataSource) {
-        super(dataSource);
+    public ExaminationRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
     @Override
