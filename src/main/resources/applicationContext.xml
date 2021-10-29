@@ -18,53 +18,53 @@
 <!--  Repository  -->
     <bean id = "icdRepository"
           class="ru.gsa.biointerface.repository.IcdRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
     <bean id = "deviceRepository"
           class="ru.gsa.biointerface.repository.DeviceRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
     <bean id = "channelNameRepository"
           class="ru.gsa.biointerface.repository.ChannelNameRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
     <bean id = "patientRecordRepository"
           class="ru.gsa.biointerface.repository.PatientRecordRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
     <bean id = "examinationRepository"
           class="ru.gsa.biointerface.repository.ExaminationRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
     <bean id = "channelRepository"
           class="ru.gsa.biointerface.repository.ChannelRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
     <bean id = "sampleRepository"
           class="ru.gsa.biointerface.repository.SampleRepository">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg name = "dataSource" ref="dataSource" />
     </bean>
 <!--  Service  -->
     <bean id = "icdService"
           class="ru.gsa.biointerface.service.IcdService">
-        <constructor-arg ref="icdRepository" />
+        <constructor-arg name = "dao" ref="icdRepository" />
     </bean>
     <bean id = "deviceService"
           class="ru.gsa.biointerface.service.DeviceService">
-        <constructor-arg ref="deviceRepository" />
+        <constructor-arg name = "dao" ref="deviceRepository" />
     </bean>
     <bean id = "channelNameService"
           class="ru.gsa.biointerface.service.ChannelNameService">
-        <constructor-arg ref="channelNameRepository" />
+        <constructor-arg name = "dao" ref="channelNameRepository" />
     </bean>
     <bean id = "patientRecordService"
           class="ru.gsa.biointerface.service.PatientRecordService">
-        <constructor-arg ref="patientRecordRepository" />
+        <constructor-arg name = "dao" ref="patientRecordRepository" />
     </bean>
     <bean id = "examinationService"
           class="ru.gsa.biointerface.service.ExaminationService">
-        <constructor-arg ref="examinationRepository" />
-        <constructor-arg ref="channelRepository" />
-        <constructor-arg ref="sampleRepository" />
+        <constructor-arg name = "dao" ref="examinationRepository" />
+        <constructor-arg name = "daoChannel" ref="channelRepository" />
+        <constructor-arg name = "daoSample" ref="sampleRepository" />
     </bean>
 </beans>
