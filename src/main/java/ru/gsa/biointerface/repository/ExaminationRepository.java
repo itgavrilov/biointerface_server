@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.repository.database.AbstractRepository;
-import ru.gsa.biointerface.repository.database.DataSource;
 import ru.gsa.biointerface.repository.exception.InsertException;
 import ru.gsa.biointerface.repository.exception.ReadException;
 import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;

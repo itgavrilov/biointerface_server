@@ -1,5 +1,8 @@
 package ru.gsa.biointerface.domain.entity;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,6 +15,8 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
+@Scope("prototype")
 @Entity(name = "channelName")
 @Table()
 public class ChannelName implements Serializable, Comparable<ChannelName> {

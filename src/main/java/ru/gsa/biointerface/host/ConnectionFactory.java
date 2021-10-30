@@ -3,7 +3,9 @@ package ru.gsa.biointerface.host;
 import com.fazecast.jSerialComm.SerialPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
+import ru.gsa.biointerface.SpringConfig;
 import ru.gsa.biointerface.domain.entity.Device;
 
 import java.util.ArrayList;
@@ -24,11 +26,10 @@ public class ConnectionFactory {
         connections.clear();
         List<SerialPort> serialPorts = getSerialPortsWithDevises();
         for (SerialPort serialPort : serialPorts) {
-            try {
-                ConnectionHandler connection = new ConnectionHandler(serialPort);
+            try(AnnotationConfigApplicationContext context
+                        = new AnnotationConfigApplicationContext(SpringConfig.class)) {
+                ConnectionHandler connection = context.getBean(ConnectionHandler.class, serialPort);
                 connections.add(connection);
-            } catch (Exception e) {
-                LOGGER.error("Error connection to serialPort(SystemPortName={})", serialPort.getSystemPortName(), e);
             }
         }
         LOGGER.info("Scanning devices");

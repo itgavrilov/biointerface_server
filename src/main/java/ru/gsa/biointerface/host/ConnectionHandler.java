@@ -3,6 +3,7 @@ package ru.gsa.biointerface.host;
 import com.fazecast.jSerialComm.SerialPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.*;
@@ -31,29 +32,29 @@ import java.util.Objects;
 @Scope("prototype")
 public class ConnectionHandler implements DataCollector, Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionHandler.class);
-    private final SerialPortHost serialPortHost;
+    @Autowired
     private ExaminationService examinationService;
+    @Autowired
     private DeviceService deviceService;
+    private final SerialPortHost serialPortHost;
     private final List<Cash> cashList = new ArrayList<>();
     private final List<ChannelName> channelNames = new ArrayList<>();
-
     private Device device;
     private PatientRecord patientRecord;
     private Examination examination;
     private String comment;
     private boolean flagTransmission = false;
 
+
     public ConnectionHandler(SerialPort serialPort) throws Exception {
         if (serialPort == null)
             throw new NullPointerException("SerialPort is null");
 
-//        examinationService = ExaminationService.getInstance();
-//        deviceService = DeviceService.getInstance();
         serialPortHost = new SerialPortHost(serialPort);
         serialPortHost.handler(new SerialPortHandler(this));
-
         serialPortHost.start();
         serialPortHost.sendPackage(ControlMessages.GET_CONFIG);
+        LOGGER.info("Crate connection to serialPort(SystemPortName={})", serialPort.getSystemPortName());
     }
 
     public PatientRecord getPatientRecord() {

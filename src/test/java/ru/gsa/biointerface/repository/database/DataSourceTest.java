@@ -13,7 +13,8 @@ class DataSourceTest {
     void getSessionFactory() {
         try(AnnotationConfigApplicationContext context
                     = new AnnotationConfigApplicationContext(SpringConfig.class)) {
-            PatientRecordService service = context.getBean("patientRecordService", PatientRecordService.class);
+            //PatientRecordService service = context.getBean("patientRecordService", PatientRecordService.class);
+            PatientRecordService service = context.getBean(PatientRecordService.class);
 
             try {
                 PatientRecord entity = service.getById((long)3);

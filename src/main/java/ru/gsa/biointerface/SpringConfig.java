@@ -5,15 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import ru.gsa.biointerface.domain.entity.*;
-import ru.gsa.biointerface.repository.database.DataSource;
-import ru.gsa.biointerface.repository.exception.NoConnectionException;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 29/10/2021
  */
 @Configuration
-@ComponentScan("ru.gsa.biointerface.repository")
-@ComponentScan("ru.gsa.biointerface.service")
+@ComponentScan("ru.gsa.biointerface")
 public class SpringConfig {
     @Bean()
     SessionFactory sessionFactory() {

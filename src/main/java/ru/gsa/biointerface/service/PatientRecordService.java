@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 @Component
 public class PatientRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientRecordService.class);
+
     private final PatientRecordRepository dao;
 
     @Autowired
