@@ -17,14 +17,14 @@ public interface Server<Input, Output, Interface> {
      */
     void stop() throws Exception;
 
-    /**
-     * Обработчик приходящих пакетов
-     * {@link ChannelHandler} используется для обработки запросов.
-     *
-     * @param handler - обработчик
-     * @return - объект сервера
-     */
-    Server<Input, Output, Interface> handler(ChannelHandler<Input, Output, Interface> handler);
+//    /**
+//     * Обработчик приходящих пакетов
+//     * {@link ChannelHandler} используется для обработки запросов.
+//     *
+//     * @param handler - обработчик
+//     * @return - объект сервера
+//     */
+//    Server<Input, Output, Interface> handler(ChannelHandler<Input, Output, Interface> handler);
 
     /**
      * Устанавливает задержку для добавления пакетов в буффур

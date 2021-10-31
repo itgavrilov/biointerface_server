@@ -15,7 +15,6 @@ import ru.gsa.biointerface.host.exception.HostNotRunningException;
 import ru.gsa.biointerface.host.exception.HostNotTransmissionException;
 import ru.gsa.biointerface.host.serialport.ControlMessages;
 import ru.gsa.biointerface.host.serialport.DataCollector;
-import ru.gsa.biointerface.host.serialport.SerialPortHandler;
 import ru.gsa.biointerface.host.serialport.SerialPortHost;
 import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
@@ -28,10 +27,10 @@ import java.util.Objects;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 
-@Component
+@Component()
 @Scope("prototype")
-public class ConnectionHandler implements DataCollector, Connection {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionHandler.class);
+public class SerialPortHostHandler implements DataCollector, HostHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerialPortHostHandler.class);
     @Autowired
     private ExaminationService examinationService;
     @Autowired
@@ -45,20 +44,12 @@ public class ConnectionHandler implements DataCollector, Connection {
     private String comment;
     private boolean flagTransmission = false;
 
-
-    public ConnectionHandler(SerialPort serialPort) throws Exception {
+    public SerialPortHostHandler(SerialPort serialPort) {
         if (serialPort == null)
             throw new NullPointerException("SerialPort is null");
 
-        serialPortHost = new SerialPortHost(serialPort);
-        serialPortHost.handler(new SerialPortHandler(this));
-        serialPortHost.start();
-        serialPortHost.sendPackage(ControlMessages.GET_CONFIG);
+        serialPortHost = new SerialPortHost(serialPort, this);
         LOGGER.info("Crate connection to serialPort(SystemPortName={})", serialPort.getSystemPortName());
-    }
-
-    public PatientRecord getPatientRecord() {
-        return patientRecord;
     }
 
     @Override
@@ -76,27 +67,9 @@ public class ConnectionHandler implements DataCollector, Connection {
         return device.getAmountChannels();
     }
 
+    @Override
     public Device getDevice() {
         return device;
-    }
-
-    @Override
-    public void setDevice(int serialNumber, int amountChannels) {
-        if (serialNumber <= 0)
-            throw new IllegalArgumentException("SerialNumber <= 0");
-        if (amountChannels <= 0 || amountChannels > 8)
-            throw new IllegalArgumentException("amountChannels <= 0 or > 8");
-
-        if (device == null || device.getId() != serialNumber) {
-            device = new Device(serialNumber, amountChannels);
-            examination = null;
-            patientRecord = null;
-
-            for (int i = 0; i < device.getAmountChannels(); i++) {
-                cashList.add(new SampleCash());
-                channelNames.add(null);
-            }
-        }
     }
 
     @Override
@@ -114,20 +87,6 @@ public class ConnectionHandler implements DataCollector, Connection {
             throw new NullPointerException("Device is null");
 
         cashList.get(number).setListener(listener);
-    }
-
-    @Override
-    public void setSampleInChannel(int number, int value) {
-        if (number >= cashList.size() || number < 0)
-            throw new IllegalArgumentException("Number > amount cashList");
-        if (device == null)
-            throw new NullPointerException("Device is null");
-
-        cashList.get(number).add(value);
-
-        if (isRecording()) {
-            examination.setSampleInChannel(number, value);
-        }
     }
 
     @Override
@@ -173,7 +132,8 @@ public class ConnectionHandler implements DataCollector, Connection {
         }
     }
 
-    public void connect() throws Exception {
+    @Override
+    public void connect() {
         if (!isConnected()) {
             try {
                 serialPortHost.start();
@@ -181,7 +141,6 @@ public class ConnectionHandler implements DataCollector, Connection {
                 LOGGER.info("Connecting to device");
             } catch (Exception e) {
                 LOGGER.error("Host is not running", e);
-                throw e;
             }
         } else {
             LOGGER.warn("Device is already connected");
@@ -189,10 +148,14 @@ public class ConnectionHandler implements DataCollector, Connection {
     }
 
     @Override
-    public void disconnect() throws Exception {
+    public void disconnect() {
         if (isConnected()) {
             if (isTransmission()) {
-                transmissionStop();
+                try {
+                    transmissionStop();
+                } catch (Exception e) {
+                    LOGGER.error("Error transmissionStop: ", e);
+                }
             }
             serialPortHost.stop();
             LOGGER.info("Disconnecting from device");
@@ -237,11 +200,6 @@ public class ConnectionHandler implements DataCollector, Connection {
         serialPortHost.sendPackage(ControlMessages.STOP_TRANSMISSION);
         flagTransmission = false;
         LOGGER.info("Stop transmission");
-    }
-
-    @Override
-    public void setFlagTransmission() {
-        flagTransmission = true;
     }
 
     @Override
@@ -324,10 +282,48 @@ public class ConnectionHandler implements DataCollector, Connection {
     }
 
     @Override
+    public void setDevice(int serialNumber, int amountChannels) {
+        if (serialNumber <= 0)
+            throw new IllegalArgumentException("SerialNumber <= 0");
+        if (amountChannels <= 0 || amountChannels > 8)
+            throw new IllegalArgumentException("amountChannels <= 0 or > 8");
+
+        if (device == null || device.getId() != serialNumber) {
+            device = new Device(serialNumber, amountChannels);
+            examination = null;
+            patientRecord = null;
+
+            for (int i = 0; i < device.getAmountChannels(); i++) {
+                cashList.add(new SampleCash());
+                channelNames.add(null);
+            }
+        }
+    }
+
+    @Override
+    public void setSampleInChannel(int number, int value) {
+        if (number >= cashList.size() || number < 0)
+            throw new IllegalArgumentException("Number > amount cashList");
+        if (device == null)
+            throw new NullPointerException("Device is null");
+
+        cashList.get(number).add(value);
+
+        if (isRecording()) {
+            examination.setSampleInChannel(number, value);
+        }
+    }
+
+    @Override
+    public void setFlagTransmission() {
+        flagTransmission = true;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ConnectionHandler that = (ConnectionHandler) o;
+        SerialPortHostHandler that = (SerialPortHostHandler) o;
         return Objects.equals(serialPortHost, that.serialPortHost);
     }
 

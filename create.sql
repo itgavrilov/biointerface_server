@@ -21,7 +21,7 @@ CREATE TABLE patientRecord (
 id INTEGER PRIMARY KEY NOT NULL,
 secondName VARCHAR(35) NOT NULL,
 firstName VARCHAR(35) NOT NULL,
-middleName VARCHAR(35),
+patronymic VARCHAR(35),
 birthday DATE  NOT NULL,
 icd_id INTEGER,
 comment TEXT,
@@ -49,9 +49,9 @@ FOREIGN KEY (channelName_id) REFERENCES channelName(id)
 
 CREATE TABLE sample (
 id INTEGER NOT NULL,
-number INTEGER NOT NULL,
+channel_id INTEGER NOT NULL,
 examination_id INTEGER NOT NULL,
 value INTEGER NOT NULL,
-PRIMARY KEY (id, number, examination_id),
-FOREIGN KEY (number, examination_id) REFERENCES channel(number, examination_id) ON DELETE CASCADE
+PRIMARY KEY (id, channel_id, examination_id),
+FOREIGN KEY (channel_id, examination_id) REFERENCES channel(id, examination_id) ON DELETE CASCADE
 );

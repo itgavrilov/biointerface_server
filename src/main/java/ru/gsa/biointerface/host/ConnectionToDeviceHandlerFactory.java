@@ -3,9 +3,9 @@ package ru.gsa.biointerface.host;
 import com.fazecast.jSerialComm.SerialPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
-import ru.gsa.biointerface.SpringConfig;
 import ru.gsa.biointerface.domain.entity.Device;
 
 import java.util.ArrayList;
@@ -15,22 +15,22 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
- * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
+ * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 28.10.2021.
  */
 @Component
-public class ConnectionFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactory.class);
-    private final List<ConnectionHandler> connections = new ArrayList<>();
+public class ConnectionToDeviceHandlerFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionToDeviceHandlerFactory.class);
+    private final List<HostHandler> hostHandlers = new ArrayList<>();
+    @Autowired
+    private AnnotationConfigApplicationContext context;
 
     public void scanningSerialPort() {
-        connections.clear();
+        hostHandlers.clear();
         List<SerialPort> serialPorts = getSerialPortsWithDevises();
         for (SerialPort serialPort : serialPorts) {
-            try(AnnotationConfigApplicationContext context
-                        = new AnnotationConfigApplicationContext(SpringConfig.class)) {
-                ConnectionHandler connection = context.getBean(ConnectionHandler.class, serialPort);
-                connections.add(connection);
-            }
+            HostHandler hostHandler = context.getBean(HostHandler.class, serialPort);
+            hostHandler.connect();
+            hostHandlers.add(hostHandler);
         }
         LOGGER.info("Scanning devices");
     }
@@ -42,7 +42,7 @@ public class ConnectionFactory {
     }
 
     public List<Device> getDevices() {
-        return connections.stream()
+        return hostHandlers.stream()
                 .peek(o -> {
                     if (o.isConnected()) {
                         try {
@@ -52,19 +52,19 @@ public class ConnectionFactory {
                         }
                     }
                 })
-                .filter(ConnectionHandler::isAvailableDevice)
-                .map(ConnectionHandler::getDevice)
+                .filter(HostHandler::isAvailableDevice)
+                .map(HostHandler::getDevice)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    public Connection getConnection(Device device) {
-        Connection connection = connections.stream()
+    public HostHandler getConnection(Device device) {
+        HostHandler hostHandler = hostHandlers.stream()
                 .filter(o -> device.equals(o.getDevice()))
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
         LOGGER.info("Get available devices");
 
-        return connection;
+        return hostHandler;
     }
 }

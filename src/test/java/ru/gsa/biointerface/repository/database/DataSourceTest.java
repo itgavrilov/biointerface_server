@@ -2,7 +2,7 @@ package ru.gsa.biointerface.repository.database;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.gsa.biointerface.SpringConfig;
+import ru.gsa.biointerface.configuration.SpringConfig;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.service.PatientRecordService;
 

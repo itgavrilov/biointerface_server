@@ -19,14 +19,14 @@ public abstract class AbstractServer<Input, Output, Interface> extends AbstractL
     protected volatile ChannelHandler<Input, Output, Interface> handler;
     private volatile int writeDelay = 0; //миллисекунды
 
-    @Override
-    public Server<Input, Output, Interface> handler(ChannelHandler<Input, Output, Interface> handler) {
-        if (handler == null)
-            throw new NullPointerException("handler");
-
-        this.handler = handler;
-        return this;
-    }
+//    @Override
+//    protected Server<Input, Output, Interface> handler(ChannelHandler<Input, Output, Interface> handler) {
+//        if (handler == null)
+//            throw new NullPointerException("handler");
+//
+//        this.handler = handler;
+//        return this;
+//    }
 
     @Override
     public Server<Input, Output, Interface> setWriteDelay(int delay) {
@@ -59,7 +59,7 @@ public abstract class AbstractServer<Input, Output, Interface> extends AbstractL
     }
 
     @Override
-    protected void doStart() throws Exception {
+    protected void doStart() {
         super.doStart();
         //Запуск потоков чтения и записи
         Thread writeThread = new WriteThread();
@@ -74,7 +74,7 @@ public abstract class AbstractServer<Input, Output, Interface> extends AbstractL
     }
 
     @Override
-    protected void doStop() throws Exception {
+    protected void doStop() {
         super.doStop();
         sendBuffer.clear();
         readBuffer.clear();

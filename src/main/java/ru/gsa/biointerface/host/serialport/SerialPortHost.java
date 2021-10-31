@@ -5,6 +5,8 @@ import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.host.serialport.packets.*;
 import ru.gsa.biointerface.host.serialport.serverByPuchkov.AbstractServer;
 
@@ -18,9 +20,17 @@ public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> i
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialPortHost.class);
     private final SerialPort serialPort;
 
-    public SerialPortHost(SerialPort serialPort) {
+    public SerialPortHost(SerialPort serialPort, DataCollector dataCollector) {
         super();
+
+        if(serialPort == null)
+            throw new NullPointerException("SerialPort is null");
+        if(dataCollector == null)
+            throw new NullPointerException("DataCollector is null");
         this.serialPort = serialPort;
+
+        handler = new SerialPortHandler(dataCollector);
+        LOGGER.info("Handler for serialPort(SystemPortName={}) is started", serialPort.getSystemPortName());
     }
 
     public boolean portIsOpen() {

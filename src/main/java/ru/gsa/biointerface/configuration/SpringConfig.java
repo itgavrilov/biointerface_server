@@ -1,10 +1,11 @@
-package ru.gsa.biointerface;
+package ru.gsa.biointerface.configuration;
 
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import ru.gsa.biointerface.domain.entity.*;
+
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 29/10/2021
