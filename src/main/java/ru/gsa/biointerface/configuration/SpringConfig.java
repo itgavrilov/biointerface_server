@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.configuration;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

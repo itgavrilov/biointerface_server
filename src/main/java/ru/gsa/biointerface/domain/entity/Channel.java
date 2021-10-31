@@ -16,15 +16,15 @@ import java.util.Objects;
 public class Channel implements Serializable, Comparable<Channel> {
     @NotNull(message = "Id can't be null")
     @Id
-    int id;
+    Integer id;
 
     @NotNull(message = "Examination can't be null")
     @Id
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
     private Examination examination;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "channelName_id", referencedColumnName = "id")
     private ChannelName channelName;
 
@@ -36,29 +36,29 @@ public class Channel implements Serializable, Comparable<Channel> {
 
     }
 
-    public Channel(int id, Examination examination, ChannelName channelName, List<Sample> samples) {
+    public Channel(Integer id, Examination examination, ChannelName channelName, List<Sample> samples) {
         this.id = id;
         this.examination = examination;
         this.channelName = channelName;
         this.samples = samples;
     }
 
-    public Channel(int id, Examination examination, ChannelName channelName) {
+    public Channel(Integer id, Examination examination, ChannelName channelName) {
         this.id = id;
         this.examination = examination;
         this.channelName = channelName;
         this.samples = new ArrayList<>();
     }
 
-    public ChannelID getPK(){
+    public ChannelID getPK() {
         return new ChannelID(id, examination);
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -91,7 +91,7 @@ public class Channel implements Serializable, Comparable<Channel> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Channel that = (Channel) o;
-        return id == that.id && Objects.equals(examination, that.examination);
+        return Objects.equals(id, that.id) && Objects.equals(examination, that.examination);
     }
 
     @Override

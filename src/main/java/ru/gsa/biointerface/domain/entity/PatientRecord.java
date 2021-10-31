@@ -1,8 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -18,8 +15,6 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
-@Scope("prototype")
 @Entity(name = "patientRecord")
 @Table(name = "patientRecord")
 public class PatientRecord implements Serializable, Comparable<PatientRecord> {
@@ -52,7 +47,7 @@ public class PatientRecord implements Serializable, Comparable<PatientRecord> {
     @Column(nullable = false)
     private Calendar birthday;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "icd_id", referencedColumnName = "id")
     private Icd icd;
 
@@ -191,6 +186,7 @@ public class PatientRecord implements Serializable, Comparable<PatientRecord> {
     @Override
     public String toString() {
         String icd_id = "-";
+
         String birthday = this.getBirthdayInLocalDate().format(
                 DateTimeFormatter.ofPattern("dd.MM.yyyy")
         );
@@ -202,7 +198,7 @@ public class PatientRecord implements Serializable, Comparable<PatientRecord> {
                 "id=" + id +
                 ", secondName='" + secondName + '\'' +
                 ", firstName='" + firstName + '\'' +
-                ", middleName='" + patronymic + '\'' +
+                ", patronymic='" + patronymic + '\'' +
                 ", birthday=" + birthday +
                 ", icd_id=" + icd_id +
                 '}';

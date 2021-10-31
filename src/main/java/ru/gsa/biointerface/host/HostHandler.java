@@ -19,7 +19,7 @@ public interface HostHandler {
 
     void connect();
 
-    void disconnect();
+    void disconnect() throws Exception;
 
     boolean isConnected();
 

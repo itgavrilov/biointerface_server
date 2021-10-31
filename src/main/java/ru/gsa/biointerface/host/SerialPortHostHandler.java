@@ -31,13 +31,13 @@ import java.util.Objects;
 @Scope("prototype")
 public class SerialPortHostHandler implements DataCollector, HostHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialPortHostHandler.class);
+    private final SerialPortHost serialPortHost;
+    private final List<Cash> cashList = new ArrayList<>();
+    private final List<ChannelName> channelNames = new ArrayList<>();
     @Autowired
     private ExaminationService examinationService;
     @Autowired
     private DeviceService deviceService;
-    private final SerialPortHost serialPortHost;
-    private final List<Cash> cashList = new ArrayList<>();
-    private final List<ChannelName> channelNames = new ArrayList<>();
     private Device device;
     private PatientRecord patientRecord;
     private Examination examination;
@@ -148,14 +148,13 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
     }
 
     @Override
-    public void disconnect() {
+    public void disconnect() throws Exception {
         if (isConnected()) {
             if (isTransmission()) {
-                try {
-                    transmissionStop();
-                } catch (Exception e) {
-                    LOGGER.error("Error transmissionStop: ", e);
+                if (isRecording()) {
+                    recordingStop();
                 }
+                transmissionStop();
             }
             serialPortHost.stop();
             LOGGER.info("Disconnecting from device");
@@ -197,6 +196,10 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         if (!serialPortHost.isRunning())
             throw new HostNotRunningException();
 
+        if (isRecording()) {
+            recordingStop();
+        }
+
         serialPortHost.sendPackage(ControlMessages.STOP_TRANSMISSION);
         flagTransmission = false;
         LOGGER.info("Stop transmission");
@@ -221,17 +224,11 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
                     patientRecord,
                     device,
                     comment);
-            patientRecord.getExaminations().add(examination);
-            device.getExaminations().add(examination);
 
             for (int i = 0; i < device.getAmountChannels(); i++) {
                 ChannelName channelName = channelNames.get(i);
                 Channel channel = new Channel(i, examination, channelName);
                 examination.getChannels().add(channel);
-
-                if (channelName != null) {
-                    channelName.getChannels().add(channel);
-                }
             }
 
             try {

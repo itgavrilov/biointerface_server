@@ -1,10 +1,6 @@
 package ru.gsa.biointerface.domain.entity;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -21,8 +17,6 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
-@Scope("prototype")
 @Entity(name = "examination")
 @Table(name = "examination")
 public class Examination implements Serializable, Comparable<Examination> {
@@ -38,12 +32,12 @@ public class Examination implements Serializable, Comparable<Examination> {
     private Date startTime;
 
     @NotNull(message = "Patient record can't be null")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "patientRecord_id", referencedColumnName = "id", nullable = false)
     private PatientRecord patientRecord;
 
     @NotNull(message = "Device can't be null")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "device_id", referencedColumnName = "id", nullable = false)
     private Device device;
 

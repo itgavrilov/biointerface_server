@@ -46,11 +46,11 @@ public abstract class AbstractLifeCycle implements LifeCycle {
     @Override
     public final void stop() {
         synchronized (_lock) {
-                if (_state == __STOPPING || _state == __STOPPED)
-                    return;
-                setStopping();
-                doStop();
-                setStopped();
+            if (_state == __STOPPING || _state == __STOPPED)
+                return;
+            setStopping();
+            doStop();
+            setStopped();
         }
     }
 
