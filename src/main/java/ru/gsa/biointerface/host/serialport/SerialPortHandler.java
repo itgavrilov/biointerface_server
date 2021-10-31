@@ -18,7 +18,7 @@ public class SerialPortHandler implements ChannelHandler<Packet, Packet, SerialP
 
     public SerialPortHandler(DataCollector dataCollector) {
         if (dataCollector == null)
-            throw new NullPointerException("Devise is null");
+            throw new NullPointerException("DataCollector is null");
 
         this.dataCollector = dataCollector;
     }

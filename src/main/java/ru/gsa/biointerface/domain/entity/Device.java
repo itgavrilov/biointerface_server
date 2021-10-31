@@ -1,5 +1,8 @@
 package ru.gsa.biointerface.domain.entity;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -13,6 +16,8 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
+@Scope("prototype")
 @Entity(name = "device")
 @Table(name = "device")
 public class Device implements Serializable, Comparable<Device> {
@@ -45,10 +50,10 @@ public class Device implements Serializable, Comparable<Device> {
         this.examinations = examinations;
     }
 
-    public Device(long id, int amountChannels, String comment) {
+    public Device(long id, int amountChannels) {
         this.id = id;
         this.amountChannels = amountChannels;
-        this.comment = comment;
+        this.comment = null;
         this.examinations = new ArrayList<>();
     }
 

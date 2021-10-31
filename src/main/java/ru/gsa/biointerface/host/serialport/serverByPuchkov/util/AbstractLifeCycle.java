@@ -26,41 +26,31 @@ public abstract class AbstractLifeCycle implements LifeCycle {
         return FAILED;
     }
 
-    protected void doStart() throws Exception {
+    protected void doStart() {
     }
 
-    protected void doStop() throws Exception {
+    protected void doStop() {
     }
 
     @Override
-    public final void start() throws Exception {
+    public final void start() {
         synchronized (_lock) {
-            try {
-                if (_state == __STARTED || _state == __STARTING)
-                    return;
-                setStarting();
-                doStart();
-                setStarted();
-            } catch (Throwable e) {
-                setFailed(e);
-                throw e;
-            }
+            if (_state == __STARTED || _state == __STARTING)
+                return;
+            setStarting();
+            doStart();
+            setStarted();
         }
     }
 
     @Override
-    public final void stop() throws Exception {
+    public final void stop() {
         synchronized (_lock) {
-            try {
-                if (_state == __STOPPING || _state == __STOPPED)
-                    return;
-                setStopping();
-                doStop();
-                setStopped();
-            } catch (Throwable e) {
-                setFailed(e);
-                throw e;
-            }
+            if (_state == __STOPPING || _state == __STOPPED)
+                return;
+            setStopping();
+            doStop();
+            setStopped();
         }
     }
 

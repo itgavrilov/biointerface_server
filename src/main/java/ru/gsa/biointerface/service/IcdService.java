@@ -1,10 +1,14 @@
-package ru.gsa.biointerface.services;
+package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.repository.IcdRepository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -12,35 +16,24 @@ import java.util.NoSuchElementException;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class IcdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(IcdService.class);
-    private static IcdService instance = null;
     private final IcdRepository dao;
 
-    private IcdService() throws Exception {
-        dao = IcdRepository.getInstance();
+    @Autowired
+    private IcdService(IcdRepository dao) {
+        this.dao = dao;
     }
 
-    public static IcdService getInstance() throws Exception {
-        if (instance == null) {
-            instance = new IcdService();
-        }
-
-        return instance;
+    @PostConstruct
+    private void init(){
+        LOGGER.info("IcdService is init");
     }
 
-    public Icd create(String name, int version, String comment) throws Exception {
-        if (name == null)
-            throw new NullPointerException("Name is null");
-        if (name.isBlank())
-            throw new IllegalArgumentException("Name is blank");
-        if (version <= 0)
-            throw new IllegalArgumentException("Version <= 0");
-
-        Icd entity = new Icd(name, version, comment);
-        LOGGER.info("New icd created");
-
-        return entity;
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("IcdService is destruction");
     }
 
     public List<Icd> getAll() throws Exception {
@@ -55,11 +48,13 @@ public class IcdService {
         return entities;
     }
 
-    public Icd getById(long id) throws Exception {
+    public Icd getById(Long id) throws Exception {
+        if(id == null)
+            throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd entity = dao.read(id);
+        Icd entity = dao.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get icd(id={}) from database", entity.getId());
@@ -83,7 +78,7 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = dao.read(entity.getId());
+        Icd readEntity = dao.getById(entity.getId());
 
         if (readEntity == null) {
             dao.insert(entity);
@@ -100,7 +95,7 @@ public class IcdService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd readEntity = dao.read(entity.getId());
+        Icd readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.delete(entity);
@@ -125,7 +120,7 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = dao.read(entity.getId());
+        Icd readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.update(entity);

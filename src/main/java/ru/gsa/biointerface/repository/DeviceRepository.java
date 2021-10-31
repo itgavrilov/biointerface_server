@@ -1,23 +1,18 @@
 package ru.gsa.biointerface.repository;
 
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.repository.database.AbstractRepository;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class DeviceRepository extends AbstractRepository<Device, Long> {
-    private static DeviceRepository dao;
-
-    private DeviceRepository() throws Exception {
-        super();
-    }
-
-    public static DeviceRepository getInstance() throws Exception {
-        if (dao == null) {
-            dao = new DeviceRepository();
-        }
-
-        return dao;
+    @Autowired
+    public DeviceRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 }

@@ -15,7 +15,7 @@ import java.lang.reflect.ParameterizedType;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-public abstract class AbstractDAO<Entity, Key> {
+public abstract class AbstractDAO<Entity, Id> {
     @SuppressWarnings("unchecked")
     protected final Class<Entity> genericType = (Class<Entity>)
             ((ParameterizedType) getClass().getGenericSuperclass())
@@ -23,8 +23,8 @@ public abstract class AbstractDAO<Entity, Key> {
     protected final Logger LOGGER = LoggerFactory.getLogger(genericType.getSimpleName() + "Repository");
     protected final SessionFactory sessionFactory;
 
-    protected AbstractDAO() throws Exception {
-        sessionFactory = DatabaseHandler.getInstance().getSessionFactory();
+    protected AbstractDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public void insert(Entity entity) throws Exception {
@@ -42,14 +42,14 @@ public abstract class AbstractDAO<Entity, Key> {
         }
     }
 
-    public Entity read(Key key) throws Exception {
-        if (key == null)
+    public Entity getById(Id id) throws Exception {
+        if (id == null)
             throw new NullPointerException("Key is null");
 
         Entity entity;
 
         try (final Session session = sessionFactory.openSession()) {
-            entity = session.get(genericType, (Serializable) key);
+            entity = session.get(genericType, (Serializable) id);
             LOGGER.info("Entity read successful");
         } catch (Exception e) {
             LOGGER.error("Read entity error", e);

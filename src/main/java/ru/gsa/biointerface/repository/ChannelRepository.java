@@ -1,7 +1,10 @@
 package ru.gsa.biointerface.repository;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
 import ru.gsa.biointerface.domain.entity.Examination;
@@ -13,19 +16,11 @@ import java.util.List;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class ChannelRepository extends AbstractRepository<Channel, ChannelID> {
-    private static ChannelRepository dao;
-
-    private ChannelRepository() throws Exception {
-        super();
-    }
-
-    public static ChannelRepository getInstance() throws Exception {
-        if (dao == null) {
-            dao = new ChannelRepository();
-        }
-
-        return dao;
+    @Autowired
+    public ChannelRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
     public List<Channel> getAllByExamination(Examination examination) throws Exception {

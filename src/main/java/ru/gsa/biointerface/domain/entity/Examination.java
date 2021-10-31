@@ -1,11 +1,11 @@
 package ru.gsa.biointerface.domain.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -22,12 +22,7 @@ import java.util.Objects;
 public class Examination implements Serializable, Comparable<Examination> {
     @NotNull(message = "Id can't be null")
     @Id
-    @GeneratedValue()
-//    @GeneratedValue(generator = "sqlite_examination")
-//    @TableGenerator(name = "sqlite_examination", table = "sqlite_sequence",
-//            pkColumnName = "name", valueColumnName = "seq",
-//            pkColumnValue = "examination",
-//            initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotNull(message = "Start time can't be null")
@@ -37,12 +32,12 @@ public class Examination implements Serializable, Comparable<Examination> {
     private Date startTime;
 
     @NotNull(message = "Patient record can't be null")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "patientRecord_id", referencedColumnName = "id", nullable = false)
     private PatientRecord patientRecord;
 
     @NotNull(message = "Device can't be null")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "device_id", referencedColumnName = "id", nullable = false)
     private Device device;
 
@@ -54,7 +49,6 @@ public class Examination implements Serializable, Comparable<Examination> {
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
 
-    @AssertTrue
     @Transient
     private boolean recording = false;
 
@@ -70,18 +64,9 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.channels = channels;
     }
 
-    public Examination(Date startTime, PatientRecord patientRecord, Device device, String comment, List<Channel> channels) {
+    public Examination(PatientRecord patientRecord, Device device, String comment) {
         this.id = -1;
-        this.startTime = startTime;
-        this.patientRecord = patientRecord;
-        this.device = device;
-        this.comment = comment;
-        this.channels = channels;
-    }
-
-    public Examination(Date startTime, PatientRecord patientRecord, Device device, String comment) {
-        this.id = -1;
-        this.startTime = startTime;
+        this.startTime = Timestamp.valueOf(LocalDateTime.now());
         this.patientRecord = patientRecord;
         this.device = device;
         this.comment = comment;

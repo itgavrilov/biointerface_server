@@ -1,45 +1,39 @@
-package ru.gsa.biointerface.services;
+package ru.gsa.biointerface.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.exception.InsertException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
 public class ChannelNameService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelNameService.class);
-    private static ChannelNameService instance = null;
     private final ChannelNameRepository dao;
 
-    private ChannelNameService() throws Exception {
-        dao = ChannelNameRepository.getInstance();
+    @Autowired
+    private ChannelNameService(ChannelNameRepository dao) {
+        this.dao = dao;
     }
 
-    public static ChannelNameService getInstance() throws Exception {
-        if (instance == null) {
-            instance = new ChannelNameService();
-        }
-
-        return instance;
+    @PostConstruct
+    private void init(){
+        LOGGER.info("ChannelNameService is init");
     }
 
-    public ChannelName create(String name, String comment) throws Exception {
-        if (name == null)
-            throw new NullPointerException("Name is null");
-        if (name.isBlank())
-            throw new IllegalArgumentException("Name is blank");
-
-        ChannelName entity = new ChannelName(name, comment);
-        LOGGER.info("New channelName created");
-
-        return entity;
+    @PreDestroy
+    private void destroy(){
+        LOGGER.info("ChannelNameService is destruction");
     }
 
     public List<ChannelName> getAll() throws Exception {
@@ -54,11 +48,13 @@ public class ChannelNameService {
         return entities;
     }
 
-    public ChannelName getById(long id) throws Exception {
+    public ChannelName getById(Long id) throws Exception {
+        if(id == null)
+            throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        ChannelName entity = dao.read(id);
+        ChannelName entity = dao.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get channelName(id={}) from database", entity.getId());
@@ -80,7 +76,7 @@ public class ChannelNameService {
         if (entity.getChannels() == null)
             throw new NullPointerException("Channels is null");
 
-        ChannelName readEntity = dao.read(entity.getId());
+        ChannelName readEntity = dao.getById(entity.getId());
 
         if (readEntity == null) {
             dao.insert(entity);
@@ -97,7 +93,7 @@ public class ChannelNameService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        ChannelName readEntity = dao.read(entity.getId());
+        ChannelName readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.delete(entity);
@@ -120,7 +116,7 @@ public class ChannelNameService {
         if (entity.getChannels() == null)
             throw new NullPointerException("Channels is null");
 
-        ChannelName readEntity = dao.read(entity.getId());
+        ChannelName readEntity = dao.getById(entity.getId());
 
         if (readEntity != null) {
             dao.update(entity);

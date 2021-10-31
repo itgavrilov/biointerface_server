@@ -18,9 +18,17 @@ public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> i
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialPortHost.class);
     private final SerialPort serialPort;
 
-    public SerialPortHost(SerialPort serialPort) {
+    public SerialPortHost(SerialPort serialPort, DataCollector dataCollector) {
         super();
+
+        if (serialPort == null)
+            throw new NullPointerException("SerialPort is null");
+        if (dataCollector == null)
+            throw new NullPointerException("DataCollector is null");
         this.serialPort = serialPort;
+
+        handler = new SerialPortHandler(dataCollector);
+        LOGGER.info("Handler for serialPort(SystemPortName={}) is started", serialPort.getSystemPortName());
     }
 
     public boolean portIsOpen() {

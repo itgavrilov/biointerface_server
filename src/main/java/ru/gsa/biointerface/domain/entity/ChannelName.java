@@ -1,5 +1,8 @@
 package ru.gsa.biointerface.domain.entity;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,17 +15,14 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Component
+@Scope("prototype")
 @Entity(name = "channelName")
 @Table()
 public class ChannelName implements Serializable, Comparable<ChannelName> {
     @NotNull(message = "Id can't be null")
     @Id
-    @GeneratedValue()
-//    @GeneratedValue(generator = "sqlite_channel")
-//    @TableGenerator(name = "sqlite_channel", table = "sqlite_sequence",
-//            pkColumnName = "name", valueColumnName = "seq",
-//            pkColumnValue = "channelName",
-//            initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotNull(message = "Name can't be null")
