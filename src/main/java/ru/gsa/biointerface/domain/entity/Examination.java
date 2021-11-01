@@ -60,8 +60,8 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.startTime = Timestamp.valueOf(LocalDateTime.now());
         this.comment = comment;
         this.channels = new ArrayList<>();
-        patientRecord.addExamination(this);
-        device.addExamination(this);
+        this.device = device;
+        this.patientRecord = patientRecord;
     }
 
     public long getId() {
@@ -126,13 +126,7 @@ public class Examination implements Serializable, Comparable<Examination> {
         if (number >= channels.size())
             throw new IllegalArgumentException("I > amount channels");
 
-        if (channels.get(number).getChannelName() != null) {
-            channels.get(number).getChannelName().deleteChannel(channels.get(number));
-        }
-
-        if (channelName != null) {
-            channelName.addChannel(channels.get(number));
-        }
+        channels.get(number).setChannelName(channelName);
     }
 
     public void setSampleInChannel(int numberOfChannel, int value) {

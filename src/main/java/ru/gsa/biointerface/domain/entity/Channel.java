@@ -39,12 +39,8 @@ public class Channel implements Serializable, Comparable<Channel> {
     public Channel(Integer id, Examination examination, ChannelName channelName) {
         this.id = id;
         this.samples = new LinkedList<>();
-        if(examination != null) {
-            examination.addChannel(this);
-        }
-        if(channelName != null) {
-            channelName.addChannel(this);
-        }
+        this.examination = examination;
+        this.channelName = channelName;
     }
 
     public ChannelID getPK() {
