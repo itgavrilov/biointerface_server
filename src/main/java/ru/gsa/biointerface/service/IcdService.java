@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.repository.IcdRepository;
+import ru.gsa.biointerface.repository.impl.IcdRepositoryImpl;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -19,10 +19,10 @@ import java.util.NoSuchElementException;
 @Component
 public class IcdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(IcdService.class);
-    private final IcdRepository dao;
+    private final IcdRepositoryImpl dao;
 
     @Autowired
-    private IcdService(IcdRepository dao) {
+    private IcdService(IcdRepositoryImpl dao) {
         this.dao = dao;
     }
 

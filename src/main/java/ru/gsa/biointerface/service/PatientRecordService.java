@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.repository.PatientRecordRepository;
+import ru.gsa.biointerface.repository.impl.PatientRecordRepositoryImpl;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,10 +22,10 @@ import java.util.NoSuchElementException;
 public class PatientRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientRecordService.class);
 
-    private final PatientRecordRepository dao;
+    private final PatientRecordRepositoryImpl dao;
 
     @Autowired
-    private PatientRecordService(PatientRecordRepository dao) {
+    private PatientRecordService(PatientRecordRepositoryImpl dao) {
         this.dao = dao;
     }
 

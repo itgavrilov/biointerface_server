@@ -2,7 +2,7 @@ package ru.gsa.biointerface.host;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.gsa.biointerface.configuration.SpringConfig;
+import ru.gsa.biointerface.configuration.ApplicationConfiguration;
 import ru.gsa.biointerface.domain.entity.Device;
 
 import java.util.List;
@@ -14,7 +14,7 @@ class HostHandlerFactoryTest {
     @Test
     void getDevices() {
         try (AnnotationConfigApplicationContext context
-                     = new AnnotationConfigApplicationContext(SpringConfig.class)) {
+                     = new AnnotationConfigApplicationContext(ApplicationConfiguration.class)) {
             ConnectionToDeviceHandlerFactory connectionToDeviceHandlerFactory = context.getBean(ConnectionToDeviceHandlerFactory.class);
 
             try {

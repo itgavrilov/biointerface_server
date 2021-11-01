@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.repository.DeviceRepository;
+import ru.gsa.biointerface.repository.impl.DeviceRepositoryImpl;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -18,10 +18,10 @@ import java.util.List;
 @Component
 public class DeviceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
-    private final DeviceRepository dao;
+    private final DeviceRepositoryImpl dao;
 
     @Autowired
-    private DeviceService(DeviceRepository dao) {
+    private DeviceService(DeviceRepositoryImpl dao) {
         this.dao = dao;
     }
 

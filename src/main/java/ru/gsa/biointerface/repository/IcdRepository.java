@@ -1,18 +1,16 @@
 package ru.gsa.biointerface.repository;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.repository.database.AbstractRepository;
+
+import java.util.List;
 
 /**
- * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
+ * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
-@Component
-public class IcdRepository extends AbstractRepository<Icd, Long> {
-    @Autowired
-    public IcdRepository(SessionFactory sessionFactory) {
-        super(sessionFactory);
-    }
+public interface IcdRepository {
+    void insert(Icd icd) throws Exception;
+    Icd getById(Long id) throws Exception;
+    void update(Icd icd) throws Exception;
+    void delete(Icd icd) throws Exception;
+    List<Icd> getAll() throws Exception;
 }

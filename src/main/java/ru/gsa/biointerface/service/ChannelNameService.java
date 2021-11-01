@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.repository.ChannelNameRepository;
+import ru.gsa.biointerface.repository.impl.ChannelNameRepositoryImpl;
 import ru.gsa.biointerface.repository.exception.InsertException;
 
 import javax.annotation.PostConstruct;
@@ -19,10 +19,10 @@ import java.util.List;
 @Component
 public class ChannelNameService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelNameService.class);
-    private final ChannelNameRepository dao;
+    private final ChannelNameRepositoryImpl dao;
 
     @Autowired
-    private ChannelNameService(ChannelNameRepository dao) {
+    private ChannelNameService(ChannelNameRepositoryImpl dao) {
         this.dao = dao;
     }
 

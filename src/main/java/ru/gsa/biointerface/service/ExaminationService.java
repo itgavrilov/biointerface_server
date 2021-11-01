@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.repository.ChannelRepository;
-import ru.gsa.biointerface.repository.ExaminationRepository;
-import ru.gsa.biointerface.repository.SampleRepository;
+import ru.gsa.biointerface.repository.impl.ChannelRepositoryImpl;
+import ru.gsa.biointerface.repository.impl.ExaminationRepositoryImpl;
+import ru.gsa.biointerface.repository.impl.SampleRepositoryImpl;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,15 +22,15 @@ import java.util.List;
 @Component
 public class ExaminationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExaminationService.class);
-    private final ExaminationRepository dao;
-    private final ChannelRepository daoChannel;
-    private final SampleRepository daoSample;
+    private final ExaminationRepositoryImpl dao;
+    private final ChannelRepositoryImpl daoChannel;
+    private final SampleRepositoryImpl daoSample;
 
     @Autowired
     private ExaminationService(
-            ExaminationRepository dao,
-            ChannelRepository daoChannel,
-            SampleRepository daoSample
+            ExaminationRepositoryImpl dao,
+            ChannelRepositoryImpl daoChannel,
+            SampleRepositoryImpl daoSample
     ) {
         this.dao = dao;
         this.daoChannel = daoChannel;
@@ -184,7 +184,7 @@ public class ExaminationService {
         entity.setChannels(daoChannel.getAllByExamination(entity));
 
         for (Channel channel : entity.getChannels()) {
-            channel.setSamples(daoSample.getAllByGraph(channel));
+            channel.setSamples(daoSample.getAllByChannel(channel));
         }
 
         LOGGER.info("Examination(id={}) load with graphs from database", entity.getId());
