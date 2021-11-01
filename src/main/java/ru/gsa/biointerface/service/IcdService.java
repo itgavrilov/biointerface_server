@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.repository.impl.IcdRepositoryImpl;
+import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -19,11 +19,11 @@ import java.util.NoSuchElementException;
 @Component
 public class IcdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(IcdService.class);
-    private final IcdRepositoryImpl dao;
+    private final IcdRepository repository;
 
     @Autowired
-    private IcdService(IcdRepositoryImpl dao) {
-        this.dao = dao;
+    private IcdService(IcdRepository repository) {
+        this.repository = repository;
     }
 
     @PostConstruct
@@ -37,7 +37,7 @@ public class IcdService {
     }
 
     public List<Icd> getAll() throws Exception {
-        List<Icd> entities = dao.getAll();
+        List<Icd> entities = repository.findAll();
 
         if (entities.size() > 0) {
             LOGGER.info("Get all icds from database");
@@ -54,7 +54,7 @@ public class IcdService {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd entity = dao.getById(id);
+        Icd entity = repository.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get icd(id={}) from database", entity.getId());
@@ -78,10 +78,10 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = dao.getById(entity.getId());
+        Icd readEntity = repository.getById(entity.getId());
 
         if (readEntity == null) {
-            dao.insert(entity);
+            repository.save(entity);
             LOGGER.info("Icd(id={}) is recorded in database", entity.getId());
         } else {
             LOGGER.error("Icd(id={}) already exists in database", entity.getId());
@@ -95,10 +95,10 @@ public class IcdService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd readEntity = dao.getById(entity.getId());
+        Icd readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.delete(entity);
+            repository.delete(entity);
             LOGGER.info("Icd(id={}) is deleted in database", entity.getId());
         } else {
             LOGGER.error("Icd(id={}) not found in database", entity.getId());
@@ -120,10 +120,10 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = dao.getById(entity.getId());
+        Icd readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.update(entity);
+            repository.save(entity);
             LOGGER.info("Icd(id={}) updated in database", entity.getId());
         } else {
             LOGGER.error("Icd(id={}) not found in database", entity.getId());

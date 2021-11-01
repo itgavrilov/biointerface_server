@@ -13,11 +13,10 @@ class DataSourceTest {
     void getSessionFactory() {
         try (AnnotationConfigApplicationContext context
                      = new AnnotationConfigApplicationContext(ApplicationConfiguration.class)) {
-            //PatientRecordService service = context.getBean("patientRecordService", PatientRecordService.class);
             PatientRecordService service = context.getBean(PatientRecordService.class);
 
             try {
-                PatientRecord entity = service.getById((long) 3);
+                PatientRecord entity = service.getById(3L);
                 System.out.println(entity);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -3,13 +3,14 @@ package ru.gsa.biointerface.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.repository.impl.ChannelRepositoryImpl;
-import ru.gsa.biointerface.repository.impl.ExaminationRepositoryImpl;
-import ru.gsa.biointerface.repository.impl.SampleRepositoryImpl;
+import ru.gsa.biointerface.repository.ChannelRepository;
+import ru.gsa.biointerface.repository.ExaminationRepository;
+import ru.gsa.biointerface.repository.SampleRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,19 +23,19 @@ import java.util.List;
 @Component
 public class ExaminationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExaminationService.class);
-    private final ExaminationRepositoryImpl dao;
-    private final ChannelRepositoryImpl daoChannel;
-    private final SampleRepositoryImpl daoSample;
+    private final ExaminationRepository repository;
+    private final ChannelRepository channelRepository;
+    private final SampleRepository sampleRepository;
 
     @Autowired
     private ExaminationService(
-            ExaminationRepositoryImpl dao,
-            ChannelRepositoryImpl daoChannel,
-            SampleRepositoryImpl daoSample
+            ExaminationRepository repository,
+            ChannelRepository channelRepository,
+            SampleRepository sampleRepository
     ) {
-        this.dao = dao;
-        this.daoChannel = daoChannel;
-        this.daoSample = daoSample;
+        this.repository = repository;
+        this.channelRepository = channelRepository;
+        this.sampleRepository = sampleRepository;
     }
 
     @PostConstruct
@@ -48,7 +49,7 @@ public class ExaminationService {
     }
 
     public List<Examination> getAll() throws Exception {
-        List<Examination> entities = dao.getAll();
+        List<Examination> entities = repository.findAll();
 
         if (entities.size() > 0) {
             LOGGER.info("Get all examinations from database");
@@ -63,7 +64,7 @@ public class ExaminationService {
         if (patientRecord == null)
             throw new NullPointerException("PatientRecord is null");
 
-        List<Examination> entities = dao.getByPatientRecord(patientRecord);
+        List<Examination> entities = repository.findAllByPatientRecord(patientRecord);
 
         if (entities.size() > 0) {
             LOGGER.info("Get all examinations by patientRecord(id={}) from database", patientRecord.getId());
@@ -80,7 +81,7 @@ public class ExaminationService {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Examination entity = dao.getById(id);
+        Examination entity = repository.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get examination(id={}) from database", entity.getId());
@@ -106,12 +107,12 @@ public class ExaminationService {
         if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
             throw new IllegalArgumentException("Amount channels differs from amount in device");
 
-        Examination readEntity = dao.getById(entity.getId());
+        Examination readEntity = repository.getById(entity.getId());
 
         if (readEntity == null) {
-            dao.transactionOpen();
+            repository.transactionOpen();
             LOGGER.info("Transaction started");
-            dao.insert(entity);
+            repository.insert(entity);
             LOGGER.info("Examination(id={}) is recorded", entity.getId());
             entity.recordingStart();
         } else {
@@ -129,7 +130,7 @@ public class ExaminationService {
             throw new NullPointerException("Entity is null");
 
         entity.recordingStop();
-        dao.transactionClose();
+        repository.transactionClose();
     }
 
     public void delete(Examination entity) throws Exception {
@@ -138,10 +139,10 @@ public class ExaminationService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Examination readEntity = dao.getById(entity.getId());
+        Examination readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.delete(entity);
+            repository.delete(entity);
             LOGGER.info("Examination(id={}) is deleted in database", entity.getId());
         } else {
             LOGGER.info("Examination(id={}) not found in database", entity.getId());
@@ -168,10 +169,10 @@ public class ExaminationService {
             throw new IllegalArgumentException("Amount channels differs from amount in device");
 
 
-        Examination readEntity = dao.getById(entity.getId());
+        Examination readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.update(entity);
+            repository.save(entity);
             LOGGER.info("Examination(id={}) updated in database", entity.getId());
         } else {
             LOGGER.error("Examination(id={}) not found in database", entity.getId());
@@ -181,10 +182,10 @@ public class ExaminationService {
 
     public Examination loadWithGraphsById(Long id) throws Exception {
         Examination entity = getById(id);
-        entity.setChannels(daoChannel.getAllByExamination(entity));
+        entity.setChannels(channelRepository.findAllByExamination(entity));
 
         for (Channel channel : entity.getChannels()) {
-            channel.setSamples(daoSample.getAllByChannel(channel));
+            channel.setSamples(sampleRepository.findAllByChannel(channel));
         }
 
         LOGGER.info("Examination(id={}) load with graphs from database", entity.getId());

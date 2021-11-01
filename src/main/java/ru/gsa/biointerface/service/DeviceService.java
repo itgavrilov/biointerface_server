@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.repository.impl.DeviceRepositoryImpl;
+import ru.gsa.biointerface.repository.DeviceRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -18,11 +18,11 @@ import java.util.List;
 @Component
 public class DeviceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
-    private final DeviceRepositoryImpl dao;
+    private final DeviceRepository repository;
 
     @Autowired
-    private DeviceService(DeviceRepositoryImpl dao) {
-        this.dao = dao;
+    public DeviceService(DeviceRepository repository) {
+        this.repository = repository;
     }
 
     @PostConstruct
@@ -36,7 +36,7 @@ public class DeviceService {
     }
 
     public List<Device> getAll() throws Exception {
-        List<Device> entities = dao.getAll();
+        List<Device> entities = repository.findAll();
 
         if (entities.size() > 0) {
             LOGGER.info("Get all devices from database");
@@ -53,7 +53,7 @@ public class DeviceService {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Device entity = dao.getById(id);
+        Device entity = repository.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get device(id={}) from database", entity.getId());
@@ -75,10 +75,10 @@ public class DeviceService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        Device readEntity = dao.getById(entity.getId());
+        Device readEntity = repository.getById(entity.getId());
 
         if (readEntity == null) {
-            dao.insert(entity);
+            repository.save(entity);
             LOGGER.info("Device(id={}) is recorded in database", entity.getId());
         } else {
             LOGGER.warn("Device(id={}) already exists in database", entity.getId());
@@ -95,10 +95,10 @@ public class DeviceService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Device readEntity = dao.getById(entity.getId());
+        Device readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.delete(entity);
+            repository.delete(entity);
             LOGGER.info("Device(id={}) is deleted in database", entity.getId());
         } else {
             LOGGER.info("Device(id={}) not found in database", entity.getId());
@@ -116,10 +116,10 @@ public class DeviceService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        Device readEntity = dao.getById(entity.getId());
+        Device readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.update(entity);
+            repository.save(entity);
             LOGGER.info("Device(id={}) updated in database", entity.getId());
         } else {
             LOGGER.error("Device(id={}) not found in database", entity.getId());

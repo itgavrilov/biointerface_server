@@ -15,6 +15,7 @@ class HostHandlerFactoryTest {
     void getDevices() {
         try (AnnotationConfigApplicationContext context
                      = new AnnotationConfigApplicationContext(ApplicationConfiguration.class)) {
+
             ConnectionToDeviceHandlerFactory connectionToDeviceHandlerFactory = context.getBean(ConnectionToDeviceHandlerFactory.class);
 
             try {

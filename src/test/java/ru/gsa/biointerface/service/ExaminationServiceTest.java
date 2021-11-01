@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.gsa.biointerface.configuration.ApplicationConfiguration;
 import ru.gsa.biointerface.domain.entity.*;
-import ru.gsa.biointerface.repository.impl.ChannelRepositoryImpl;
-import ru.gsa.biointerface.repository.impl.DeviceRepositoryImpl;
-import ru.gsa.biointerface.repository.impl.ExaminationRepositoryImpl;
-import ru.gsa.biointerface.repository.impl.PatientRecordRepositoryImpl;
+import ru.gsa.biointerface.repository.ExaminationRepository;
+import ru.gsa.biointerface.repository.ChannelRepository;
+import ru.gsa.biointerface.repository.DeviceRepository;
+import ru.gsa.biointerface.repository.PatientRecordRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.sql.Timestamp;
@@ -32,22 +32,22 @@ class ExaminationServiceTest {
             comment);
     private static final Device device = new Device(1, 1);
     private static ExaminationService service;
-    private static ExaminationRepositoryImpl repository;
+    private static ExaminationRepository repository;
     private static AnnotationConfigApplicationContext context;
 
     @BeforeAll
     static void setUp() throws Exception {
         context = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
         service = context.getBean(ExaminationService.class);
-        repository = context.getBean(ExaminationRepositoryImpl.class);
-        context.getBean(PatientRecordRepositoryImpl.class).insert(patientRecord);
-        context.getBean(DeviceRepositoryImpl.class).insert(device);
+        repository = context.getBean(ExaminationRepository.class);
+        context.getBean(PatientRecordRepository.class).save(patientRecord);
+        context.getBean(DeviceRepository.class).save(device);
     }
 
     @AfterAll
     static void tearDown() throws Exception {
-        context.getBean(PatientRecordRepositoryImpl.class).delete(patientRecord);
-        context.getBean(DeviceRepositoryImpl.class).delete(device);
+        context.getBean(PatientRecordRepository.class).delete(patientRecord);
+        context.getBean(DeviceRepository.class).delete(device);
         context.close();
     }
 
@@ -146,7 +146,7 @@ class ExaminationServiceTest {
         entity.recordingStop();
         repository.transactionClose();
         Assertions.assertEquals(entity, repository.getById(entity.getId()));
-        Channel channelTest = context.getBean(ChannelRepositoryImpl.class).getById(new ChannelID(
+        Channel channelTest = context.getBean(ChannelRepository.class).getById(new ChannelID(
                 entity.getChannels().get(0).getId(),
                 entity
         ));

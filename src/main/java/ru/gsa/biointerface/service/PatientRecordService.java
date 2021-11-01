@@ -3,9 +3,10 @@ package ru.gsa.biointerface.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.repository.impl.PatientRecordRepositoryImpl;
+import ru.gsa.biointerface.repository.PatientRecordRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -21,12 +22,11 @@ import java.util.NoSuchElementException;
 @Component
 public class PatientRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientRecordService.class);
-
-    private final PatientRecordRepositoryImpl dao;
+    private final PatientRecordRepository repository;
 
     @Autowired
-    private PatientRecordService(PatientRecordRepositoryImpl dao) {
-        this.dao = dao;
+    public PatientRecordService(PatientRecordRepository repository) {
+        this.repository = repository;
     }
 
     private static Calendar localDateToDate(LocalDate localDate) {
@@ -53,7 +53,7 @@ public class PatientRecordService {
     }
 
     public List<PatientRecord> getAll() throws Exception {
-        List<PatientRecord> entities = dao.getAll();
+        List<PatientRecord> entities = repository.findAll();
 
         if (entities.size() > 0) {
             LOGGER.info("Get all patientRecords from database");
@@ -70,7 +70,7 @@ public class PatientRecordService {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        PatientRecord entity = dao.getById(id);
+        PatientRecord entity = repository.getById(id);
 
         if (entity != null) {
             LOGGER.info("Get patientRecord(id={}) from database", entity.getId());
@@ -106,10 +106,10 @@ public class PatientRecordService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        PatientRecord readEntity = dao.getById(entity.getId());
+        PatientRecord readEntity = repository.getById(entity.getId());
 
         if (readEntity == null) {
-            dao.insert(entity);
+            repository.save(entity);
             LOGGER.info("PatientRecord(id={}) is recorded in database", entity.getId());
         } else {
             LOGGER.error("PatientRecord(id={}) already exists in database", entity.getId());
@@ -125,10 +125,10 @@ public class PatientRecordService {
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        PatientRecord readEntity = dao.getById(entity.getId());
+        PatientRecord readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.delete(entity);
+            repository.delete(entity);
             LOGGER.info("PatientRecord(id={}) is deleted in database", entity.getId());
         } else {
             LOGGER.error("PatientRecord(id={}) not found in database", entity.getId());
@@ -160,10 +160,10 @@ public class PatientRecordService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        PatientRecord readEntity = dao.getById(entity.getId());
+        PatientRecord readEntity = repository.getById(entity.getId());
 
         if (readEntity != null) {
-            dao.update(entity);
+            repository.save(entity);
             LOGGER.info("PatientRecord(id={}) updated in database", entity.getId());
         } else {
             LOGGER.error("PatientRecord(id={}) not found in database", entity.getId());
