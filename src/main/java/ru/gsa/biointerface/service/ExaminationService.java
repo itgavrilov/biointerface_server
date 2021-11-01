@@ -31,19 +31,19 @@ public class ExaminationService {
             ExaminationRepository dao,
             ChannelRepository daoChannel,
             SampleRepository daoSample
-    ){
+    ) {
         this.dao = dao;
         this.daoChannel = daoChannel;
-        this. daoSample = daoSample;
+        this.daoSample = daoSample;
     }
 
     @PostConstruct
-    private void init(){
+    private void init() {
         LOGGER.info("ExaminationService is init");
     }
 
     @PreDestroy
-    private void destroy(){
+    private void destroy() {
         LOGGER.info("ExaminationService is destruction");
     }
 
@@ -75,7 +75,7 @@ public class ExaminationService {
     }
 
     public Examination getById(Long id) throws Exception {
-        if(id == null)
+        if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");

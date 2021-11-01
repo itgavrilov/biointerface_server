@@ -1,8 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -13,8 +10,6 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
-@Scope("prototype")
 @Entity(name = "icd")
 @Table(name = "icd")
 public class Icd implements Serializable, Comparable<Icd> {
@@ -43,14 +38,6 @@ public class Icd implements Serializable, Comparable<Icd> {
     private List<PatientRecord> patientRecords;
 
     public Icd() {
-    }
-
-    public Icd(long id, String name, int version, String comment, List<PatientRecord> patientRecords) {
-        this.id = id;
-        this.name = name;
-        this.version = version;
-        this.comment = comment;
-        this.patientRecords = patientRecords;
     }
 
     public Icd(String name, int version, String comment) {
@@ -99,6 +86,28 @@ public class Icd implements Serializable, Comparable<Icd> {
 
     public void setPatientRecords(List<PatientRecord> patientRecords) {
         this.patientRecords = patientRecords;
+    }
+
+    public void addPatientRecord(PatientRecord patientRecord) {
+        if (patientRecord == null)
+            throw new NullPointerException("PatientRecord is null");
+
+        patientRecord.setIcd(this);
+
+        if (!patientRecords.contains(patientRecord)) {
+            patientRecords.add(patientRecord);
+        }
+    }
+
+    public void deletePatientRecord(PatientRecord patientRecord) {
+        if (patientRecord == null)
+            throw new NullPointerException("PatientRecord is null");
+
+        patientRecords.remove(patientRecord);
+
+        if (patientRecord.getIcd().equals(this)) {
+            patientRecord.setIcd(null);
+        }
     }
 
     @Override

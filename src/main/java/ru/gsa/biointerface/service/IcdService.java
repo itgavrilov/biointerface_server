@@ -27,12 +27,12 @@ public class IcdService {
     }
 
     @PostConstruct
-    private void init(){
+    private void init() {
         LOGGER.info("IcdService is init");
     }
 
     @PreDestroy
-    private void destroy(){
+    private void destroy() {
         LOGGER.info("IcdService is destruction");
     }
 
@@ -49,7 +49,7 @@ public class IcdService {
     }
 
     public Icd getById(Long id) throws Exception {
-        if(id == null)
+        if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");

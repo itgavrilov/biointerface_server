@@ -1,8 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,8 +12,6 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
-@Scope("prototype")
 @Entity(name = "channelName")
 @Table()
 public class ChannelName implements Serializable, Comparable<ChannelName> {
@@ -40,13 +35,6 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     private List<Channel> channels;
 
     public ChannelName() {
-    }
-
-    public ChannelName(long id, String name, String comment, List<Channel> channels) {
-        this.id = id;
-        this.name = name;
-        this.comment = comment;
-        this.channels = channels;
     }
 
     public ChannelName(String name, String comment) {
@@ -86,6 +74,28 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
 
     public void setChannels(List<Channel> channels) {
         this.channels = channels;
+    }
+
+    public void addChannel(Channel channel) {
+        if (channel == null)
+            throw new NullPointerException("Channel is null");
+
+        channel.setChannelName(this);
+
+        if (!channels.contains(channel)) {
+            channels.add(channel);
+        }
+    }
+
+    public void deleteChannel(Channel channel) {
+        if (channel == null)
+            throw new NullPointerException("Channel is null");
+
+        channels.remove(channel);
+
+        if (channel.getChannelName().equals(this)) {
+            channel.setChannelName(null);
+        }
     }
 
     @Override

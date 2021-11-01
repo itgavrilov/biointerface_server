@@ -13,8 +13,8 @@ class HostHandlerFactoryTest {
 
     @Test
     void getDevices() {
-        try(AnnotationConfigApplicationContext context
-                    = new AnnotationConfigApplicationContext(SpringConfig.class)) {
+        try (AnnotationConfigApplicationContext context
+                     = new AnnotationConfigApplicationContext(SpringConfig.class)) {
             ConnectionToDeviceHandlerFactory connectionToDeviceHandlerFactory = context.getBean(ConnectionToDeviceHandlerFactory.class);
 
             try {

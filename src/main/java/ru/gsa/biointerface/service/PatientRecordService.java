@@ -29,16 +29,6 @@ public class PatientRecordService {
         this.dao = dao;
     }
 
-    @PostConstruct
-    private void init(){
-        LOGGER.info("PatientRecordService is init");
-    }
-
-    @PreDestroy
-    private void destroy(){
-        LOGGER.info("PatientRecordService is destruction");
-    }
-
     private static Calendar localDateToDate(LocalDate localDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
@@ -50,6 +40,16 @@ public class PatientRecordService {
         );
 
         return calendar;
+    }
+
+    @PostConstruct
+    private void init() {
+        LOGGER.info("PatientRecordService is init");
+    }
+
+    @PreDestroy
+    private void destroy() {
+        LOGGER.info("PatientRecordService is destruction");
     }
 
     public List<PatientRecord> getAll() throws Exception {
@@ -65,7 +65,7 @@ public class PatientRecordService {
     }
 
     public PatientRecord getById(Long id) throws Exception {
-        if(id == null)
+        if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");

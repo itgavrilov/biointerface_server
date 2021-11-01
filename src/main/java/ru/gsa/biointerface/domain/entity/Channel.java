@@ -20,11 +20,11 @@ public class Channel implements Serializable, Comparable<Channel> {
 
     @NotNull(message = "Examination can't be null")
     @Id
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
     private Examination examination;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "channelName_id", referencedColumnName = "id")
     private ChannelName channelName;
 
@@ -36,18 +36,15 @@ public class Channel implements Serializable, Comparable<Channel> {
 
     }
 
-    public Channel(Integer id, Examination examination, ChannelName channelName, List<Sample> samples) {
-        this.id = id;
-        this.examination = examination;
-        this.channelName = channelName;
-        this.samples = samples;
-    }
-
     public Channel(Integer id, Examination examination, ChannelName channelName) {
         this.id = id;
-        this.examination = examination;
-        this.channelName = channelName;
         this.samples = new ArrayList<>();
+        if (examination != null) {
+            examination.addChannel(this);
+        }
+        if (channelName != null) {
+            channelName.addChannel(this);
+        }
     }
 
     public ChannelID getPK() {
@@ -127,4 +124,3 @@ public class Channel implements Serializable, Comparable<Channel> {
                 '}';
     }
 }
-

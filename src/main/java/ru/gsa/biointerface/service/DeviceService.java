@@ -26,12 +26,12 @@ public class DeviceService {
     }
 
     @PostConstruct
-    private void init(){
+    private void init() {
         LOGGER.info("DeviceService is init");
     }
 
     @PreDestroy
-    private void destroy(){
+    private void destroy() {
         LOGGER.info("DeviceService is destruction");
     }
 
@@ -48,7 +48,7 @@ public class DeviceService {
     }
 
     public Device getById(Long id) throws Exception {
-        if(id == null)
+        if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
