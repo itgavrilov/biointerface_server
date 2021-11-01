@@ -1,31 +1,27 @@
 package ru.gsa.biointerface.repository.impl;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 import ru.gsa.biointerface.repository.exception.InsertException;
-import ru.gsa.biointerface.repository.exception.ReadException;
 import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
 import ru.gsa.biointerface.repository.exception.TransactionStopException;
 
-import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
-public class ExaminationRepositoryImpl extends AbstractRepository<Examination, Long> implements ExaminationRepository {
-    private Session session;
+public class CustomizedExaminationRepositoryImpl implements CustomizedExaminationRepository {
+    protected final Logger LOGGER = LoggerFactory.getLogger(ExaminationRepository.class);
+    private EntityManager entityManager;
 
     @Autowired
-    public ExaminationRepositoryImpl(SessionFactory sessionFactory) {
-        super(sessionFactory);
-    }
+    private EntityManagerFactory entityManagerFactory;
 
     @Override
     public void insert(Examination entity) throws Exception {
@@ -35,7 +31,7 @@ public class ExaminationRepositoryImpl extends AbstractRepository<Examination, L
             throw new TransactionNotOpenException("Transaction is not active");
 
         try {
-            session.save(entity);
+            entityManager.persist(entity);
             LOGGER.info("Entity insert successful");
         } catch (Exception e) {
             LOGGER.error("Insert entity error", e);
@@ -44,27 +40,10 @@ public class ExaminationRepositoryImpl extends AbstractRepository<Examination, L
     }
 
     @Override
-    public List<Examination> getByPatientRecord(PatientRecord patientRecord) throws Exception {
-        try (final Session session = sessionFactory.openSession()) {
-            String hql = "FROM examination where patientRecord_id = :id";
-            //noinspection unchecked
-            Query<Examination> query = session.createQuery(hql);
-            query.setParameter("id", patientRecord.getId());
-            List<Examination> entities = query.list();
-            LOGGER.info("Reading entities by patientRecord is successful");
-
-            return entities;
-        } catch (Exception e) {
-            LOGGER.error("Error reading entities by patientRecord", e);
-            throw new ReadException(e);
-        }
-    }
-
-    @Override
     public void transactionOpen() throws Exception {
         try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+            entityManager = entityManagerFactory.createEntityManager();
+            entityManager.getTransaction().begin();
             LOGGER.info("Transaction open is successful");
         } catch (Exception e) {
             LOGGER.error("Transaction opening error", e);
@@ -78,9 +57,10 @@ public class ExaminationRepositoryImpl extends AbstractRepository<Examination, L
             throw new TransactionNotOpenException("Transaction is not active");
 
         try {
-            session.flush();
-            session.getTransaction().commit();
-            session.close();
+            entityManager.flush();
+            entityManager.getTransaction().commit();
+            entityManager.close();
+            entityManager = null;
             LOGGER.info("Transaction close is successful");
         } catch (Exception e) {
             LOGGER.error("Transaction closing error", e);
@@ -90,12 +70,12 @@ public class ExaminationRepositoryImpl extends AbstractRepository<Examination, L
 
     @Override
     public boolean sessionIsOpen() {
-        return session != null && session.isOpen();
+        return entityManager != null && entityManager.isOpen();
     }
 
     @Override
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean transactionIsOpen() {
-        return sessionIsOpen() && session.getTransaction().isActive();
+        return sessionIsOpen() && entityManager.getTransaction().isActive();
     }
 }
