@@ -1,5 +1,8 @@
 package ru.gsa.biointerface.domain.entity;
 
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -8,10 +11,14 @@ import java.util.Objects;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 public class ChannelID implements Serializable, Comparable<ChannelID> {
-    @NotNull
+    @NotNull(message = "Id can't be null")
+    @Id
     private int id;
 
-    @NotNull
+    @NotNull(message = "Examination can't be null")
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
     private Examination examination;
 
     public ChannelID() {
@@ -47,9 +54,14 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
 
     @Override
     public String toString() {
-        return "ChannelID{" +
+        String examinationId = "-";
+
+        if (examination != null)
+            examinationId = String.valueOf(examination.getId());
+
+        return "Channel{" +
                 "number=" + id +
-                ", examination=" + examination +
+                ", examinationEntity_id=" + examinationId +
                 '}';
     }
 }

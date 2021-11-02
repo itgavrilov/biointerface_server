@@ -32,12 +32,12 @@ public class Examination implements Serializable, Comparable<Examination> {
     private Date startTime;
 
     @NotNull(message = "Patient record can't be null")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "patientRecord_id", referencedColumnName = "id", nullable = false)
     private PatientRecord patientRecord;
 
     @NotNull(message = "Device can't be null")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "device_id", referencedColumnName = "id", nullable = false)
     private Device device;
 
@@ -46,7 +46,11 @@ public class Examination implements Serializable, Comparable<Examination> {
     private String comment;
 
     @NotNull(message = "Channels can't be null")
-    @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+            CascadeType.DETACH
+    })
     private List<Channel> channels;
 
     @Transient

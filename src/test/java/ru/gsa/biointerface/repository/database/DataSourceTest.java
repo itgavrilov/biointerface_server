@@ -1,40 +1,38 @@
 package ru.gsa.biointerface.repository.database;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.gsa.biointerface.configuration.ApplicationConfiguration;
-import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
+import ru.gsa.biointerface.repository.PatientRecordRepository;
+import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientRecordService;
+
+import javax.transaction.Transactional;
 
 
 class DataSourceTest {
+
     @Test
-    public void connection() {
+    void getSessionFactory() {
         try (AnnotationConfigApplicationContext context
                      = new AnnotationConfigApplicationContext(ApplicationConfiguration.class)) {
-            SessionFactory sessionFactory = context.getBean(SessionFactory.class);
 
-            Assertions.assertTrue(sessionFactory.isOpen());
+            PatientRecordService service = context.getBean(PatientRecordService.class);
+            IcdService icdService = context.getBean(IcdService.class);
 
-            Device deviceExpected = new Device();
-            deviceExpected.setId(1000);
-            deviceExpected.setComment("test");
+            try {
+                Icd icd = new Icd("testName", 10, "testComment");
+                icd = icdService.save(icd);
 
-            try (Session session = sessionFactory.openSession()) {
-                Transaction transaction = session.beginTransaction();
-                session.saveOrUpdate(deviceExpected);
-                transaction.commit();
-            }
+                System.out.println("!!!!!!!!!!"+icd);
+                icdService.delete(icd);
+                PatientRecord entity = service.findById(3L);
 
-            try (Session session = sessionFactory.openSession()) {
-                Device device1 = session.get(Device.class, 1000L);
-                Assertions.assertEquals(deviceExpected.getId(), device1.getId());
-                Assertions.assertEquals(deviceExpected.getComment(), device1.getComment());
+                System.out.println("!!!!!!!!!!"+entity);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

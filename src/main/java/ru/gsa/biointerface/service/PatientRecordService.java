@@ -5,21 +5,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.repository.PatientRecordRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
+@Service
 public class PatientRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientRecordService.class);
     private final PatientRecordRepository repository;
@@ -64,26 +68,26 @@ public class PatientRecordService {
         return entities;
     }
 
-    public PatientRecord getById(Long id) throws Exception {
+    public PatientRecord findById(Long id) throws Exception {
         if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        PatientRecord entity = repository.getById(id);
+        Optional<PatientRecord> optional = repository.findById(id);
 
-        if (entity != null) {
-            LOGGER.info("Get patientRecord(id={}) from database", entity.getId());
+        if (optional.isPresent()) {
+            LOGGER.info("Get patientRecord(id={}) from database", optional.get().getId());
+            return optional.get();
         } else {
             LOGGER.error("PatientRecord(id={}) is not found in database", id);
             throw new EntityNotFoundException(
                     "PatientRecord(id=" + id + ") is not found in database"
             );
         }
-
-        return entity;
     }
 
+    @Transactional
     public void save(PatientRecord entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
@@ -106,68 +110,27 @@ public class PatientRecordService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        PatientRecord readEntity = repository.getById(entity.getId());
-
-        if (readEntity == null) {
-            repository.save(entity);
-            LOGGER.info("PatientRecord(id={}) is recorded in database", entity.getId());
-        } else {
-            LOGGER.error("PatientRecord(id={}) already exists in database", entity.getId());
-            throw new IllegalArgumentException(
-                    "PatientRecord(id=" + entity.getId() + ") already exists in database"
-            );
-        }
+        repository.save(entity);
+        LOGGER.info("PatientRecord(id={}) is recorded in database", entity.getId());
     }
 
+    @Transactional
     public void delete(PatientRecord entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        PatientRecord readEntity = repository.getById(entity.getId());
+        Optional<PatientRecord> optional = repository.findById(entity.getId());
 
-        if (readEntity != null) {
-            repository.delete(entity);
-            LOGGER.info("PatientRecord(id={}) is deleted in database", entity.getId());
+        if (optional.isPresent()) {
+            repository.delete(optional.get());
+            LOGGER.info("PatientRecord(id={}) is deleted in database", optional.get().getId());
         } else {
             LOGGER.error("PatientRecord(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException(
                     "PatientRecord(id=" + entity.getId() + ") not found in database"
             );
-        }
-    }
-
-    public void update(PatientRecord entity) throws Exception {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
-        if (entity.getSecondName() == null)
-            throw new NullPointerException("SecondName is null");
-        if (entity.getSecondName().isBlank())
-            throw new IllegalArgumentException("SecondName is blank");
-        if (entity.getFirstName() == null)
-            throw new NullPointerException("FirstName is null");
-        if (entity.getFirstName().isBlank())
-            throw new IllegalArgumentException("FirstName is blank");
-        if (entity.getPatronymic() == null)
-            throw new NullPointerException("MiddleName is null");
-        if (entity.getPatronymic().isBlank())
-            throw new IllegalArgumentException("MiddleName is blank");
-        if (entity.getBirthday() == null)
-            throw new NullPointerException("Birthday is null");
-        if (entity.getExaminations() == null)
-            throw new NullPointerException("Examinations is null");
-
-        PatientRecord readEntity = repository.getById(entity.getId());
-
-        if (readEntity != null) {
-            repository.save(entity);
-            LOGGER.info("PatientRecord(id={}) updated in database", entity.getId());
-        } else {
-            LOGGER.error("PatientRecord(id={}) not found in database", entity.getId());
-            throw new NoSuchElementException("PatientRecord(id=" + entity.getId() + ") not found in database");
         }
     }
 }

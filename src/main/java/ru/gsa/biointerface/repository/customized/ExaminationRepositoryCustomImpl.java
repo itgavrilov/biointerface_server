@@ -1,22 +1,27 @@
-package ru.gsa.biointerface.repository.impl;
+package ru.gsa.biointerface.repository.customized;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
+import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.repository.ExaminationRepository;
+import ru.gsa.biointerface.repository.exception.DeleteException;
 import ru.gsa.biointerface.repository.exception.InsertException;
 import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
 import ru.gsa.biointerface.repository.exception.TransactionStopException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.LinkedList;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-public class CustomizedExaminationRepositoryImpl implements CustomizedExaminationRepository {
+@Component
+public class ExaminationRepositoryCustomImpl implements ExaminationRepositoryCustom {
     protected final Logger LOGGER = LoggerFactory.getLogger(ExaminationRepository.class);
     private EntityManager entityManager;
 
@@ -24,15 +29,23 @@ public class CustomizedExaminationRepositoryImpl implements CustomizedExaminatio
     private EntityManagerFactory entityManagerFactory;
 
     @Override
-    public void insert(Examination entity) throws Exception {
+    public Examination insert(Examination entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (!transactionIsOpen())
             throw new TransactionNotOpenException("Transaction is not active");
 
+        JpaEntityInformation<Examination, ?> entityInformation =
+                JpaEntityInformationSupport.getEntityInformation(Examination.class, entityManager);
+
         try {
-            entityManager.persist(entity);
+            if (entityInformation.isNew(entity)) {
+                entityManager.persist(entity);
+            } else {
+                entity = entityManager.merge(entity);
+            }
             LOGGER.info("Entity insert successful");
+            return entity;
         } catch (Exception e) {
             LOGGER.error("Insert entity error", e);
             throw new InsertException(e);

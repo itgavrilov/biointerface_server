@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'idea'
 }
 
 def junitVersion = '5.8.1'
@@ -37,8 +38,10 @@ dependencies {
     implementation("org.springframework.data:spring-data-jpa:2.5.6")
     implementation("org.apache.tomcat:tomcat-dbcp:10.1.0-M6")
     implementation("org.hibernate:hibernate-core:${hibernateVersion}")
-    implementation("com.github.gwenn:sqlite-dialect:0.1.2")
-    implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+    implementation("org.postgresql:postgresql:42.3.1")
+
+    //implementation("com.github.gwenn:sqlite-dialect:0.1.2")
+    //implementation("org.xerial:sqlite-jdbc:3.36.0.3")
 // Annotation processor for metamodel for criteria api
     //annotationProcessor("javax.xml.bind:jaxb-api")
     //annotationProcessor("org.hibernate:hibernate-jpamodelgen:${hibernateVersion}")
@@ -57,8 +60,7 @@ dependencies {
     //implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("javax.annotation:javax.annotation-api:1.3.2") // PostConstruct и тд...
 //-----------Tests--------------------------
-    testImplementation("org.hibernate:hibernate-core:${hibernateVersion}")
-    testImplementation("com.h2database:h2:1.4.200")
+    //testImplementation("com.h2database:h2:1.4.200")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }

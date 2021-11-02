@@ -32,7 +32,7 @@ public class Icd implements Serializable, Comparable<Icd> {
     private String comment;
 
     @NotNull(message = "Patient records can't be null")
-    @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<PatientRecord> patientRecords;
 
     public Icd() {
@@ -115,9 +115,9 @@ public class Icd implements Serializable, Comparable<Icd> {
     @Override
     public String toString() {
         return "Icd{" +
-                "ICD='" + name + '\'' +
+                "id=" + id +
+                ", ICD='" + name + '\'' +
                 ", version=" + version +
-                ", id=" + id +
                 '}';
     }
 }

@@ -20,7 +20,7 @@ public class Sample implements Serializable, Comparable<Sample> {
 
     @NotNull(message = "Channel can't be null")
     @Id
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinColumns({
             @JoinColumn(name = "examination_id", referencedColumnName = "examination_id", nullable = false),
             @JoinColumn(name = "channel_id", referencedColumnName = "id", nullable = false)
@@ -94,10 +94,19 @@ public class Sample implements Serializable, Comparable<Sample> {
 
     @Override
     public String toString() {
+        String channelId = "-";
+        String examinationId = "-";
+
+        if (channel != null) {
+            channelId = String.valueOf(channel.getId());
+
+            if (channel.getExamination() != null)
+                examinationId = String.valueOf(channel.getExamination().getId());
+        }
         return "Sample{" +
                 "id=" + id +
-                ", examination_id=" + channel.getExamination().getId() +
-                ", numberOfChannel=" + channel.getId() +
+                ", examination_id=" + channelId +
+                ", numberOfChannel=" + examinationId +
                 ", value=" + value +
                 '}';
     }

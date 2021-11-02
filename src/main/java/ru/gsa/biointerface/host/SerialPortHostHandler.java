@@ -19,6 +19,7 @@ import ru.gsa.biointerface.host.serialport.SerialPortHost;
 import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

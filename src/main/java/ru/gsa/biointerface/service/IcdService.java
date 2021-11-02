@@ -4,25 +4,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-@Component
+@Service
 public class IcdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(IcdService.class);
     private final IcdRepository repository;
 
     @Autowired
-    private IcdService(IcdRepository repository) {
+    public IcdService(IcdRepository repository) {
         this.repository = repository;
     }
 
@@ -48,25 +52,26 @@ public class IcdService {
         return entities;
     }
 
-    public Icd getById(Long id) throws Exception {
+    public Icd findById(Long id) throws Exception {
         if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd entity = repository.getById(id);
+        Optional<Icd> optional = repository.findById(id);
 
-        if (entity != null) {
-            LOGGER.info("Get icd(id={}) from database", entity.getId());
+        if (optional.isPresent()) {
+            LOGGER.info("Get icd(id={}) from database", optional.get().getId());
+
+            return optional.get();
         } else {
             LOGGER.error("Icd(id={}) is not found in database", id);
             throw new NoSuchElementException("Icd(id=" + id + ") is not found in database");
         }
-
-        return entity;
     }
 
-    public void save(Icd entity) throws Exception {
+    @Transactional
+    public Icd save(Icd entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getName() == null)
@@ -78,55 +83,27 @@ public class IcdService {
         if (entity.getPatientRecords() == null)
             throw new NullPointerException("PatientRecords is null");
 
-        Icd readEntity = repository.getById(entity.getId());
 
-        if (readEntity == null) {
-            repository.save(entity);
-            LOGGER.info("Icd(id={}) is recorded in database", entity.getId());
-        } else {
-            LOGGER.error("Icd(id={}) already exists in database", entity.getId());
-            throw new IllegalArgumentException("Icd(id=" + entity.getId() + ") already exists in database");
-        }
+        entity = repository.save(entity);
+        LOGGER.info("Icd(id={}) is recorded in database", entity.getId());
+
+        return entity;
     }
 
+    @Transactional
     public void delete(Icd entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
-        Icd readEntity = repository.getById(entity.getId());
+        Optional<Icd> optional = repository.findById(entity.getId());
 
-        if (readEntity != null) {
-            repository.delete(entity);
-            LOGGER.info("Icd(id={}) is deleted in database", entity.getId());
+        if (optional.isPresent()) {
+            repository.delete(optional.get());
+            LOGGER.info("Icd(id={}) is deleted in database", optional.get().getId());
         } else {
-            LOGGER.error("Icd(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException("Icd(id=" + entity.getId() + ") not found in database");
-        }
-    }
-
-    public void update(Icd entity) throws Exception {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
-        if (entity.getName() == null)
-            throw new NullPointerException("Name is null");
-        if (entity.getName().isBlank())
-            throw new IllegalArgumentException("Name is blank");
-        if (entity.getVersion() <= 0)
-            throw new IllegalArgumentException("Version <= 0");
-        if (entity.getPatientRecords() == null)
-            throw new NullPointerException("PatientRecords is null");
-
-        Icd readEntity = repository.getById(entity.getId());
-
-        if (readEntity != null) {
-            repository.save(entity);
-            LOGGER.info("Icd(id={}) updated in database", entity.getId());
-        } else {
-            LOGGER.error("Icd(id={}) not found in database", entity.getId());
+            LOGGER.info("Icd(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException("Icd(id=" + entity.getId() + ") not found in database");
         }
     }

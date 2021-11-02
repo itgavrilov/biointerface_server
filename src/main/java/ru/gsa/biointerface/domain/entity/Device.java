@@ -30,7 +30,7 @@ public class Device implements Serializable, Comparable<Device> {
     private String comment;
 
     @NotNull(message = "Examinations can't be null")
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Examination> examinations;
 
     public Device() {

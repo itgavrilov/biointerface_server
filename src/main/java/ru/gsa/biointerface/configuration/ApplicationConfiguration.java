@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @ComponentScan("ru.gsa.biointerface")
 @EnableJpaRepositories(basePackages = "ru.gsa.biointerface.repository")
-@PropertySource("classpath:hibernate.properties")
+@PropertySource("classpath:application.properties")
 public class ApplicationConfiguration {
     @Autowired
     private Environment env;
@@ -35,9 +35,15 @@ public class ApplicationConfiguration {
         return Objects.requireNonNull(env.getProperty(key));
     }
 
-    private Properties getProperties() {
+    private Properties getFactoryProperties() {
         Properties connectionProperties = new Properties();
         connectionProperties.put("hibernate.dialect", getProperty("hibernate.dialect"));
+        connectionProperties.put("hibernate.hbm2ddl.auto", getProperty("hibernate.hbm2ddl.auto"));
+        connectionProperties.put("hibernate.connection.autocommit", getProperty("hibernate.connection.autocommit"));
+        connectionProperties.put("hibernate.cache.use_second_level_cache", getProperty("hibernate.cache.use_second_level_cache"));
+        connectionProperties.put("hibernate.cache.provider_class", getProperty("hibernate.cache.provider_class"));
+        connectionProperties.put("hibernate.format_sql", getProperty("hibernate.format_sql"));
+        connectionProperties.put("hibernate.show_sql", getProperty("hibernate.show_sql"));
 
         return connectionProperties;
     }
@@ -47,7 +53,8 @@ public class ApplicationConfiguration {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(getProperty("hibernate.connection.driver_class"));
         dataSource.setUrl(getProperty("hibernate.connection.url"));
-        dataSource.setConnectionProperties(getProperties());
+        dataSource.setUsername(getProperty("hibernate.connection.username"));
+        dataSource.setPassword(getProperty("hibernate.connection.password"));
 
         return dataSource;
     }
@@ -55,13 +62,13 @@ public class ApplicationConfiguration {
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setGenerateDdl(true);
-
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+        vendorAdapter.setGenerateDdl(true);
         factory.setJpaVendorAdapter(vendorAdapter);
         factory.setPersistenceProviderClass(HibernatePersistenceProvider.class);
         factory.setPackagesToScan("ru.gsa.biointerface.domain.entity");
         factory.setDataSource(dataSource);
+        factory.setJpaProperties(getFactoryProperties());
 
         return factory;
     }
@@ -73,7 +80,6 @@ public class ApplicationConfiguration {
 
         return txManager;
     }
-
 //    @Bean
 //    public LocalSessionFactoryBean sessionFactory() {
 //        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();

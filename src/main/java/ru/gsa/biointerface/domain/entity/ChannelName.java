@@ -29,7 +29,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     private String comment;
 
     @NotNull(message = "Channels can't be null")
-    @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Channel> channels;
 
     public ChannelName() {
