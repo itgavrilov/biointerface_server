@@ -3,9 +3,7 @@ package ru.gsa.biointerface.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.repository.IcdRepository;
 
@@ -40,7 +38,7 @@ public class IcdService {
         LOGGER.info("IcdService is destruction");
     }
 
-    public List<Icd> getAll() throws Exception {
+    public List<Icd> findAll() throws Exception {
         List<Icd> entities = repository.findAll();
 
         if (entities.size() > 0) {
@@ -52,9 +50,7 @@ public class IcdService {
         return entities;
     }
 
-    public Icd findById(Long id) throws Exception {
-        if (id == null)
-            throw new NullPointerException("Id is null");
+    public Icd findById(int id) throws Exception {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 

@@ -5,11 +5,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ru.gsa.biointerface.configuration.ApplicationConfiguration;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.repository.PatientRecordRepository;
 import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientRecordService;
-
-import javax.transaction.Transactional;
 
 
 class DataSourceTest {
@@ -26,11 +23,11 @@ class DataSourceTest {
                 Icd icd = new Icd("testName", 10, "testComment");
                 icd = icdService.save(icd);
 
-                System.out.println("!!!!!!!!!!"+icd);
+                System.out.println("!!!!!!!!!!" + icd);
                 icdService.delete(icd);
-                PatientRecord entity = service.findById(3L);
+                PatientRecord entity = service.findById(3);
 
-                System.out.println("!!!!!!!!!!"+entity);
+                System.out.println("!!!!!!!!!!" + entity);
             } catch (Exception e) {
                 e.printStackTrace();
             }

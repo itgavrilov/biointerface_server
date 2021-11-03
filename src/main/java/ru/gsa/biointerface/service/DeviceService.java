@@ -37,7 +37,7 @@ public class DeviceService {
         LOGGER.info("DeviceService is destruction");
     }
 
-    public List<Device> getAll() throws Exception {
+    public List<Device> findAll() throws Exception {
         List<Device> entities = repository.findAll();
 
         if (entities.size() > 0) {
@@ -49,9 +49,7 @@ public class DeviceService {
         return entities;
     }
 
-    public Device findById(Long id) throws Exception {
-        if (id == null)
-            throw new NullPointerException("Id is null");
+    public Device findById(int id) throws Exception {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 

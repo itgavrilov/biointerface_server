@@ -5,7 +5,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -16,7 +18,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
 
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
@@ -42,11 +44,11 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
         this.channels = new TreeSet<>();
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -79,7 +81,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelName that = (ChannelName) o;
-        return Objects.equals(name, that.name);
+        return id == that.id && name.equals(that.name);
     }
 
     @Override

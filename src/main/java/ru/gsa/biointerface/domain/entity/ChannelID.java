@@ -11,32 +11,32 @@ import java.util.Objects;
 @Embeddable
 public class ChannelID implements Serializable, Comparable<ChannelID> {
     @NotNull(message = "Id can't be null")
-    private Integer id;
+    private int number;
 
     @NotNull(message = "Id can't be null")
-    private Long examination_id;
+    private int examination_id;
 
     public ChannelID() {
     }
 
-    public ChannelID(Integer id, Long examination_id) {
-        this.id = id;
+    public ChannelID(int id, int examination_id) {
+        this.number = id;
         this.examination_id = examination_id;
     }
 
-    public Integer getId() {
-        return id;
+    public int getNumber() {
+        return number;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
-    public Long getExamination_id() {
+    public int getExamination_id() {
         return examination_id;
     }
 
-    public void setExamination_id(Long examination_id) {
+    public void setExamination_id(int examination_id) {
         this.examination_id = examination_id;
     }
 
@@ -45,20 +45,20 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelID that = (ChannelID) o;
-        return Objects.equals(id, that.id) && Objects.equals(examination_id, that.examination_id);
+        return number == that.number && examination_id == that.examination_id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, examination_id);
+        return Objects.hash(number, examination_id);
     }
 
     @Override
     public int compareTo(ChannelID o) {
-        int result = examination_id.compareTo(o.examination_id);
+        int result = examination_id - o.examination_id;
 
         if (result == 0)
-            result = id - o.id;
+            result = number - o.number;
 
         return result;
     }
@@ -66,7 +66,7 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
     @Override
     public String toString() {
         return "Channel{" +
-                "number=" + id +
+                "number=" + number +
                 ", examinationEntity_id=" + examination_id +
                 '}';
     }

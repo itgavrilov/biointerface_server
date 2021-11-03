@@ -7,7 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -18,7 +21,7 @@ public class PatientRecord implements Serializable, Comparable<PatientRecord> {
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
     @Id
-    private long id;
+    private int id;
 
     @NotNull(message = "Second name can't be null")
     @NotBlank(message = "Second name can't be blank")
@@ -59,7 +62,7 @@ public class PatientRecord implements Serializable, Comparable<PatientRecord> {
     public PatientRecord() {
     }
 
-    public PatientRecord(long id, String secondName, String firstName, String patronymic, Calendar birthday, Icd icd, String comment) {
+    public PatientRecord(int id, String secondName, String firstName, String patronymic, Calendar birthday, Icd icd, String comment) {
         this.id = id;
         this.secondName = secondName;
         this.firstName = firstName;
@@ -70,11 +73,11 @@ public class PatientRecord implements Serializable, Comparable<PatientRecord> {
         this.icd = icd;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

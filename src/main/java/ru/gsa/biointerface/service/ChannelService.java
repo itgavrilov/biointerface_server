@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
-import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.ChannelRepository;
 
 import javax.annotation.PostConstruct;
@@ -100,7 +98,7 @@ public class ChannelService {
     public void delete(Channel entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
-        if (entity.getId().getId() <= 0)
+        if (entity.getId().getNumber() <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
         Optional<Channel> optional = repository.findById(entity.getId());

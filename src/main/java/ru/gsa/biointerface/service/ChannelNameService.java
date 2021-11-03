@@ -49,9 +49,7 @@ public class ChannelNameService {
         return entities;
     }
 
-    public ChannelName findById(Long id) throws Exception {
-        if (id == null)
-            throw new NullPointerException("Id is null");
+    public ChannelName findById(int id) throws Exception {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 

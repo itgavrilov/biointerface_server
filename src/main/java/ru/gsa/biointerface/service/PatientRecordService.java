@@ -3,10 +3,7 @@ package ru.gsa.biointerface.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
 import ru.gsa.biointerface.repository.PatientRecordRepository;
 
@@ -17,7 +14,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -56,7 +52,7 @@ public class PatientRecordService {
         LOGGER.info("PatientRecordService is destruction");
     }
 
-    public List<PatientRecord> getAll() throws Exception {
+    public List<PatientRecord> findAll() throws Exception {
         List<PatientRecord> entities = repository.findAll();
 
         if (entities.size() > 0) {
@@ -68,9 +64,7 @@ public class PatientRecordService {
         return entities;
     }
 
-    public PatientRecord findById(Long id) throws Exception {
-        if (id == null)
-            throw new NullPointerException("Id is null");
+    public PatientRecord findById(int id) throws Exception {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 

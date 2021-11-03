@@ -9,6 +9,6 @@ import ru.gsa.biointerface.domain.entity.Device;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface DeviceRepository extends JpaRepository<Device, Long> {
+public interface DeviceRepository extends JpaRepository<Device, Integer> {
 
 }

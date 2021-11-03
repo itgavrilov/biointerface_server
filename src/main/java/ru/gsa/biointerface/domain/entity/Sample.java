@@ -21,7 +21,7 @@ public class Sample implements Serializable, Comparable<Sample> {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinColumns({
             @JoinColumn(name = "examination_id", referencedColumnName = "examination_id", nullable = false),
-            @JoinColumn(name = "channel_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "channel_number", referencedColumnName = "number", nullable = false)
     })
     @MapsId("channel_id")
     private Channel channel;
@@ -33,7 +33,7 @@ public class Sample implements Serializable, Comparable<Sample> {
     public Sample() {
     }
 
-    public Sample(Integer id, Channel channel, int value) {
+    public Sample(int id, Channel channel, int value) {
         this.id = new SampleID(id, channel.getId());
         this.channel = channel;
         channel.getSamples().add(this);

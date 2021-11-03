@@ -8,5 +8,5 @@ import ru.gsa.biointerface.domain.entity.Icd;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface IcdRepository extends JpaRepository<Icd, Long> {
+public interface IcdRepository extends JpaRepository<Icd, Integer> {
 }

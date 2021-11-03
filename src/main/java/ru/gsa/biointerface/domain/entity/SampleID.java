@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.entity;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ import java.util.Objects;
  */
 @Embeddable
 public class SampleID implements Serializable, Comparable<SampleID> {
-    private Integer id;
+    private int id;
 
     @Embedded
     private ChannelID channel_id;
@@ -22,11 +23,11 @@ public class SampleID implements Serializable, Comparable<SampleID> {
         this.channel_id = channel_id;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -43,7 +44,7 @@ public class SampleID implements Serializable, Comparable<SampleID> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SampleID sampleID = (SampleID) o;
-        return Objects.equals(id, sampleID.id) && Objects.equals(channel_id, sampleID.channel_id);
+        return id == sampleID.id && Objects.equals(channel_id, sampleID.channel_id);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class SampleID implements Serializable, Comparable<SampleID> {
         String examinationId = "-";
 
         if (channel_id != null) {
-            channelId = String.valueOf(channel_id.getId());
+            channelId = String.valueOf(channel_id.getNumber());
             examinationId = String.valueOf(channel_id.getExamination_id());
         }
         return "Sample{" +

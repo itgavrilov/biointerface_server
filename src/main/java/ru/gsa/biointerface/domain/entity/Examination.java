@@ -23,7 +23,7 @@ public class Examination implements Serializable, Comparable<Examination> {
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @NotNull(message = "Start time can't be null")
     @Past(message = "Start time should be in past")
@@ -53,7 +53,7 @@ public class Examination implements Serializable, Comparable<Examination> {
     }
 
     public Examination(PatientRecord patientRecord, Device device, String comment) {
-        this.id = -1L;
+        this.id = -1;
         this.startTime = Timestamp.valueOf(LocalDateTime.now());
         this.comment = comment;
         this.channels = new ArrayList<>();
@@ -61,11 +61,11 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.patientRecord = patientRecord;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -120,7 +120,7 @@ public class Examination implements Serializable, Comparable<Examination> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Examination entity = (Examination) o;
-        return Objects.equals(id, entity.id);
+        return id == entity.id;
     }
 
     @Override

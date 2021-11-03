@@ -8,5 +8,5 @@ import ru.gsa.biointerface.domain.entity.ChannelName;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface ChannelNameRepository extends JpaRepository<ChannelName, Long> {
+public interface ChannelNameRepository extends JpaRepository<ChannelName, Integer> {
 }

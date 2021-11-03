@@ -63,7 +63,7 @@ class ExaminationServiceTest {
         Examination entity = new Examination(patientRecord, device, comment);
         entity = repository.save(entity);
 
-        List<Examination>  examinations = service.findAll();
+        List<Examination> examinations = service.findAll();
         Assertions.assertTrue(examinations.contains(entity));
         repository.delete(entity);
         Assertions.assertFalse(repository.existsById(entity.getId()));
@@ -83,10 +83,10 @@ class ExaminationServiceTest {
 
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> service.findById(-1L));
+                () -> service.findById(-1));
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> service.findById(0L));
+                () -> service.findById(0));
 
         Examination entityTest = service.findById(entity.getId());
         Assertions.assertEquals(entity, entityTest);
@@ -192,7 +192,7 @@ class ExaminationServiceTest {
                 IllegalArgumentException.class,
                 () -> {
                     Examination entity =
-                        new Examination(patientRecord, device, comment);
+                            new Examination(patientRecord, device, comment);
                     entity.setChannels(new ArrayList<>());
                     service.recordingStart(entity);
                 });
@@ -272,7 +272,7 @@ class ExaminationServiceTest {
                 () -> {
                     Examination entityTest =
                             new Examination(patientRecord, device, comment);
-                    entityTest.setId(-1L);
+                    entityTest.setId(-1);
                     service.delete(entityTest);
                 });
         Assertions.assertThrows(
@@ -280,16 +280,16 @@ class ExaminationServiceTest {
                 () -> {
                     Examination entityTest =
                             new Examination(patientRecord, device, comment);
-                    entityTest.setId(0L);
+                    entityTest.setId(0);
                     service.delete(entityTest);
                 });
-        Long idTest = entity.getId();
+        Integer idTest = entity.getId();
         Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> {
                     Examination entityTest =
                             new Examination(patientRecord, device, comment);
-                    entityTest.setId(idTest+1);
+                    entityTest.setId(idTest + 1);
                     service.delete(entityTest);
                 });
 

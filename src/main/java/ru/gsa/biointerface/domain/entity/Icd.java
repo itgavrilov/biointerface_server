@@ -3,7 +3,9 @@ package ru.gsa.biointerface.domain.entity;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -13,7 +15,7 @@ import java.util.*;
 public class Icd implements Serializable, Comparable<Icd> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
 
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
@@ -46,11 +48,11 @@ public class Icd implements Serializable, Comparable<Icd> {
         this.patientRecords = new TreeSet<>();
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

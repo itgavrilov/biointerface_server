@@ -22,6 +22,7 @@ import javax.persistence.EntityManagerFactory;
 public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
     protected final Logger LOGGER = LoggerFactory.getLogger(SampleRepository.class);
     private EntityManager entityManager;
+    private boolean transactionIsOpen;
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
@@ -55,6 +56,7 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
             entityManager = entityManagerFactory.createEntityManager();
             entityManager.getTransaction().begin();
             LOGGER.info("Transaction open is successful");
+            transactionIsOpen = true;
         } catch (Exception e) {
             LOGGER.error("Transaction opening error", e);
             throw new TransactionNotOpenException(e);
@@ -65,6 +67,8 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
     public void transactionClose() throws Exception {
         if (!transactionIsOpen())
             throw new TransactionNotOpenException("Transaction is not active");
+
+        transactionIsOpen = false;
 
         try {
             entityManager.flush();
@@ -79,13 +83,12 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
     }
 
     @Override
-    public boolean sessionIsOpen() {
-        return entityManager != null && entityManager.isOpen();
-    }
-
-    @Override
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean transactionIsOpen() {
-        return sessionIsOpen() && entityManager.getTransaction().isActive();
+        boolean result = entityManager != null &&
+                entityManager.isOpen() &&
+                entityManager.getTransaction().isActive();
+
+        return result && transactionIsOpen;
     }
 }

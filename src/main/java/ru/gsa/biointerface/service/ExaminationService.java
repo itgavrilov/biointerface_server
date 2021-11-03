@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 
 import javax.annotation.PostConstruct;
@@ -75,7 +74,7 @@ public class ExaminationService {
         return entities;
     }
 
-    public Examination findById(Long id) throws Exception {
+    public Examination findById(Integer id) throws Exception {
         if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
@@ -132,7 +131,7 @@ public class ExaminationService {
         }
     }
 
-    public Examination loadWithGraphsById(Long id) throws Exception {
+    public Examination loadWithGraphsById(int id) throws Exception {
         Examination entity = findById(id);
         entity.setChannels(channelService.findAllByExamination(entity));
 
@@ -177,7 +176,7 @@ public class ExaminationService {
         LOGGER.info("Recording stopped");
     }
 
-    public boolean isRecording(){
+    public boolean isRecording() {
         return sampleService.transactionIsOpen();
     }
 }

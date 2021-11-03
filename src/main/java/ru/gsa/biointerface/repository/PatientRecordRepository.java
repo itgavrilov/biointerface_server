@@ -9,5 +9,5 @@ import ru.gsa.biointerface.domain.entity.PatientRecord;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface PatientRecordRepository extends JpaRepository<PatientRecord, Long> {
+public interface PatientRecordRepository extends JpaRepository<PatientRecord, Integer> {
 }

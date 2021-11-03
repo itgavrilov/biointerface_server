@@ -57,12 +57,12 @@ public class SampleService {
         LOGGER.info("Transaction is close");
     }
 
-    public boolean transactionIsOpen(){
+    public boolean transactionIsOpen() {
         return repository.transactionIsOpen();
     }
 
     public void setSampleInChannel(Channel channel, int value) throws Exception {
-        if(!transactionIsOpen())
+        if (!transactionIsOpen())
             throw new ServiceException("Recording not started");
         if (channel == null)
             throw new NullPointerException("Channel is null");

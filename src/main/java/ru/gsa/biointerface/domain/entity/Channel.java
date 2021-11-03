@@ -98,7 +98,7 @@ public class Channel implements Serializable, Comparable<Channel> {
             channelNameId = String.valueOf(channelName.getId());
 
         return "Channel{" +
-                "number=" + id.getId() +
+                "number=" + id.getNumber() +
                 ", examination_id=" + id.getExamination_id() +
                 ", channelName_id=" + channelNameId +
                 '}';
