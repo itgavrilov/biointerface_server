@@ -7,9 +7,8 @@ import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.PatientRecord;
-import ru.gsa.biointerface.repository.ChannelRepository;
+import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.repository.ExaminationRepository;
-import ru.gsa.biointerface.repository.SampleRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -25,18 +24,18 @@ import java.util.Optional;
 public class ExaminationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExaminationService.class);
     private final ExaminationRepository repository;
-    private final ChannelRepository channelRepository;
-    private final SampleRepository sampleRepository;
+    private final SampleService sampleService;
+    private final ChannelService channelService;
 
     @Autowired
     public ExaminationService(
             ExaminationRepository repository,
-            ChannelRepository channelRepository,
-            SampleRepository sampleRepository
+            ChannelService channelService,
+            SampleService sampleService
     ) {
         this.repository = repository;
-        this.channelRepository = channelRepository;
-        this.sampleRepository = sampleRepository;
+        this.channelService = channelService;
+        this.sampleService = sampleService;
     }
 
     @PostConstruct
@@ -49,7 +48,7 @@ public class ExaminationService {
         LOGGER.info("ExaminationService is destruction");
     }
 
-    public List<Examination> getAll() throws Exception {
+    public List<Examination> findAll() throws Exception {
         List<Examination> entities = repository.findAll();
 
         if (entities.size() > 0) {
@@ -95,6 +94,25 @@ public class ExaminationService {
     }
 
     @Transactional
+    public Examination save(Examination entity) throws Exception {
+        if (entity == null)
+            throw new NullPointerException("Entity is null");
+        if (entity.getStartTime() == null)
+            throw new NullPointerException("StartTime is null");
+        if (entity.getPatientRecord() == null)
+            throw new NullPointerException("PatientRecord is null");
+        if (entity.getDevice() == null)
+            throw new NullPointerException("Device is null");
+        if (entity.getChannels() == null)
+            throw new NullPointerException("Channels is null");
+
+        entity = repository.save(entity);
+        LOGGER.info("Examination(id={}) is recorded in database", entity.getId());
+
+        return entity;
+    }
+
+    @Transactional
     public void delete(Examination entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
@@ -114,89 +132,52 @@ public class ExaminationService {
         }
     }
 
-    @Transactional
-    public void update(Examination entity) throws Exception {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
-        if (entity.isRecording())
-            throw new IllegalArgumentException("Entity is already being recorded");
-        if (entity.getStartTime() == null)
-            throw new NullPointerException("StartTime is null");
-        if (entity.getPatientRecord() == null)
-            throw new NullPointerException("PatientRecord is null");
-        if (entity.getDevice() == null)
-            throw new NullPointerException("Device is null");
-        if (entity.getChannels() == null)
-            throw new NullPointerException("Channels is null");
-        if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
-            throw new IllegalArgumentException("Amount channels differs from amount in device");
-
-        Optional<Examination> optional = repository.findById(entity.getId());
-
-        if(optional.isPresent()) {
-            entity = repository.save(entity);
-            LOGGER.info("Device(id={}) is recorded in database", entity.getId());
-        } else {
-            LOGGER.info("Examination(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException(
-                    "Examination(id=" + entity.getId() + ") is not found in database"
-            );
-        }
-    }
-
-    public Examination recordingStart(Examination entity) throws Exception {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.isRecording())
-            throw new IllegalArgumentException("Entity is already being recorded");
-        if (entity.getPatientRecord() == null)
-            throw new NullPointerException("PatientRecord is null");
-        if (entity.getDevice() == null)
-            throw new NullPointerException("Device is null");
-        if (entity.getChannels() == null)
-            throw new NullPointerException("Channels is null");
-        if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
-            throw new IllegalArgumentException("Amount channels differs from amount in device");
-
-        Optional<Examination> optional = repository.findById(entity.getId());
-
-        if (optional.isEmpty()) {
-            repository.transactionOpen();
-            LOGGER.info("Transaction started");
-            entity = repository.insert(entity);
-            LOGGER.info("Examination(id={}) is recorded", entity.getId());
-            entity.recordingStart();
-            return entity;
-        } else {
-            LOGGER.error(
-                    "Examination(id={}) already exists in database. Recording is not start",
-                    entity.getId());
-            throw new IllegalArgumentException(
-                    "Examination(id=" + entity.getId() + ") already exists in database. Recording is not start"
-            );
-        }
-    }
-
-    public void recordingStop(Examination entity) throws Exception {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-
-        entity.recordingStop();
-        repository.transactionClose();
-    }
-
     public Examination loadWithGraphsById(Long id) throws Exception {
         Examination entity = findById(id);
-        entity.setChannels(channelRepository.findAllByExamination(entity));
+        entity.setChannels(channelService.findAllByExamination(entity));
 
         for (Channel channel : entity.getChannels()) {
-            channel.setSamples(sampleRepository.findAllByChannel(channel));
+            channel.setSamples(sampleService.findAllByChannel(channel));
         }
 
         LOGGER.info("Examination(id={}) load with channels from database", entity.getId());
 
         return entity;
+    }
+
+    public void recordingStart(Examination entity) throws Exception {
+        if (entity == null)
+            throw new NullPointerException("Entity is null");
+        if (entity.getPatientRecord() == null)
+            throw new NullPointerException("PatientRecord is null");
+        if (entity.getDevice() == null)
+            throw new NullPointerException("Device is null");
+        if (entity.getChannels() == null)
+            throw new NullPointerException("Channels is null");
+        if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
+            throw new IllegalArgumentException("Amount channels differs from amount in device");
+
+        Optional<Examination> optional = repository.findById(entity.getId());
+
+        if (optional.isPresent()) {
+            sampleService.transactionOpen();
+            LOGGER.info("Recording started");
+        } else {
+            LOGGER.error(
+                    "Examination(id={}) does not yet exist in database. Recording is not start",
+                    entity.getId());
+            throw new NullPointerException(
+                    "Examination(id=" + entity.getId() + ") does not yet exist in database. Recording is not start"
+            );
+        }
+    }
+
+    public void recordingStop() throws Exception {
+        sampleService.transactionClose();
+        LOGGER.info("Recording stopped");
+    }
+
+    public boolean isRecording(){
+        return sampleService.transactionIsOpen();
     }
 }

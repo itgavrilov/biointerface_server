@@ -68,7 +68,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public void save(Device entity) throws Exception {
+    public Device save(Device entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -80,6 +80,8 @@ public class DeviceService {
 
         entity = repository.save(entity);
         LOGGER.info("Device(id={}) is recorded in database", entity.getId());
+
+        return entity;
     }
 
     @Transactional

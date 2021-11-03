@@ -12,16 +12,14 @@ import java.util.Objects;
  */
 @Entity(name = "channel")
 @Table(name = "channel")
-@IdClass(ChannelID.class)
 public class Channel implements Serializable, Comparable<Channel> {
-    @NotNull(message = "Id can't be null")
-    @Id
-    Integer id;
+    @EmbeddedId
+    ChannelID id;
 
     @NotNull(message = "Examination can't be null")
-    @Id
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
+    @MapsId("examination_id")
     private Examination examination;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
@@ -29,33 +27,24 @@ public class Channel implements Serializable, Comparable<Channel> {
     private ChannelName channelName;
 
     @NotNull(message = "Samples can't be null")
-    @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE,
-            CascadeType.DETACH
-    })
+    @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
 
     public Channel() {
-
     }
 
     public Channel(Integer id, Examination examination, ChannelName channelName) {
-        this.id = id;
+        this.id = new ChannelID(id, examination.getId());
         this.samples = new LinkedList<>();
         this.examination = examination;
         this.channelName = channelName;
     }
 
-    public ChannelID getPK() {
-        return new ChannelID(id, examination);
-    }
-
-    public Integer getId() {
+    public ChannelID getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(ChannelID id) {
         this.id = id;
     }
 
@@ -87,40 +76,30 @@ public class Channel implements Serializable, Comparable<Channel> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Channel that = (Channel) o;
-        return Objects.equals(id, that.id) && Objects.equals(examination, that.examination);
+        Channel channel = (Channel) o;
+        return Objects.equals(id, channel.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, examination);
+        return Objects.hash(id);
     }
 
     @Override
     public int compareTo(Channel o) {
-        int result = examination.compareTo(o.examination);
-
-        if (result == 0)
-            result = id - o.id;
-
-        return result;
+        return id.compareTo(o.id);
     }
 
     @Override
     public String toString() {
-        String examinationId = "-";
-
-        if (examination != null)
-            examinationId = String.valueOf(examination.getId());
-
         String channelNameId = "-";
 
         if (channelName != null)
             channelNameId = String.valueOf(channelName.getId());
 
         return "Channel{" +
-                "number=" + id +
-                ", examinationEntity_id=" + examinationId +
+                "number=" + id.getId() +
+                ", examination_id=" + id.getExamination_id() +
                 ", channelName_id=" + channelNameId +
                 '}';
     }

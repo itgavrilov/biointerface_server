@@ -1,60 +1,59 @@
 package ru.gsa.biointerface.domain.entity;
 
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Embeddable
 public class SampleID implements Serializable, Comparable<SampleID> {
-    @NotNull(message = "Id can't be null")
-    @Min(value = 0, message = "Id can't be lass then 0")
-    @Id
-    private long id;
+    private Integer id;
 
-    @NotNull(message = "Channel can't be null")
-    @Id
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "examination_id", referencedColumnName = "examination_id", nullable = false),
-            @JoinColumn(name = "channel_id", referencedColumnName = "id", nullable = false)
-    })
-    private Channel channel;
+    @Embedded
+    private ChannelID channel_id;
 
     public SampleID() {
     }
 
-    public SampleID(long id, Channel channel) {
+    public SampleID(Integer id, ChannelID channel_id) {
         this.id = id;
-        this.channel = channel;
+        this.channel_id = channel_id;
     }
 
-    public SampleID getPK() {
-        return new SampleID(id, channel);
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public ChannelID getChannel_id() {
+        return channel_id;
+    }
+
+    public void setChannel_id(ChannelID channel_id) {
+        this.channel_id = channel_id;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SampleID that = (SampleID) o;
-        return id == that.id && Objects.equals(channel, that.channel);
+        SampleID sampleID = (SampleID) o;
+        return Objects.equals(id, sampleID.id) && Objects.equals(channel_id, sampleID.channel_id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, channel);
+        return Objects.hash(id, channel_id);
     }
 
     @Override
     public int compareTo(SampleID o) {
-        int result = channel.compareTo(o.channel);
+        int result = channel_id.compareTo(o.channel_id);
 
         if (result == 0) {
             if (id > o.id) {
@@ -72,16 +71,14 @@ public class SampleID implements Serializable, Comparable<SampleID> {
         String channelId = "-";
         String examinationId = "-";
 
-        if (channel != null) {
-            channelId = String.valueOf(channel.getId());
-
-            if (channel.getExamination() != null)
-                examinationId = String.valueOf(channel.getExamination().getId());
+        if (channel_id != null) {
+            channelId = String.valueOf(channel_id.getId());
+            examinationId = String.valueOf(channel_id.getExamination_id());
         }
         return "Sample{" +
                 "id=" + id +
-                ", examination_id=" + channelId +
-                ", numberOfChannel=" + examinationId +
+                ", channel_id=" + channelId +
+                ", examination_id=" + examinationId +
                 '}';
     }
 }

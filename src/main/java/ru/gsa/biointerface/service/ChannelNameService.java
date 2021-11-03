@@ -98,7 +98,7 @@ public class ChannelNameService {
             LOGGER.info("ChannelName(id={}) is deleted in database", optional.get().getId());
         } else {
             LOGGER.info("ChannelName(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException("Device(id=" + entity.getId() + ") not found in database");
+            throw new EntityNotFoundException("ChannelName(id=" + entity.getId() + ") not found in database");
         }
     }
 }

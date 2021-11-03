@@ -6,37 +6,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.stereotype.Component;
-import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.repository.ExaminationRepository;
-import ru.gsa.biointerface.repository.exception.DeleteException;
+import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.repository.SampleRepository;
 import ru.gsa.biointerface.repository.exception.InsertException;
 import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
 import ru.gsa.biointerface.repository.exception.TransactionStopException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.LinkedList;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Component
-public class ExaminationRepositoryCustomImpl implements ExaminationRepositoryCustom {
-    protected final Logger LOGGER = LoggerFactory.getLogger(ExaminationRepository.class);
+public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
+    protected final Logger LOGGER = LoggerFactory.getLogger(SampleRepository.class);
     private EntityManager entityManager;
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
     @Override
-    public Examination insert(Examination entity) throws Exception {
+    public Sample insert(Sample entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (!transactionIsOpen())
             throw new TransactionNotOpenException("Transaction is not active");
 
-        JpaEntityInformation<Examination, ?> entityInformation =
-                JpaEntityInformationSupport.getEntityInformation(Examination.class, entityManager);
+        JpaEntityInformation<Sample, ?> entityInformation =
+                JpaEntityInformationSupport.getEntityInformation(Sample.class, entityManager);
 
         try {
             if (entityInformation.isNew(entity)) {
@@ -44,10 +42,9 @@ public class ExaminationRepositoryCustomImpl implements ExaminationRepositoryCus
             } else {
                 entity = entityManager.merge(entity);
             }
-            LOGGER.info("Entity insert successful");
             return entity;
         } catch (Exception e) {
-            LOGGER.error("Insert entity error", e);
+            LOGGER.error("Insert sample error", e);
             throw new InsertException(e);
         }
     }

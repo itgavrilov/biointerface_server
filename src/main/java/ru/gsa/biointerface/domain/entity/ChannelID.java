@@ -1,8 +1,6 @@
 package ru.gsa.biointerface.domain.entity;
 
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,23 +8,36 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Embeddable
 public class ChannelID implements Serializable, Comparable<ChannelID> {
     @NotNull(message = "Id can't be null")
-    @Id
-    private int id;
+    private Integer id;
 
-    @NotNull(message = "Examination can't be null")
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
-    private Examination examination;
+    @NotNull(message = "Id can't be null")
+    private Long examination_id;
 
     public ChannelID() {
     }
 
-    public ChannelID(int id, Examination examination) {
+    public ChannelID(Integer id, Long examination_id) {
         this.id = id;
-        this.examination = examination;
+        this.examination_id = examination_id;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Long getExamination_id() {
+        return examination_id;
+    }
+
+    public void setExamination_id(Long examination_id) {
+        this.examination_id = examination_id;
     }
 
     @Override
@@ -34,17 +45,17 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelID that = (ChannelID) o;
-        return id == that.id && Objects.equals(examination, that.examination);
+        return Objects.equals(id, that.id) && Objects.equals(examination_id, that.examination_id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, examination);
+        return Objects.hash(id, examination_id);
     }
 
     @Override
     public int compareTo(ChannelID o) {
-        int result = examination.compareTo(o.examination);
+        int result = examination_id.compareTo(o.examination_id);
 
         if (result == 0)
             result = id - o.id;
@@ -54,14 +65,9 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
 
     @Override
     public String toString() {
-        String examinationId = "-";
-
-        if (examination != null)
-            examinationId = String.valueOf(examination.getId());
-
         return "Channel{" +
                 "number=" + id +
-                ", examinationEntity_id=" + examinationId +
+                ", examinationEntity_id=" + examination_id +
                 '}';
     }
 }

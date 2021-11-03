@@ -10,16 +10,16 @@ import ru.gsa.biointerface.domain.entity.*;
 import ru.gsa.biointerface.host.cash.Cash;
 import ru.gsa.biointerface.host.cash.DataListener;
 import ru.gsa.biointerface.host.cash.SampleCash;
-import ru.gsa.biointerface.host.exception.HostException;
 import ru.gsa.biointerface.host.exception.HostNotRunningException;
 import ru.gsa.biointerface.host.exception.HostNotTransmissionException;
 import ru.gsa.biointerface.host.serialport.ControlMessages;
 import ru.gsa.biointerface.host.serialport.DataCollector;
 import ru.gsa.biointerface.host.serialport.SerialPortHost;
+import ru.gsa.biointerface.service.ChannelService;
 import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
+import ru.gsa.biointerface.service.SampleService;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,9 +36,14 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
     private final List<Cash> cashList = new ArrayList<>();
     private final List<ChannelName> channelNames = new ArrayList<>();
     @Autowired
+    private DeviceService deviceService;
+    @Autowired
     private ExaminationService examinationService;
     @Autowired
-    private DeviceService deviceService;
+    private ChannelService channelService;
+    @Autowired
+    private SampleService sampleService;
+
     private Device device;
     private PatientRecord patientRecord;
     private Examination examination;
@@ -102,7 +107,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         channelNames.set(number, channelName);
 
         if (examination != null) {
-            examination.setNameInChannel(number, channelName);
+            examination.getChannels().get(number).setChannelName(channelName);
         }
 
         if (channelName != null) {
@@ -122,7 +127,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             if (Objects.equals(comment, newComment)) {
                 try {
                     examination.setComment(newComment);
-                    examinationService.update(examination);
+                    examinationService.save(examination);
                     LOGGER.info("New comment is set in examination(number={})", examination.getId());
                 } catch (Exception e) {
                     examination.setComment(comment);
@@ -222,20 +227,17 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
 
         if (!isRecording()) {
             examination = new Examination(patientRecord, device, comment);
+            device = deviceService.save(device);
+            examination = examinationService.save(examination);
 
             for (int i = 0; i < device.getAmountChannels(); i++) {
                 Channel channel = new Channel(i, examination, channelNames.get(i));
+                channel = channelService.save(channel);
+                examination.getChannels().add(channel);
             }
 
-            try {
-                deviceService.save(device);
-                examinationService.recordingStart(examination);
-                LOGGER.info("Start recording");
-            } catch (Exception e) {
-                examination = null;
-                LOGGER.error("Error recording started", e);
-                throw new HostException("Error recording started", e);
-            }
+            examinationService.recordingStart(examination);
+            LOGGER.info("Start recording");
         } else {
             LOGGER.warn("Recording is already in progress");
         }
@@ -246,7 +248,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         if (!isRecording())
             throw new HostNotRunningException();
 
-        examinationService.recordingStop(examination);
+        examinationService.recordingStop();
         examination = null;
         LOGGER.info("Stop recording");
     }
@@ -256,7 +258,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         boolean result = false;
 
         if (examination != null) {
-            result = examination.isRecording();
+            result = examinationService.isRecording();
         }
 
         return result;
@@ -303,7 +305,14 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         cashList.get(number).add(value);
 
         if (isRecording()) {
-            examination.setSampleInChannel(number, value);
+            try {
+                sampleService.setSampleInChannel(
+                        examination.getChannels().get(number),
+                        value
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

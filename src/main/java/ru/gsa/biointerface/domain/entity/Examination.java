@@ -23,7 +23,7 @@ public class Examination implements Serializable, Comparable<Examination> {
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull(message = "Start time can't be null")
     @Past(message = "Start time should be in past")
@@ -46,21 +46,14 @@ public class Examination implements Serializable, Comparable<Examination> {
     private String comment;
 
     @NotNull(message = "Channels can't be null")
-    @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE,
-            CascadeType.DETACH
-    })
+    @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
-
-    @Transient
-    private boolean recording = false;
 
     public Examination() {
     }
 
     public Examination(PatientRecord patientRecord, Device device, String comment) {
-        this.id = -1;
+        this.id = -1L;
         this.startTime = Timestamp.valueOf(LocalDateTime.now());
         this.comment = comment;
         this.channels = new ArrayList<>();
@@ -68,11 +61,11 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.patientRecord = patientRecord;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -122,73 +115,12 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.channels = channels;
     }
 
-    public void setNameInChannel(int number, ChannelName channelName) {
-        if (channels == null)
-            throw new NullPointerException("Channels is null");
-        if (number < 0)
-            throw new IllegalArgumentException("number < 0");
-        if (number >= channels.size())
-            throw new IllegalArgumentException("I > amount channels");
-
-        channels.get(number).setChannelName(channelName);
-    }
-
-    public void setSampleInChannel(int numberOfChannel, int value) {
-        if (numberOfChannel >= channels.size() || numberOfChannel < 0)
-            throw new IllegalArgumentException("NumberOfChannel < 0 or > amount channels");
-
-        Channel channel = channels.get(numberOfChannel);
-        List<Sample> entities = channel.getSamples();
-        Sample sample =
-                new Sample(
-                        entities.size(),
-                        channel,
-                        value
-                );
-        entities.add(entities.size(), sample);
-    }
-
-    public boolean isRecording() {
-        return recording;
-    }
-
-    public void recordingStart() {
-        this.recording = true;
-    }
-
-    public void recordingStop() {
-        this.recording = false;
-    }
-
-
-    public void addChannel(Channel channel) {
-        if (channel == null)
-            throw new NullPointerException("Channel is null");
-
-        channel.setExamination(this);
-
-        if (!channels.contains(channel)) {
-            channels.add(channel);
-        }
-    }
-
-    public void deleteChannel(Channel channel) {
-        if (channel == null)
-            throw new NullPointerException("Channel is null");
-
-        channels.remove(channel);
-
-        if (channel.getExamination().equals(this)) {
-            channel.setExamination(null);
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Examination entity = (Examination) o;
-        return id == entity.id;
+        return Objects.equals(id, entity.id);
     }
 
     @Override
