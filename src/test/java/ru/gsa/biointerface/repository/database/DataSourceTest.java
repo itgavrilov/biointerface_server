@@ -2,11 +2,11 @@ package ru.gsa.biointerface.repository.database;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.gsa.biointerface.configuration.ApplicationConfiguration;
+import ru.gsa.biointerface.config.JpaConfig;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.domain.entity.PatientRecord;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.service.IcdService;
-import ru.gsa.biointerface.service.PatientRecordService;
+import ru.gsa.biointerface.service.PatientService;
 
 
 class DataSourceTest {
@@ -14,9 +14,9 @@ class DataSourceTest {
     @Test
     void getSessionFactory() {
         try (AnnotationConfigApplicationContext context
-                     = new AnnotationConfigApplicationContext(ApplicationConfiguration.class)) {
+                     = new AnnotationConfigApplicationContext(JpaConfig.class)) {
 
-            PatientRecordService service = context.getBean(PatientRecordService.class);
+            PatientService service = context.getBean(PatientService.class);
             IcdService icdService = context.getBean(IcdService.class);
 
             try {
@@ -25,7 +25,7 @@ class DataSourceTest {
 
                 System.out.println("!!!!!!!!!!" + icd);
                 icdService.delete(icd);
-                PatientRecord entity = service.findById(3);
+                Patient entity = service.findById(3);
 
                 System.out.println("!!!!!!!!!!" + entity);
             } catch (Exception e) {
