@@ -29,12 +29,12 @@ public class Examination implements Serializable, Comparable<Examination> {
     @Past(message = "Start time should be in past")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date startTime;
+    private Date starttime;
 
-    @NotNull(message = "Patient record can't be null")
+    @NotNull(message = "Patient can't be null")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "patientRecord_id", referencedColumnName = "id", nullable = false)
-    private PatientRecord patientRecord;
+    @JoinColumn(name = "patient_id", referencedColumnName = "id", nullable = false)
+    private Patient patient;
 
     @NotNull(message = "Device can't be null")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
@@ -52,13 +52,13 @@ public class Examination implements Serializable, Comparable<Examination> {
     public Examination() {
     }
 
-    public Examination(PatientRecord patientRecord, Device device, String comment) {
+    public Examination(Patient patient, Device device, String comment) {
         this.id = -1;
-        this.startTime = Timestamp.valueOf(LocalDateTime.now());
+        this.starttime = Timestamp.valueOf(LocalDateTime.now());
         this.comment = comment;
         this.channels = new ArrayList<>();
         this.device = device;
-        this.patientRecord = patientRecord;
+        this.patient = patient;
     }
 
     public int getId() {
@@ -69,26 +69,26 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.id = id;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Date getStarttime() {
+        return starttime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setStarttime(Date startTime) {
+        this.starttime = startTime;
     }
 
     public LocalDateTime getStartTimeInLocalDateTime() {
-        return startTime.toInstant()
+        return starttime.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
 
-    public PatientRecord getPatientRecord() {
-        return patientRecord;
+    public Patient getPatientRecord() {
+        return patient;
     }
 
-    public void setPatientRecord(PatientRecord patientRecord) {
-        this.patientRecord = patientRecord;
+    public void setPatientRecord(Patient patient) {
+        this.patient = patient;
     }
 
     public Device getDevice() {
@@ -143,14 +143,14 @@ public class Examination implements Serializable, Comparable<Examination> {
 
     @Override
     public String toString() {
-        String startTime = this.getStartTimeInLocalDateTime().format(
+        String starttime = this.getStartTimeInLocalDateTime().format(
                 DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
         );
 
         return "Examination{" +
                 "id=" + id +
-                ", dateTime=" + startTime +
-                ", patientRecord_id=" + patientRecord.getId() +
+                ", datetime=" + starttime +
+                ", patientRecord_id=" + patient.getId() +
                 ", device_id=" + device.getId() +
                 '}';
     }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.PatientRecord;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 
 import javax.annotation.PostConstruct;
@@ -59,16 +59,16 @@ public class ExaminationService {
         return entities;
     }
 
-    public List<Examination> getByPatientRecord(PatientRecord patientRecord) throws Exception {
-        if (patientRecord == null)
+    public List<Examination> getByPatientRecord(Patient patient) throws Exception {
+        if (patient == null)
             throw new NullPointerException("PatientRecord is null");
 
-        List<Examination> entities = repository.findAllByPatientRecord(patientRecord);
+        List<Examination> entities = repository.findAllByPatient(patient);
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all examinations by patientRecord(id={}) from database", patientRecord.getId());
+            LOGGER.info("Get all examinations by patientRecord(id={}) from database", patient.getId());
         } else {
-            LOGGER.info("Examinations by patientRecord(id={}) is not found in database", patientRecord.getId());
+            LOGGER.info("Examinations by patientRecord(id={}) is not found in database", patient.getId());
         }
 
         return entities;
@@ -96,7 +96,7 @@ public class ExaminationService {
     public Examination save(Examination entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
-        if (entity.getStartTime() == null)
+        if (entity.getStarttime() == null)
             throw new NullPointerException("StartTime is null");
         if (entity.getPatientRecord() == null)
             throw new NullPointerException("PatientRecord is null");
