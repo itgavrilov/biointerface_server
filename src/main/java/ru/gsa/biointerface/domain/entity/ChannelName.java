@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,6 +16,9 @@ import java.util.TreeSet;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "channel_name")
 @Table(name = "channel_name")
 public class ChannelName implements Serializable, Comparable<ChannelName> {
@@ -34,46 +41,11 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Channel> channels;
 
-    public ChannelName() {
-    }
-
     public ChannelName(String name, String comment) {
         this.id = -1;
         this.name = name;
         this.comment = comment;
         this.channels = new TreeSet<>();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Set<Channel> getChannels() {
-        return channels;
-    }
-
-    public void setChannels(Set<Channel> channels) {
-        this.channels = channels;
     }
 
     @Override

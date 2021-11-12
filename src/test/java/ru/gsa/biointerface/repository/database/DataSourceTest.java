@@ -1,36 +1,36 @@
 package ru.gsa.biointerface.repository.database;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.gsa.biointerface.config.JpaConfig;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientService;
 
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 class DataSourceTest {
+    @Autowired
+    PatientService service;
+    @Autowired
+    IcdService icdService;
 
     @Test
     void getSessionFactory() {
-        try (AnnotationConfigApplicationContext context
-                     = new AnnotationConfigApplicationContext(JpaConfig.class)) {
+        try {
+            Icd icd = new Icd("testName", 10, "testComment");
+            icd = icdService.save(icd);
 
-            PatientService service = context.getBean(PatientService.class);
-            IcdService icdService = context.getBean(IcdService.class);
+            System.out.println("!!!!!!!!!!" + icd);
+            icdService.delete(icd);
+            Patient entity = service.findById(3);
 
-            try {
-                Icd icd = new Icd("testName", 10, "testComment");
-                icd = icdService.save(icd);
-
-                System.out.println("!!!!!!!!!!" + icd);
-                icdService.delete(icd);
-                Patient entity = service.findById(3);
-
-                System.out.println("!!!!!!!!!!" + entity);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            System.out.println("!!!!!!!!!!" + entity);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

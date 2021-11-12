@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
@@ -19,9 +18,9 @@ import java.util.Optional;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 03/11/2021
  */
+@Slf4j
 @Service
 public class ChannelService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChannelService.class);
     private final ChannelRepository repository;
 
     @Autowired
@@ -31,21 +30,21 @@ public class ChannelService {
 
     @PostConstruct
     private void init() {
-        LOGGER.info("ChannelService is init");
+        log.info("ChannelService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        LOGGER.info("ChannelService is destruction");
+        log.info("ChannelService is destruction");
     }
 
     public List<Channel> findAll() throws Exception {
         List<Channel> entities = repository.findAll();
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all channels from database");
+            log.info("Get all channels from database");
         } else {
-            LOGGER.info("Channels is not found in database");
+            log.info("Channels is not found in database");
         }
 
         return entities;
@@ -55,9 +54,9 @@ public class ChannelService {
         List<Channel> entities = repository.findAllByExamination(examination);
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all channels by examination from database");
+            log.info("Get all channels by examination from database");
         } else {
-            LOGGER.info("Channels by examination is not found in database");
+            log.info("Channels by examination is not found in database");
         }
 
         return entities;
@@ -70,11 +69,11 @@ public class ChannelService {
         Optional<Channel> optional = repository.findById(id);
 
         if (optional.isPresent()) {
-            LOGGER.info("Get channel(id={}) from database", optional.get().getId());
+            log.info("Get channel(id={}) from database", optional.get().getId());
 
             return optional.get();
         } else {
-            LOGGER.error("Channel(id={}) is not found in database", id);
+            log.error("Channel(id={}) is not found in database", id);
             throw new EntityNotFoundException("Channel(id=" + id + ") is not found in database");
         }
     }
@@ -89,7 +88,7 @@ public class ChannelService {
             throw new NullPointerException("Samples is null");
 
         entity = repository.save(entity);
-        LOGGER.info("Channel(id={})  is recorded in database", entity.getId());
+        log.info("Channel(id={})  is recorded in database", entity.getId());
 
         return entity;
     }
@@ -105,9 +104,9 @@ public class ChannelService {
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
-            LOGGER.info("Channel(id={}) is deleted in database", optional.get().getId());
+            log.info("Channel(id={}) is deleted in database", optional.get().getId());
         } else {
-            LOGGER.info("Channel(id={}) not found in database", entity.getId());
+            log.info("Channel(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException("Channel(id=" + entity.getId() + ") not found in database");
         }
     }

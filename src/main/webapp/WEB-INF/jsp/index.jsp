@@ -10,11 +10,11 @@
 <head>
     <meta charset="UTF-8">
     <title>BiointerfaceController(server)</title>
-    <link rel="stylesheet" href="/css/dropdown.css"/>
+    <link rel="stylesheet" href="/pdown.css"/>
 </head>
 <body>
     <div id="menu">
-        <%@include  file="topMenu.html" %>
+        <%@include  file="../templates/topMenu.html" %>
     </div>
     <div id="content">
         <h2>${message}</h2>

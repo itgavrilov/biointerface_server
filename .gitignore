@@ -7,6 +7,6 @@ gradle/*
 
 build/*
 logs/*
-
+out/*
 #*.s3db
 

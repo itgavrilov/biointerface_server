@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Patient;
@@ -19,9 +18,9 @@ import java.util.Optional;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Slf4j
 @Service
 public class PatientService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PatientService.class);
     private final PatientRepository repository;
 
     @Autowired
@@ -44,21 +43,21 @@ public class PatientService {
 
     @PostConstruct
     private void init() {
-        LOGGER.info("PatientService is init");
+        log.info("PatientService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        LOGGER.info("PatientService is destruction");
+        log.info("PatientService is destruction");
     }
 
     public List<Patient> findAll() throws Exception {
         List<Patient> entities = repository.findAll();
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all patients from database");
+            log.info("Get all patients from database");
         } else {
-            LOGGER.info("Patient is not found in database");
+            log.info("Patient is not found in database");
         }
 
         return entities;
@@ -71,10 +70,10 @@ public class PatientService {
         Optional<Patient> optional = repository.findById(id);
 
         if (optional.isPresent()) {
-            LOGGER.info("Get Patient(id={}) from database", optional.get().getId());
+            log.info("Get Patient(id={}) from database", optional.get().getId());
             return optional.get();
         } else {
-            LOGGER.error("Patient(id={}) is not found in database", id);
+            log.error("Patient(id={}) is not found in database", id);
             throw new EntityNotFoundException(
                     "Patient(id=" + id + ") is not found in database"
             );
@@ -105,7 +104,7 @@ public class PatientService {
             throw new NullPointerException("Examinations is null");
 
         repository.save(entity);
-        LOGGER.info("Patient(id={}) is recorded in database", entity.getId());
+        log.info("Patient(id={}) is recorded in database", entity.getId());
     }
 
     @Transactional
@@ -119,9 +118,9 @@ public class PatientService {
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
-            LOGGER.info("Patient(id={}) is deleted in database", optional.get().getId());
+            log.info("Patient(id={}) is deleted in database", optional.get().getId());
         } else {
-            LOGGER.error("Patient(id={}) not found in database", entity.getId());
+            log.error("Patient(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException(
                     "Patient(id=" + entity.getId() + ") not found in database"
             );

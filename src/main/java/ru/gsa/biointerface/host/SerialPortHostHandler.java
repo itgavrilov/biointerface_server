@@ -1,8 +1,8 @@
 package ru.gsa.biointerface.host;
 
 import com.fazecast.jSerialComm.SerialPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -27,11 +27,12 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
-
+@Slf4j
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Component()
 @Scope("prototype")
 public class SerialPortHostHandler implements DataCollector, HostHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SerialPortHostHandler.class);
+    @EqualsAndHashCode.Include
     private final SerialPortHost serialPortHost;
     private final List<Cash> cashList = new ArrayList<>();
     private final List<ChannelName> channelNames = new ArrayList<>();
@@ -55,7 +56,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             throw new NullPointerException("SerialPort is null");
 
         serialPortHost = new SerialPortHost(serialPort, this);
-        LOGGER.info("Crate connection to serialPort(SystemPortName={})", serialPort.getSystemPortName());
+        log.info("Crate connection to serialPort(SystemPortName={})", serialPort.getSystemPortName());
     }
 
     @Override
@@ -111,16 +112,16 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         }
 
         if (channelName != null) {
-            LOGGER.info("ChannelName(id={}) is set in channel(number={})", channelName.getId(), number);
+            log.info("ChannelName(id={}) is set in channel(number={})", channelName.getId(), number);
         } else {
-            LOGGER.info("ChannelName is reset in channel(number={})", number);
+            log.info("ChannelName is reset in channel(number={})", number);
         }
     }
 
     @Override
     public void setCommentForExamination(String newComment) throws Exception {
         this.comment = newComment;
-        LOGGER.info("Set new comment for examination");
+        log.info("Set new comment for examination");
 
         if (examination != null) {
             String comment = examination.getComment();
@@ -128,10 +129,10 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
                 try {
                     examination.setComment(newComment);
                     examinationService.save(examination);
-                    LOGGER.info("New comment is set in examination(number={})", examination.getId());
+                    log.info("New comment is set in examination(number={})", examination.getId());
                 } catch (Exception e) {
                     examination.setComment(comment);
-                    LOGGER.error("Error update examination(number={})", examination.getId(), e);
+                    log.error("Error update examination(number={})", examination.getId(), e);
                     throw e;
                 }
             }
@@ -144,12 +145,12 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             try {
                 serialPortHost.start();
                 serialPortHost.sendPackage(ControlMessages.GET_CONFIG);
-                LOGGER.info("Connecting to device");
+                log.info("Connecting to device");
             } catch (Exception e) {
-                LOGGER.error("Host is not running", e);
+                log.error("Host is not running", e);
             }
         } else {
-            LOGGER.warn("Device is already connected");
+            log.warn("Device is already connected");
         }
     }
 
@@ -163,9 +164,9 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
                 transmissionStop();
             }
             serialPortHost.stop();
-            LOGGER.info("Disconnecting from device");
+            log.info("Disconnecting from device");
         } else {
-            LOGGER.warn("Device is already disconnected");
+            log.warn("Device is already disconnected");
         }
     }
 
@@ -192,7 +193,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
 
         serialPortHost.sendPackage(ControlMessages.START_TRANSMISSION);
         flagTransmission = true;
-        LOGGER.info("Start transmission");
+        log.info("Start transmission");
     }
 
     @Override
@@ -208,7 +209,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
 
         serialPortHost.sendPackage(ControlMessages.STOP_TRANSMISSION);
         flagTransmission = false;
-        LOGGER.info("Stop transmission");
+        log.info("Stop transmission");
     }
 
     @Override
@@ -237,9 +238,9 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             }
 
             examinationService.recordingStart(examination);
-            LOGGER.info("Start recording");
+            log.info("Start recording");
         } else {
-            LOGGER.warn("Recording is already in progress");
+            log.warn("Recording is already in progress");
         }
     }
 
@@ -250,7 +251,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
 
         examinationService.recordingStop();
         examination = null;
-        LOGGER.info("Stop recording");
+        log.info("Stop recording");
     }
 
     @Override
@@ -273,7 +274,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
 
         serialPortHost.sendPackage(ControlMessages.REBOOT);
         disconnect();
-        LOGGER.info("Reboot controller");
+        log.info("Reboot controller");
     }
 
     @Override
@@ -319,19 +320,6 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
     @Override
     public void setFlagTransmission() {
         flagTransmission = true;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SerialPortHostHandler that = (SerialPortHostHandler) o;
-        return Objects.equals(serialPortHost, that.serialPortHost);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(serialPortHost);
     }
 
     @Override

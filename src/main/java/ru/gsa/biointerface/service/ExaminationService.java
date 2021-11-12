@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
@@ -19,9 +18,9 @@ import java.util.Optional;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Slf4j
 @Service
 public class ExaminationService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExaminationService.class);
     private final ExaminationRepository repository;
     private final SampleService sampleService;
     private final ChannelService channelService;
@@ -39,21 +38,21 @@ public class ExaminationService {
 
     @PostConstruct
     private void init() {
-        LOGGER.info("ExaminationService is init");
+        log.info("ExaminationService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        LOGGER.info("ExaminationService is destruction");
+        log.info("ExaminationService is destruction");
     }
 
     public List<Examination> findAll() throws Exception {
         List<Examination> entities = repository.findAll();
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all examinations from database");
+            log.info("Get all examinations from database");
         } else {
-            LOGGER.info("Examinations is not found in database");
+            log.info("Examinations is not found in database");
         }
 
         return entities;
@@ -66,9 +65,9 @@ public class ExaminationService {
         List<Examination> entities = repository.findAllByPatient(patient);
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all examinations by patientRecord(id={}) from database", patient.getId());
+            log.info("Get all examinations by patientRecord(id={}) from database", patient.getId());
         } else {
-            LOGGER.info("Examinations by patientRecord(id={}) is not found in database", patient.getId());
+            log.info("Examinations by patientRecord(id={}) is not found in database", patient.getId());
         }
 
         return entities;
@@ -83,11 +82,11 @@ public class ExaminationService {
         Optional<Examination> optional = repository.findById(id);
 
         if (optional.isPresent()) {
-            LOGGER.info("Get examination(id={}) from database", optional.get().getId());
+            log.info("Get examination(id={}) from database", optional.get().getId());
 
             return optional.get();
         } else {
-            LOGGER.error("Examination(id={}) is not found in database", id);
+            log.error("Examination(id={}) is not found in database", id);
             throw new EntityNotFoundException("Examination(id=" + id + ") is not found in database");
         }
     }
@@ -98,15 +97,15 @@ public class ExaminationService {
             throw new NullPointerException("Entity is null");
         if (entity.getStarttime() == null)
             throw new NullPointerException("StartTime is null");
-        if (entity.getPatientRecord() == null)
-            throw new NullPointerException("PatientRecord is null");
+        if (entity.getPatient() == null)
+            throw new NullPointerException("Patient is null");
         if (entity.getDevice() == null)
             throw new NullPointerException("Device is null");
         if (entity.getChannels() == null)
             throw new NullPointerException("Channels is null");
 
         entity = repository.save(entity);
-        LOGGER.info("Examination(id={}) is recorded in database", entity.getId());
+        log.info("Examination(id={}) is recorded in database", entity.getId());
 
         return entity;
     }
@@ -122,9 +121,9 @@ public class ExaminationService {
 
         if (optional.isPresent()) {
             repository.delete(entity);
-            LOGGER.info("Examination(id={}) is deleted in database", entity.getId());
+            log.info("Examination(id={}) is deleted in database", entity.getId());
         } else {
-            LOGGER.info("Examination(id={}) not found in database", entity.getId());
+            log.info("Examination(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException(
                     "Examination(id=" + entity.getId() + ") is not found in database"
             );
@@ -139,7 +138,7 @@ public class ExaminationService {
             channel.setSamples(sampleService.findAllByChannel(channel));
         }
 
-        LOGGER.info("Examination(id={}) load with channels from database", entity.getId());
+        log.info("Examination(id={}) load with channels from database", entity.getId());
 
         return entity;
     }
@@ -147,8 +146,8 @@ public class ExaminationService {
     public void recordingStart(Examination entity) throws Exception {
         if (entity == null)
             throw new NullPointerException("Entity is null");
-        if (entity.getPatientRecord() == null)
-            throw new NullPointerException("PatientRecord is null");
+        if (entity.getPatient() == null)
+            throw new NullPointerException("Patient is null");
         if (entity.getDevice() == null)
             throw new NullPointerException("Device is null");
         if (entity.getChannels() == null)
@@ -160,9 +159,9 @@ public class ExaminationService {
 
         if (optional.isPresent()) {
             sampleService.transactionOpen();
-            LOGGER.info("Recording started");
+            log.info("Recording started");
         } else {
-            LOGGER.error(
+            log.error(
                     "Examination(id={}) does not yet exist in database. Recording is not start",
                     entity.getId());
             throw new NullPointerException(
@@ -173,7 +172,7 @@ public class ExaminationService {
 
     public void recordingStop() throws Exception {
         sampleService.transactionClose();
-        LOGGER.info("Recording stopped");
+        log.info("Recording stopped");
     }
 
     public boolean isRecording() {

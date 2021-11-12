@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -15,6 +19,9 @@ import java.util.TreeSet;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "patient")
 @Table(name = "patient")
 public class Patient implements Serializable, Comparable<Patient> {
@@ -59,9 +66,6 @@ public class Patient implements Serializable, Comparable<Patient> {
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     private Set<Examination> examinations;
 
-    public Patient() {
-    }
-
     public Patient(int id, String secondName, String firstName, String patronymic, Calendar birthday, Icd icd, String comment) {
         this.id = id;
         this.secondName = secondName;
@@ -73,77 +77,12 @@ public class Patient implements Serializable, Comparable<Patient> {
         this.icd = icd;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getPatronymic() {
-        return patronymic;
-    }
-
-    public void setPatronymic(String middleName) {
-        this.patronymic = middleName;
-    }
-
-    public Calendar getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Calendar birthday) {
-        this.birthday = birthday;
-    }
-
     public LocalDate getBirthdayInLocalDate() {
         return LocalDateTime.ofInstant(
                         birthday.toInstant(),
                         ZoneId.systemDefault()
                 )
                 .toLocalDate();
-    }
-
-    public Icd getIcd() {
-        return icd;
-    }
-
-    public void setIcd(Icd icd) {
-        this.icd = icd;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Set<Examination> getExaminations() {
-        return examinations;
-    }
-
-    public void setExaminations(Set<Examination> examinations) {
-        this.examinations = examinations;
     }
 
     @Override

@@ -1,13 +1,11 @@
 package ru.gsa.biointerface.repository.customized;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Sample;
-import ru.gsa.biointerface.repository.SampleRepository;
 import ru.gsa.biointerface.repository.exception.InsertException;
 import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
 import ru.gsa.biointerface.repository.exception.TransactionStopException;
@@ -18,9 +16,9 @@ import javax.persistence.EntityManagerFactory;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Slf4j
 @Component
 public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
-    protected final Logger LOGGER = LoggerFactory.getLogger(SampleRepository.class);
     private EntityManager entityManager;
     private boolean transactionIsOpen;
 
@@ -45,7 +43,7 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
             }
             return entity;
         } catch (Exception e) {
-            LOGGER.error("Insert sample error", e);
+            log.error("Insert sample error", e);
             throw new InsertException(e);
         }
     }
@@ -55,10 +53,10 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
         try {
             entityManager = entityManagerFactory.createEntityManager();
             entityManager.getTransaction().begin();
-            LOGGER.info("Transaction open is successful");
+            log.info("Transaction open is successful");
             transactionIsOpen = true;
         } catch (Exception e) {
-            LOGGER.error("Transaction opening error", e);
+            log.error("Transaction opening error", e);
             throw new TransactionNotOpenException(e);
         }
     }
@@ -75,9 +73,9 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
             entityManager.getTransaction().commit();
             entityManager.close();
             entityManager = null;
-            LOGGER.info("Transaction close is successful");
+            log.info("Transaction close is successful");
         } catch (Exception e) {
-            LOGGER.error("Transaction closing error", e);
+            log.error("Transaction closing error", e);
             throw new TransactionStopException(e);
         }
     }

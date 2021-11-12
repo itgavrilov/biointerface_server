@@ -1,3 +1,9 @@
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    font-family: Arial, sans-serif;
+}
 /* Dropdown Button */
 .dropbtn {
     background-color: #74bec7;
@@ -6,14 +12,6 @@
     font-size: 14px;
     border: none;
 }
-
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
-    position: relative;
-    display: inline-block;
-    font-family: Arial;
-}
-
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
     display: none;

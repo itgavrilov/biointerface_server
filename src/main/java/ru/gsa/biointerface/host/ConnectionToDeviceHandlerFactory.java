@@ -1,10 +1,9 @@
 package ru.gsa.biointerface.host;
 
 import com.fazecast.jSerialComm.SerialPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Device;
 
@@ -17,12 +16,12 @@ import java.util.stream.Collectors;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 28.10.2021.
  */
+@Slf4j
 @Component
 public class ConnectionToDeviceHandlerFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionToDeviceHandlerFactory.class);
     private final List<HostHandler> hostHandlers = new ArrayList<>();
     @Autowired
-    private AnnotationConfigApplicationContext context;
+    private ApplicationContext context;
 
     public void scanningSerialPort() {
         hostHandlers.clear();
@@ -32,7 +31,7 @@ public class ConnectionToDeviceHandlerFactory {
             hostHandler.connect();
             hostHandlers.add(hostHandler);
         }
-        LOGGER.info("Scanning devices");
+        log.info("Scanning devices");
     }
 
     private List<SerialPort> getSerialPortsWithDevises() {
@@ -48,7 +47,7 @@ public class ConnectionToDeviceHandlerFactory {
                         try {
                             o.disconnect();
                         } catch (Exception e) {
-                            LOGGER.error("Device disconnect error", e);
+                            log.error("Device disconnect error", e);
                         }
                     }
                 })
@@ -63,7 +62,7 @@ public class ConnectionToDeviceHandlerFactory {
                 .filter(o -> device.equals(o.getDevice()))
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
-        LOGGER.info("Get available devices");
+        log.info("Get available devices");
 
         return hostHandler;
     }

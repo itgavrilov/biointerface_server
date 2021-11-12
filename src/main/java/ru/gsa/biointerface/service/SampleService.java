@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
@@ -15,9 +14,9 @@ import java.util.List;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 03/11/2021
  */
+@Slf4j
 @Service
 public class SampleService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SampleService.class);
     private final SampleRepository repository;
 
     @Autowired
@@ -27,21 +26,21 @@ public class SampleService {
 
     @PostConstruct
     private void init() {
-        LOGGER.info("SampleService is init");
+        log.info("SampleService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        LOGGER.info("SampleService is destruction");
+        log.info("SampleService is destruction");
     }
 
     public List<Sample> findAllByChannel(Channel channel) throws Exception {
         List<Sample> entities = repository.findAllByChannel(channel);
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all samples by channel from database");
+            log.info("Get all samples by channel from database");
         } else {
-            LOGGER.info("Samples by channel is not found in database");
+            log.info("Samples by channel is not found in database");
         }
 
         return entities;
@@ -49,12 +48,12 @@ public class SampleService {
 
     public void transactionOpen() throws Exception {
         repository.transactionOpen();
-        LOGGER.info("Transaction is open");
+        log.info("Transaction is open");
     }
 
     public void transactionClose() throws Exception {
         repository.transactionClose();
-        LOGGER.info("Transaction is close");
+        log.info("Transaction is close");
     }
 
     public boolean transactionIsOpen() {
