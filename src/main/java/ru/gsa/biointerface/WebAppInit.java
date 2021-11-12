@@ -1,31 +1,24 @@
 package ru.gsa.biointerface;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
-import ru.gsa.biointerface.config.MvcConfig;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Description;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 07/11/2021
  */
-public class WebAppInit implements WebApplicationInitializer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebAppInit.class);
-
+@SpringBootApplication
+public class WebAppInit extends SpringBootServletInitializer {
     @Override
-    public void onStartup(ServletContext servletContext) {
-        AnnotationConfigWebApplicationContext applicationContext =
-                new AnnotationConfigWebApplicationContext();
-        applicationContext.register(MvcConfig.class);
-
-        DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext);
-        ServletRegistration.Dynamic registration =
-                servletContext.addServlet("dispatcherServlet", dispatcherServlet);
-        registration.setLoadOnStartup(1);
-        registration.addMapping("/");
+    @Description("To run on an external container without Spring Framework Servlet 3.0")
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(WebAppInit.class);
     }
+
+    public static void main(String[] args) {
+            SpringApplication.run(WebAppInit.class, args);
+        }
+
 }

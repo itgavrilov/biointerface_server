@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -10,6 +14,9 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "channel")
 @Table(name = "channel")
 public class Channel implements Serializable, Comparable<Channel> {
@@ -30,46 +37,11 @@ public class Channel implements Serializable, Comparable<Channel> {
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
 
-    public Channel() {
-    }
-
     public Channel(Integer id, Examination examination, ChannelName channelName) {
         this.id = new ChannelID(id, examination.getId());
         this.samples = new LinkedList<>();
         this.examination = examination;
         this.channelName = channelName;
-    }
-
-    public ChannelID getId() {
-        return id;
-    }
-
-    public void setId(ChannelID id) {
-        this.id = id;
-    }
-
-    public Examination getExamination() {
-        return examination;
-    }
-
-    public void setExamination(Examination examination) {
-        this.examination = examination;
-    }
-
-    public ChannelName getChannelName() {
-        return channelName;
-    }
-
-    public void setChannelName(ChannelName channelName) {
-        this.channelName = channelName;
-    }
-
-    public List<Sample> getSamples() {
-        return samples;
-    }
-
-    public void setSamples(List<Sample> samples) {
-        this.samples = samples;
     }
 
     @Override

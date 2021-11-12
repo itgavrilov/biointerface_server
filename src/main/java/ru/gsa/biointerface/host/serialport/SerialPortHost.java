@@ -3,8 +3,8 @@ package ru.gsa.biointerface.host.serialport;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import ru.gsa.biointerface.host.serialport.packets.*;
 import ru.gsa.biointerface.host.serialport.serverByPuchkov.AbstractServer;
 
@@ -14,8 +14,10 @@ import java.util.Arrays;
  * Created by Пучков Константин on 12.03.2019.
  * Modified by Gavrilov Stepan on 16.08.2021.
  */
+@Slf4j
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> implements SerialPortDataListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SerialPortHost.class);
+    @EqualsAndHashCode.Include
     private final SerialPort serialPort;
 
     public SerialPortHost(SerialPort serialPort, DataCollector dataCollector) {
@@ -28,7 +30,7 @@ public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> i
         this.serialPort = serialPort;
 
         handler = new SerialPortHandler(dataCollector);
-        LOGGER.info("Handler for serialPort(SystemPortName={}) is started", serialPort.getSystemPortName());
+        log.info("Handler for serialPort(SystemPortName={}) is started", serialPort.getSystemPortName());
     }
 
     public boolean portIsOpen() {
@@ -46,9 +48,9 @@ public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> i
             serialPort.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
             serialPort.openPort();
             serialPort.addDataListener(this);
-            LOGGER.info("SerialPortHost with serialPort(SystemPortName={}) started", serialPort.getSystemPortName());
+            log.info("SerialPortHost with serialPort(SystemPortName={}) started", serialPort.getSystemPortName());
         } catch (Exception e) {
-            LOGGER.error("Error started serialPortHost with serialPort(SystemPortName={})", serialPort.getSystemPortName(), e);
+            log.error("Error started serialPortHost with serialPort(SystemPortName={})", serialPort.getSystemPortName(), e);
         }
     }
 
@@ -59,12 +61,12 @@ public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> i
             if (serialPort.isOpen()) {
                 serialPort.closePort();
                 serialPort.removeDataListener();
-                LOGGER.info("SerialPortHost with serialPort(SystemPortName={}) come to stop", serialPort.getSystemPortName());
+                log.info("SerialPortHost with serialPort(SystemPortName={}) come to stop", serialPort.getSystemPortName());
             } else {
-                LOGGER.warn("SerialPort(SystemPortName={}) is not open", serialPort.getSystemPortName());
+                log.warn("SerialPort(SystemPortName={}) is not open", serialPort.getSystemPortName());
             }
         } catch (Exception e) {
-            LOGGER.error("SerialPortHost with serialPort(SystemPortName={} stop error)", serialPort.getSystemPortName(), e);
+            log.error("SerialPortHost with serialPort(SystemPortName={} stop error)", serialPort.getSystemPortName(), e);
         }
     }
 
@@ -130,19 +132,6 @@ public class SerialPortHost extends AbstractServer<Packet, Packet, SerialPort> i
                     indexByteArray++;
             }
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SerialPortHost serialPortHost = (SerialPortHost) o;
-        return serialPort.equals(serialPortHost.serialPort);
-    }
-
-    @Override
-    public int hashCode() {
-        return serialPort.hashCode();
     }
 
     @Override

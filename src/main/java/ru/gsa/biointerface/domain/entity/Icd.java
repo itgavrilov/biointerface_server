@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -10,6 +14,9 @@ import java.util.TreeSet;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "icd")
 @Table(name = "icd")
 public class Icd implements Serializable, Comparable<Icd> {
@@ -37,55 +44,12 @@ public class Icd implements Serializable, Comparable<Icd> {
     @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Patient> patients;
 
-    public Icd() {
-    }
-
     public Icd(String name, int version, String comment) {
         this.id = -1;
         this.name = name;
         this.version = version;
         this.comment = comment;
         this.patients = new TreeSet<>();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Set<Patient> getPatientRecords() {
-        return patients;
-    }
-
-    public void setPatientRecords(Set<Patient> patients) {
-        this.patients = patients;
     }
 
     @Override

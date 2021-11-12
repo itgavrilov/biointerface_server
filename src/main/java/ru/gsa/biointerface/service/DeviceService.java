@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Device;
@@ -17,9 +16,9 @@ import java.util.Optional;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Slf4j
 @Service
 public class DeviceService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
     private final DeviceRepository repository;
 
     @Autowired
@@ -29,21 +28,21 @@ public class DeviceService {
 
     @PostConstruct
     private void init() {
-        LOGGER.info("DeviceService is init");
+        log.info("DeviceService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        LOGGER.info("DeviceService is destruction");
+        log.info("DeviceService is destruction");
     }
 
     public List<Device> findAll() throws Exception {
         List<Device> entities = repository.findAll();
 
         if (entities.size() > 0) {
-            LOGGER.info("Get all devices from database");
+            log.info("Get all devices from database");
         } else {
-            LOGGER.info("Devices is not found in database");
+            log.info("Devices is not found in database");
         }
 
         return entities;
@@ -56,11 +55,11 @@ public class DeviceService {
         Optional<Device> optional = repository.findById(id);
 
         if (optional.isPresent()) {
-            LOGGER.info("Get device(id={}) from database", optional.get().getId());
+            log.info("Get device(id={}) from database", optional.get().getId());
 
             return optional.get();
         } else {
-            LOGGER.error("Device(id={}) is not found in database", id);
+            log.error("Device(id={}) is not found in database", id);
             throw new EntityNotFoundException("Device(id=" + id + ") is not found in database");
         }
     }
@@ -77,7 +76,7 @@ public class DeviceService {
             throw new NullPointerException("Examinations is null");
 
         entity = repository.save(entity);
-        LOGGER.info("Device(id={}) is recorded in database", entity.getId());
+        log.info("Device(id={}) is recorded in database", entity.getId());
 
         return entity;
     }
@@ -93,9 +92,9 @@ public class DeviceService {
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
-            LOGGER.info("Device(id={}) is deleted in database", optional.get().getId());
+            log.info("Device(id={}) is deleted in database", optional.get().getId());
         } else {
-            LOGGER.info("Device(id={}) not found in database", entity.getId());
+            log.info("Device(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException("Device(id=" + entity.getId() + ") not found in database");
         }
     }

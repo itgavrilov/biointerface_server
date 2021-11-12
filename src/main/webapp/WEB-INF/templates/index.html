@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>BiointerfaceController(server)</title>
+    <link rel="stylesheet" th:href="@{/css/dropdown.css}"/>
+</head>
+<body>
+<th:block th:insert="topMenu::header" />
+<div class="content">
+    <h2 th:utext="${message}"></h2>
+</div>
+<img th:src="@{/img/spring.jpg}">
+<script type="/text/javascript" th:src="@{js/index.js}"></script>
+</body>
+</html>

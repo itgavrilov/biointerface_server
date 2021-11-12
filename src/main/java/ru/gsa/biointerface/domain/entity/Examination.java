@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
@@ -17,6 +21,9 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "examination")
 @Table(name = "examination")
 public class Examination implements Serializable, Comparable<Examination> {
@@ -49,9 +56,6 @@ public class Examination implements Serializable, Comparable<Examination> {
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
 
-    public Examination() {
-    }
-
     public Examination(Patient patient, Device device, String comment) {
         this.id = -1;
         this.starttime = Timestamp.valueOf(LocalDateTime.now());
@@ -61,58 +65,10 @@ public class Examination implements Serializable, Comparable<Examination> {
         this.patient = patient;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Date getStarttime() {
-        return starttime;
-    }
-
-    public void setStarttime(Date startTime) {
-        this.starttime = startTime;
-    }
-
     public LocalDateTime getStartTimeInLocalDateTime() {
         return starttime.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
-    }
-
-    public Patient getPatientRecord() {
-        return patient;
-    }
-
-    public void setPatientRecord(Patient patient) {
-        this.patient = patient;
-    }
-
-    public Device getDevice() {
-        return device;
-    }
-
-    public void setDevice(Device device) {
-        this.device = device;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public List<Channel> getChannels() {
-        return channels;
-    }
-
-    public void setChannels(List<Channel> channels) {
-        this.channels = channels;
     }
 
     @Override

@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -13,6 +17,9 @@ import java.util.TreeSet;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "device")
 @Table(name = "device")
 public class Device implements Serializable, Comparable<Device> {
@@ -35,46 +42,11 @@ public class Device implements Serializable, Comparable<Device> {
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     private Set<Examination> examinations;
 
-    public Device() {
-    }
-
     public Device(int id, int amountChannels) {
         this.id = id;
         this.amountChannels = amountChannels;
         this.comment = null;
         this.examinations = new TreeSet<>();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getAmountChannels() {
-        return amountChannels;
-    }
-
-    public void setAmountChannels(int amountChannels) {
-        this.amountChannels = amountChannels;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Set<Examination> getExaminations() {
-        return examinations;
-    }
-
-    public void setExaminations(Set<Examination> examinations) {
-        this.examinations = examinations;
     }
 
     @Override

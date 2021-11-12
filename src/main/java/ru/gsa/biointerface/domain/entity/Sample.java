@@ -1,5 +1,9 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -9,6 +13,9 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity(name = "sample")
 @Table(name = "sample")
 public class Sample implements Serializable, Comparable<Sample> {
@@ -30,37 +37,10 @@ public class Sample implements Serializable, Comparable<Sample> {
     @Column(nullable = false)
     private int value;
 
-    public Sample() {
-    }
-
     public Sample(int id, Channel channel, int value) {
         this.id = new SampleID(id, channel.getId());
         this.channel = channel;
         channel.getSamples().add(this);
-        this.value = value;
-    }
-
-    public SampleID getId() {
-        return id;
-    }
-
-    public void setId(SampleID id) {
-        this.id = id;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
         this.value = value;
     }
 
