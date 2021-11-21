@@ -3,6 +3,7 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 
@@ -10,8 +11,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -19,12 +21,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class ChannelNameService {
-    private final ChannelNameRepository repository;
-
     @Autowired
-    public ChannelNameService(ChannelNameRepository repository) {
-        this.repository = repository;
-    }
+    private ChannelNameRepository repository;
 
     @PostConstruct
     private void init() {
@@ -36,8 +34,8 @@ public class ChannelNameService {
         log.info("ChannelNameService is destruction");
     }
 
-    public List<ChannelName> getAll() throws Exception {
-        List<ChannelName> entities = repository.findAll();
+    public Set<ChannelName> findAll() {
+        Set<ChannelName> entities = new TreeSet<>(repository.findAll());
 
         if (entities.size() > 0) {
             log.info("Get all channelNames from database");
@@ -48,7 +46,7 @@ public class ChannelNameService {
         return entities;
     }
 
-    public ChannelName findById(int id) throws Exception {
+    public ChannelName findById(int id) {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
@@ -65,7 +63,7 @@ public class ChannelNameService {
     }
 
     @Transactional
-    public ChannelName save(ChannelName entity) throws Exception {
+    public ChannelName save(ChannelName entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getName() == null)
@@ -82,7 +80,7 @@ public class ChannelNameService {
     }
 
     @Transactional
-    public void delete(ChannelName entity) throws Exception {
+    public void delete(ChannelName entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -97,5 +95,22 @@ public class ChannelNameService {
             log.info("ChannelName(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException("ChannelName(id=" + entity.getId() + ") not found in database");
         }
+    }
+
+    public ChannelNameDTO convertEntityToDto(ChannelName entity) {
+        return ChannelNameDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .comment(entity.getComment())
+                .build();
+    }
+
+    public ChannelName convertDtoToEntity(ChannelNameDTO dto) {
+        return ChannelName.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .comment(dto.getComment())
+                .channels(new TreeSet<>())
+                .build();
     }
 }

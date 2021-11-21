@@ -3,7 +3,9 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.dto.ExaminationDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.repository.ExaminationRepository;
@@ -12,8 +14,13 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.List;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -21,20 +28,16 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class ExaminationService {
-    private final ExaminationRepository repository;
-    private final SampleService sampleService;
-    private final ChannelService channelService;
-
     @Autowired
-    public ExaminationService(
-            ExaminationRepository repository,
-            ChannelService channelService,
-            SampleService sampleService
-    ) {
-        this.repository = repository;
-        this.channelService = channelService;
-        this.sampleService = sampleService;
-    }
+    private ExaminationRepository repository;
+    @Autowired
+    private PatientService patientService;
+    @Autowired
+    private DeviceService deviceService;
+    @Autowired
+    private ChannelService channelService;
+    @Autowired
+    private SampleService sampleService;
 
     @PostConstruct
     private void init() {
@@ -46,8 +49,8 @@ public class ExaminationService {
         log.info("ExaminationService is destruction");
     }
 
-    public List<Examination> findAll() throws Exception {
-        List<Examination> entities = repository.findAll();
+    public Set<Examination> findAll() {
+        Set<Examination> entities = new TreeSet<>(repository.findAll());
 
         if (entities.size() > 0) {
             log.info("Get all examinations from database");
@@ -58,22 +61,37 @@ public class ExaminationService {
         return entities;
     }
 
-    public List<Examination> getByPatientRecord(Patient patient) throws Exception {
+    public Set<Examination> findByPatient(Patient patient) {
         if (patient == null)
-            throw new NullPointerException("PatientRecord is null");
+            throw new NullPointerException("Patient is null");
 
-        List<Examination> entities = repository.findAllByPatient(patient);
+        Set<Examination> entities = new TreeSet<>(repository.findAllByPatient(patient));
 
         if (entities.size() > 0) {
-            log.info("Get all examinations by patientRecord(id={}) from database", patient.getId());
+            log.info("Get all examinations by patient(id={}) from database", patient.getId());
         } else {
-            log.info("Examinations by patientRecord(id={}) is not found in database", patient.getId());
+            log.info("Examinations by patient(id={}) is not found in database", patient.getId());
         }
 
         return entities;
     }
 
-    public Examination findById(Integer id) throws Exception {
+    public Set<Examination> findByDevice(Device device) {
+        if (device == null)
+            throw new NullPointerException("Device is null");
+
+        Set<Examination> entities = new TreeSet<>(repository.findAllByDevice(device));
+
+        if (entities.size() > 0) {
+            log.info("Get all examinations by device(id={}) from database", device.getId());
+        } else {
+            log.info("Examinations by device(id={}) is not found in database", device.getId());
+        }
+
+        return entities;
+    }
+
+    public Examination findById(Integer id) {
         if (id == null)
             throw new NullPointerException("Id is null");
         if (id <= 0)
@@ -92,7 +110,7 @@ public class ExaminationService {
     }
 
     @Transactional
-    public Examination save(Examination entity) throws Exception {
+    public Examination save(Examination entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getStarttime() == null)
@@ -111,7 +129,7 @@ public class ExaminationService {
     }
 
     @Transactional
-    public void delete(Examination entity) throws Exception {
+    public void delete(Examination entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -130,7 +148,7 @@ public class ExaminationService {
         }
     }
 
-    public Examination loadWithGraphsById(int id) throws Exception {
+    public Examination loadWithGraphsById(int id) {
         Examination entity = findById(id);
         entity.setChannels(channelService.findAllByExamination(entity));
 
@@ -177,5 +195,67 @@ public class ExaminationService {
 
     public boolean isRecording() {
         return sampleService.transactionIsOpen();
+    }
+
+    public ExaminationDTO convertEntityToDto(Examination entity) {
+        int patient_id = 0;
+        int device_id = 0;
+
+        if (entity.getPatient() != null) {
+            patient_id = entity.getPatient().getId();
+        }
+
+        if (entity.getDevice() != null) {
+            device_id = entity.getDevice().getId();
+        }
+
+        return ExaminationDTO.builder()
+                .id(entity.getId())
+                .starttime(LocalDateTime.ofInstant(
+                        entity.getStarttime().toInstant(),
+                        ZoneId.systemDefault())
+                )
+                .patient_id(patient_id)
+                .device_id(device_id)
+                .comment(entity.getComment())
+                .build();
+    }
+
+    public Examination convertDtoToEntity(ExaminationDTO dto) {
+        Patient patient = null;
+        Device device = null;
+
+        if (dto.getPatient_id() != 0) {
+            patient = patientService.findById(dto.getPatient_id());
+        }
+
+        if (dto.getDevice_id() != 0) {
+            device = deviceService.findById(dto.getDevice_id());
+        }
+
+        Examination examination = Examination.builder()
+                .id(dto.getId())
+                .starttime(Timestamp.valueOf(dto.getStarttime()))
+                .comment(dto.getComment())
+                .channels(new ArrayList<>())
+                .build();
+
+        if (patient != null) {
+            if (!patient.getExaminations().contains(examination)) {
+                patient.addExamination(examination);
+            } else {
+                examination.setPatient(patient);
+            }
+        }
+
+        if (device != null) {
+            if (!device.getExaminations().contains(examination)) {
+                device.addExamination(examination);
+            } else {
+                examination.setDevice(device);
+            }
+        }
+
+        return examination;
     }
 }

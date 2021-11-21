@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
+import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
 
 import java.util.List;
@@ -14,4 +15,6 @@ import java.util.List;
 @Repository
 public interface ChannelRepository extends JpaRepository<Channel, ChannelID> {
     List<Channel> findAllByExamination(Examination examination);
+
+    List<Channel> findAllByChannelName(ChannelName channelName);
 }

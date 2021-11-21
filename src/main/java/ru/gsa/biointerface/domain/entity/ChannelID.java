@@ -16,15 +16,15 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Embeddable
 public class ChannelID implements Serializable, Comparable<ChannelID> {
-    @NotNull(message = "Id can't be null")
-    private int number;
-
-    @NotNull(message = "Id can't be null")
+    @NotNull(message = "Examination id can't be null")
     private int examination_id;
 
-    public ChannelID(int id, int examination_id) {
-        this.number = id;
+    @NotNull(message = "Number can't be null")
+    private int number;
+
+    public ChannelID(int examination_id, int number) {
         this.examination_id = examination_id;
+        this.number = number;
     }
 
     @Override

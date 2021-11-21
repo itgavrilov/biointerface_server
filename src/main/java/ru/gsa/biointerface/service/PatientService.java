@@ -3,6 +3,8 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.dto.PatientDTO;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.repository.PatientRepository;
 
@@ -10,10 +12,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -21,14 +25,12 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PatientService {
-    private final PatientRepository repository;
-
     @Autowired
-    public PatientService(PatientRepository repository) {
-        this.repository = repository;
-    }
+    private PatientRepository repository;
+    @Autowired
+    private IcdService icdService;
 
-    private static Calendar localDateToDate(LocalDate localDate) {
+    private static Calendar localDateToDate(LocalDateTime localDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
         //noinspection MagicConstant
@@ -51,8 +53,8 @@ public class PatientService {
         log.info("PatientService is destruction");
     }
 
-    public List<Patient> findAll() throws Exception {
-        List<Patient> entities = repository.findAll();
+    public Set<Patient> findAll() {
+        Set<Patient> entities = new TreeSet<>(repository.findAll());
 
         if (entities.size() > 0) {
             log.info("Get all patients from database");
@@ -63,7 +65,19 @@ public class PatientService {
         return entities;
     }
 
-    public Patient findById(int id) throws Exception {
+    public Set<Patient> findAllByIcd(Icd icd) {
+        Set<Patient> entities = new TreeSet<>(repository.findAllByIcd(icd));
+
+        if (entities.size() > 0) {
+            log.info("Get all patients by icd from database");
+        } else {
+            log.info("Patient by icd is not found in database");
+        }
+
+        return entities;
+    }
+
+    public Patient findById(int id) {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
@@ -81,7 +95,7 @@ public class PatientService {
     }
 
     @Transactional
-    public void save(Patient entity) throws Exception {
+    public Patient save(Patient entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -103,12 +117,14 @@ public class PatientService {
         if (entity.getExaminations() == null)
             throw new NullPointerException("Examinations is null");
 
-        repository.save(entity);
+        entity = repository.save(entity);
         log.info("Patient(id={}) is recorded in database", entity.getId());
+
+        return entity;
     }
 
     @Transactional
-    public void delete(Patient entity) throws Exception {
+    public void delete(Patient entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -125,5 +141,53 @@ public class PatientService {
                     "Patient(id=" + entity.getId() + ") not found in database"
             );
         }
+    }
+
+    public PatientDTO convertEntityToDto(Patient entity) {
+        int icd_id = 0;
+
+        if (entity.getIcd() != null) {
+            icd_id = entity.getIcd().getId();
+        }
+
+        return PatientDTO.builder()
+                .id(entity.getId())
+                .firstName(entity.getFirstName())
+                .secondName(entity.getSecondName())
+                .patronymic(entity.getPatronymic())
+                .birthday(LocalDateTime.ofInstant(
+                        entity.getBirthday().toInstant(),
+                        ZoneId.systemDefault()))
+                .icd_id(icd_id)
+                .comment(entity.getComment())
+                .build();
+    }
+
+    public Patient convertDtoToEntity(PatientDTO dto) {
+        Icd icd = null;
+
+        if (dto.getIcd_id() != 0) {
+            icd = icdService.findById(dto.getIcd_id());
+        }
+
+        Patient patient = Patient.builder()
+                .id(dto.getId())
+                .firstName(dto.getFirstName())
+                .secondName(dto.getSecondName())
+                .patronymic(dto.getPatronymic())
+                .birthday(localDateToDate(dto.getBirthday()))
+                .comment(dto.getComment())
+                .examinations(new TreeSet<>())
+                .build();
+
+        if (icd != null) {
+            if (!icd.getPatients().contains(patient)) {
+                icd.addPatient(patient);
+            } else {
+                patient.setIcd(icd);
+            }
+        }
+
+        return patient;
     }
 }

@@ -13,11 +13,11 @@
     <link rel="stylesheet" href="/pdown.css"/>
 </head>
 <body>
-    <div id="menu">
-        <%@include  file="../templates/topMenu.html" %>
-    </div>
-    <div id="content">
-        <h2>${message}</h2>
-    </div>
+<div id="menu">
+    <%@include file="../templates/topMenu.html" %>
+</div>
+<div id="content">
+    <h2>${message}</h2>
+</div>
 </body>
 </html>

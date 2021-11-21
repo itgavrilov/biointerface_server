@@ -11,14 +11,14 @@ import org.springframework.context.annotation.Description;
  */
 @SpringBootApplication
 public class WebAppInit extends SpringBootServletInitializer {
+    public static void main(String[] args) {
+        SpringApplication.run(WebAppInit.class, args);
+    }
+
     @Override
     @Description("To run on an external container without Spring Framework Servlet 3.0")
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(WebAppInit.class);
     }
-
-    public static void main(String[] args) {
-            SpringApplication.run(WebAppInit.class, args);
-        }
 
 }

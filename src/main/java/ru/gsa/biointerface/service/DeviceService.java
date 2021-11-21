@@ -3,6 +3,7 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.repository.DeviceRepository;
 
@@ -10,8 +11,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -19,12 +21,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DeviceService {
-    private final DeviceRepository repository;
-
     @Autowired
-    public DeviceService(DeviceRepository repository) {
-        this.repository = repository;
-    }
+    private DeviceRepository repository;
 
     @PostConstruct
     private void init() {
@@ -36,8 +34,8 @@ public class DeviceService {
         log.info("DeviceService is destruction");
     }
 
-    public List<Device> findAll() throws Exception {
-        List<Device> entities = repository.findAll();
+    public Set<Device> findAll() {
+        Set<Device> entities = new TreeSet<>(repository.findAll());
 
         if (entities.size() > 0) {
             log.info("Get all devices from database");
@@ -48,7 +46,7 @@ public class DeviceService {
         return entities;
     }
 
-    public Device findById(int id) throws Exception {
+    public Device findById(int id) {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
@@ -65,7 +63,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public Device save(Device entity) throws Exception {
+    public Device save(Device entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -82,7 +80,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public void delete(Device entity) throws Exception {
+    public void delete(Device entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -97,5 +95,22 @@ public class DeviceService {
             log.info("Device(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException("Device(id=" + entity.getId() + ") not found in database");
         }
+    }
+
+    public DeviceDTO convertEntityToDto(Device entity) {
+        return DeviceDTO.builder()
+                .id(entity.getId())
+                .amountChannels(entity.getAmountChannels())
+                .comment(entity.getComment())
+                .build();
+    }
+
+    public Device convertDtoToEntity(DeviceDTO dto) {
+        return Device.builder()
+                .id(dto.getId())
+                .amountChannels(dto.getAmountChannels())
+                .comment(dto.getComment())
+                .examinations(new TreeSet<>())
+                .build();
     }
 }

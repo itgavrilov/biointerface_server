@@ -34,7 +34,7 @@ public class SampleService {
         log.info("SampleService is destruction");
     }
 
-    public List<Sample> findAllByChannel(Channel channel) throws Exception {
+    public List<Sample> findAllByChannel(Channel channel) {
         List<Sample> entities = repository.findAllByChannel(channel);
 
         if (entities.size() > 0) {

@@ -3,6 +3,7 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.repository.IcdRepository;
 
@@ -10,9 +11,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -20,12 +22,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class IcdService {
-    private final IcdRepository repository;
-
     @Autowired
-    public IcdService(IcdRepository repository) {
-        this.repository = repository;
-    }
+    private IcdRepository repository;
 
     @PostConstruct
     private void init() {
@@ -37,8 +35,8 @@ public class IcdService {
         log.info("IcdService is destruction");
     }
 
-    public List<Icd> findAll() throws Exception {
-        List<Icd> entities = repository.findAll();
+    public Set<Icd> findAll() {
+        Set<Icd> entities = new TreeSet<>(repository.findAll());
 
         if (entities.size() > 0) {
             log.info("Get all icds from database");
@@ -49,7 +47,7 @@ public class IcdService {
         return entities;
     }
 
-    public Icd findById(int id) throws Exception {
+    public Icd findById(int id) {
         if (id <= 0)
             throw new IllegalArgumentException("Id <= 0");
 
@@ -66,7 +64,7 @@ public class IcdService {
     }
 
     @Transactional
-    public Icd save(Icd entity) throws Exception {
+    public Icd save(Icd entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getName() == null)
@@ -86,7 +84,7 @@ public class IcdService {
     }
 
     @Transactional
-    public void delete(Icd entity) throws Exception {
+    public void delete(Icd entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (entity.getId() <= 0)
@@ -101,5 +99,24 @@ public class IcdService {
             log.info("Icd(id={}) not found in database", entity.getId());
             throw new EntityNotFoundException("Icd(id=" + entity.getId() + ") not found in database");
         }
+    }
+
+    public IcdDTO convertEntityToDto(Icd entity) {
+        return IcdDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .version(entity.getVersion())
+                .comment(entity.getComment())
+                .build();
+    }
+
+    public Icd convertDtoToEntity(IcdDTO dto) {
+        return Icd.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .version(dto.getVersion())
+                .comment(dto.getComment())
+                .patients(new TreeSet<>())
+                .build();
     }
 }

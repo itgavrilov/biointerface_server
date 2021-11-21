@@ -73,5 +73,5 @@ CREATE TABLE IF NOT EXISTS sample
     FOREIGN KEY (channel_number, examination_id) REFERENCES channel (number, examination_id) ON DELETE CASCADE
 );
 
-INSERT INTO public.patient(id, second_name, first_name, patronymic, birthday, icd_id, comment)
-VALUES ('3', 'Гаврилов', 'Степан', 'Александрович', '1988-11-19', null, null);
+INSERT INTO patient(id, second_name, first_name, patronymic, birthday, icd_id, comment)
+VALUES ('3', 'Иванов', 'Иван', 'Иванович', '1980-3-3', null, null);
