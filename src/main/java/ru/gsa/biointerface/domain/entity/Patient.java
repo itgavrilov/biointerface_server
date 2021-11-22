@@ -61,7 +61,7 @@ public class Patient implements Serializable, Comparable<Patient> {
 
     @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    private Set<Examination> examinations = new TreeSet<>();
+    private Set<Examination> examinations;
 
     public Patient(int id, String secondName, String firstName, String patronymic, Calendar birthday, Icd icd, String comment) {
         this.id = id;
@@ -71,6 +71,7 @@ public class Patient implements Serializable, Comparable<Patient> {
         this.birthday = birthday;
         this.comment = comment;
         this.icd = icd;
+        examinations = new TreeSet<>();
     }
 
     public void addExamination(Examination examination) {
@@ -123,7 +124,7 @@ public class Patient implements Serializable, Comparable<Patient> {
                 ", second_name='" + secondName + '\'' +
                 ", first_name='" + firstName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", birthday=" + formatter.format(birthday) +
+                ", birthday=" + formatter.format(birthday.getTime()) +
                 ", icd_id=" + icd_id +
                 '}';
     }

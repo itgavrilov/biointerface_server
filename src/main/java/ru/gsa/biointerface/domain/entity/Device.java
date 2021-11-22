@@ -40,11 +40,12 @@ public class Device implements Serializable, Comparable<Device> {
 
     @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
-    private Set<Examination> examinations = new TreeSet<>();
+    private Set<Examination> examinations;
 
     public Device(int id, int amountChannels) {
         this.id = id;
         this.amountChannels = amountChannels;
+        examinations = new TreeSet<>();
     }
 
     public void addExamination(Examination examination) {

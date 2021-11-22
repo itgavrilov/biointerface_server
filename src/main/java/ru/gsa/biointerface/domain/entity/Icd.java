@@ -22,7 +22,7 @@ import java.util.TreeSet;
 public class Icd implements Serializable, Comparable<Icd> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id = -1;
+    private int id;
 
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
@@ -42,12 +42,14 @@ public class Icd implements Serializable, Comparable<Icd> {
 
     @NotNull(message = "Patient records can't be null")
     @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Patient> patients = new TreeSet<>();
+    private Set<Patient> patients;
 
     public Icd(String name, int version, String comment) {
+        id = -1;
         this.name = name;
         this.version = version;
         this.comment = comment;
+        patients = new TreeSet<>();
     }
 
     public void addPatient(Patient patient) {

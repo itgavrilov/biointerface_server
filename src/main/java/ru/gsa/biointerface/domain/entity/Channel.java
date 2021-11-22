@@ -35,12 +35,13 @@ public class Channel implements Serializable, Comparable<Channel> {
 
     @NotNull(message = "Samples can't be null")
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Sample> samples = new LinkedList<>();
+    private List<Sample> samples;
 
     public Channel(Integer id, Examination examination, ChannelName channelName) {
         this.id = new ChannelID(id, examination.getId());
         this.examination = examination;
         this.channelName = channelName;
+        this.samples = new LinkedList<>();
     }
 
     public void addSample(Sample sample) {

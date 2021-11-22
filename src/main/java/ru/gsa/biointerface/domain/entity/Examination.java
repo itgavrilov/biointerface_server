@@ -29,7 +29,7 @@ public class Examination implements Serializable, Comparable<Examination> {
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id = -1;
+    private int id;
 
     @NotNull(message = "Start time can't be null")
     @Past(message = "Start time should be in past")
@@ -53,13 +53,15 @@ public class Examination implements Serializable, Comparable<Examination> {
 
     @NotNull(message = "Channels can't be null")
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Channel> channels = new ArrayList<>();
+    private List<Channel> channels;
 
     public Examination(Patient patient, Device device, String comment) {
+        id  = -1;
         this.starttime = Timestamp.valueOf(LocalDateTime.now());
         this.comment = comment;
         this.device = device;
         this.patient = patient;
+        channels = new ArrayList<>();
     }
 
     public void addChannel(Channel channel) {

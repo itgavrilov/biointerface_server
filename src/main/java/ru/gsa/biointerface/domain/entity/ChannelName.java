@@ -25,7 +25,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id = -1;
+    private int id;
 
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
@@ -39,11 +39,13 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
 
     @NotNull(message = "Channels can't be null")
     @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Channel> channels = new TreeSet<>();
+    private Set<Channel> channels;
 
     public ChannelName(String name, String comment) {
+        id  = -1;
         this.name = name;
         this.comment = comment;
+        channels = new TreeSet<>();
     }
 
     public void addChannel(Channel channel) {
