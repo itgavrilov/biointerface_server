@@ -1,8 +1,6 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,9 +8,8 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +20,8 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "examination")
 @Table(name = "examination")
@@ -57,18 +56,22 @@ public class Examination implements Serializable, Comparable<Examination> {
     private List<Channel> channels;
 
     public Examination(Patient patient, Device device, String comment) {
-        this.id = -1;
+        id  = -1;
         this.starttime = Timestamp.valueOf(LocalDateTime.now());
         this.comment = comment;
-        this.channels = new ArrayList<>();
         this.device = device;
         this.patient = patient;
+        channels = new ArrayList<>();
     }
 
-    public LocalDateTime getStartTimeInLocalDateTime() {
-        return starttime.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+    public void addChannel(Channel channel) {
+        channels.add(channel);
+        channel.setExamination(this);
+    }
+
+    public void removeChannel(Channel channel) {
+        channels.remove(channel);
+        channel.setExamination(null);
     }
 
     @Override
@@ -99,13 +102,11 @@ public class Examination implements Serializable, Comparable<Examination> {
 
     @Override
     public String toString() {
-        String starttime = this.getStartTimeInLocalDateTime().format(
-                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
-        );
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyy-MM-dd hh:mm:ss");
 
         return "Examination{" +
                 "id=" + id +
-                ", datetime=" + starttime +
+                ", datetime=" + formatter.format(starttime) +
                 ", patientRecord_id=" + patient.getId() +
                 ", device_id=" + device.getId() +
                 '}';

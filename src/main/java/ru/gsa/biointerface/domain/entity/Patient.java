@@ -1,16 +1,11 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +16,8 @@ import java.util.TreeSet;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "patient")
 @Table(name = "patient")
@@ -73,16 +70,18 @@ public class Patient implements Serializable, Comparable<Patient> {
         this.patronymic = patronymic;
         this.birthday = birthday;
         this.comment = comment;
-        this.examinations = new TreeSet<>();
         this.icd = icd;
+        examinations = new TreeSet<>();
     }
 
-    public LocalDate getBirthdayInLocalDate() {
-        return LocalDateTime.ofInstant(
-                        birthday.toInstant(),
-                        ZoneId.systemDefault()
-                )
-                .toLocalDate();
+    public void addExamination(Examination examination) {
+        examinations.add(examination);
+        examination.setPatient(this);
+    }
+
+    public void removeExamination(Examination examination) {
+        examinations.remove(examination);
+        examination.setPatient(null);
     }
 
     @Override
@@ -113,21 +112,19 @@ public class Patient implements Serializable, Comparable<Patient> {
 
     @Override
     public String toString() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String icd_id = "-";
 
-        String birthday = this.getBirthdayInLocalDate().format(
-                DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        );
-
-        if (icd != null)
+        if (icd != null) {
             icd_id = String.valueOf(icd.getId());
+        }
 
         return "PatientRecord{" +
                 "id=" + id +
                 ", second_name='" + secondName + '\'' +
                 ", first_name='" + firstName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", birthday=" + birthday +
+                ", birthday=" + formatter.format(birthday.getTime()) +
                 ", icd_id=" + icd_id +
                 '}';
     }

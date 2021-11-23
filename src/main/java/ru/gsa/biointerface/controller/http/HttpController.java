@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.controller;
+package ru.gsa.biointerface.controller.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 @Controller
 @RequestMapping(value = "/")
-public class MainController {
+public class HttpController {
 
     @GetMapping(value = "")
     public String loadHomePage(Model model) {
