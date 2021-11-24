@@ -1,15 +1,21 @@
 package ru.gsa.biointerface.controller.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientService;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,6 +33,8 @@ public class PatientsController {
     PatientService service;
     @Autowired
     IcdService icdService;
+    @Autowired
+    ObjectMapper mapper;
 
     @GetMapping
     public Set<PatientDTO> getAll() {
@@ -70,15 +78,21 @@ public class PatientsController {
     }
 
     @PostMapping(value = "/save")
-    public PatientDTO save(@RequestBody PatientDTO dto) {
-
+    public ResponseEntity<String> save(@RequestBody PatientDTO dto) throws JsonProcessingException {
         Patient entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /patients/save(id={})", entity.getId());
+        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/patients/{id}")
+                .buildAndExpand(entity.getId()).toUri();
+        String body = mapper.writeValueAsString(
+                service.convertEntityToDto(entity)
+        );
 
-        return service.convertEntityToDto(entity);
+        return ResponseEntity.created(newResource).body(body);
     }
 
     @PostMapping(value = "/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody PatientDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /patients/delete(id={})", dto.getId());

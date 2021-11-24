@@ -1,9 +1,14 @@
 package ru.gsa.biointerface.controller.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.ExaminationDTO;
@@ -13,6 +18,7 @@ import ru.gsa.biointerface.service.ChannelNameService;
 import ru.gsa.biointerface.service.ChannelService;
 import ru.gsa.biointerface.service.ExaminationService;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +40,8 @@ public class ChannelController {
     ExaminationService examinationService;
     @Autowired
     ChannelNameService channelNameService;
+    @Autowired
+    ObjectMapper mapper;
 
     @PostMapping("/getbyexamination")
     public List<ChannelDTO> getByPatient(@RequestBody ExaminationDTO examinationDTO) {
@@ -84,17 +92,23 @@ public class ChannelController {
     }
 
     @PostMapping(value = "/save")
-    public ChannelDTO save(@RequestBody ChannelDTO dto) {
-
+    public ResponseEntity<String> save(@RequestBody ChannelDTO dto) throws JsonProcessingException {
         Channel entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /channels/save(examination_id={}, number={})",
                 entity.getId().getExamination_id(),
                 entity.getId().getNumber());
+        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("channels/{examination_id}/{number}")
+                .buildAndExpand(entity.getId().getExamination_id(), entity.getId().getNumber()).toUri();
+        String body = mapper.writeValueAsString(
+                service.convertEntityToDto(entity)
+        );
 
-        return service.convertEntityToDto(entity);
+        return ResponseEntity.created(newResource).body(body);
     }
 
     @PostMapping(value = "/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ChannelDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /channels/delete(examination_id={}, number={})",

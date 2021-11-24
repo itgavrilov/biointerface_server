@@ -1,13 +1,19 @@
 package ru.gsa.biointerface.controller.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.service.ChannelNameService;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -20,6 +26,8 @@ import java.util.TreeSet;
 public class ChannelNameController {
     @Autowired
     ChannelNameService service;
+    @Autowired
+    ObjectMapper mapper;
 
     @GetMapping
     public Set<ChannelNameDTO> getAll() {
@@ -48,15 +56,21 @@ public class ChannelNameController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ChannelNameDTO save(@RequestBody ChannelNameDTO dto) {
-
+    public ResponseEntity<String> save(@RequestBody ChannelNameDTO dto) throws JsonProcessingException {
         ChannelName entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /channel_names/save/(id={})", entity.getId());
+        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/channel_names/{id}")
+                .buildAndExpand(entity.getId()).toUri();
+        String body = mapper.writeValueAsString(
+                service.convertEntityToDto(entity)
+        );
 
-        return service.convertEntityToDto(entity);
+        return ResponseEntity.created(newResource).body(body);
     }
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ChannelNameDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /channel_names/delete/(id={})", dto.getId());
