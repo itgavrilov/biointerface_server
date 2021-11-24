@@ -42,7 +42,6 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     private Set<Channel> channels;
 
     public ChannelName(String name, String comment) {
-        id  = -1;
         this.name = name;
         this.comment = comment;
         channels = new TreeSet<>();

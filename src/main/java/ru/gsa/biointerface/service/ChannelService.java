@@ -133,10 +133,10 @@ public class ChannelService {
 
         return ChannelDTO.builder()
                 .number(entity.getId().getNumber())
-                .examination_id(
+                .examinationId(
                         entity.getId().getExamination_id()
                 )
-                .channelName_id(channelName_id)
+                .channelNameId(channelName_id)
                 .build();
     }
 
@@ -145,13 +145,13 @@ public class ChannelService {
         int examination_id = 0;
         ChannelName channelName = null;
 
-        if (dto.getExamination_id() != 0) {
-            examination = examinationService.findById(dto.getExamination_id());
+        if (dto.getExaminationId() != 0) {
+            examination = examinationService.findById(dto.getExaminationId());
             examination_id = examination.getId();
         }
 
-        if (dto.getChannelName_id() != 0) {
-            channelName = channelNameService.findById(dto.getChannelName_id());
+        if (dto.getChannelNameId() != 0) {
+            channelName = channelNameService.findById(dto.getChannelNameId());
         }
 
         Channel channel = Channel.builder()

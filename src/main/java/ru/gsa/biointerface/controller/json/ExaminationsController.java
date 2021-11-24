@@ -31,6 +31,7 @@ import java.util.TreeSet;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ExaminationsController {
+    private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
     ExaminationService service;
     @Autowired
@@ -52,9 +53,9 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @PostMapping("/getbypatient")
+    @PostMapping("/getByPatient")
     public Set<ExaminationDTO> getByPatient(@RequestBody PatientDTO patientDTO) {
-        log.info("REST GET /examinations/getbypatient(patient_id={})", patientDTO.getId());
+        log.info("REST GET /examinations/getByPatient(patientId={})", patientDTO.getId());
         Set<Examination> entities =
                 service.findByPatient(patientService.convertDtoToEntity(patientDTO));
         Set<ExaminationDTO> dtos = new TreeSet<>();
@@ -65,9 +66,9 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @PostMapping("/getbydevice")
+    @PostMapping("/getByDevice")
     public Set<ExaminationDTO> getByDevice(@RequestBody DeviceDTO deviceDTO) {
-        log.info("REST GET /examinations/getbydevice(patient_id={})", deviceDTO.getId());
+        log.info("REST GET /examinations/getByDevice(deviceId={})", deviceDTO.getId());
         Set<Examination> entities =
                 service.findByDevice(deviceService.convertDtoToEntity(deviceDTO));
         Set<ExaminationDTO> dtos = new TreeSet<>();
@@ -111,5 +112,16 @@ public class ExaminationsController {
     public void delete(@RequestBody ExaminationDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /examinations/delete/(id={})", dto.getId());
+    }
+
+    @PostMapping(value = "/health")
+    @ResponseStatus(HttpStatus.OK)
+    public void health() {
+    }
+
+    @PostMapping(value = "/version")
+    @ResponseStatus(HttpStatus.OK)
+    public String version() {
+        return version;
     }
 }

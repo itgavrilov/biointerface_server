@@ -45,7 +45,6 @@ public class Icd implements Serializable, Comparable<Icd> {
     private Set<Patient> patients;
 
     public Icd(String name, int version, String comment) {
-        id = -1;
         this.name = name;
         this.version = version;
         this.comment = comment;

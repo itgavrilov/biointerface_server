@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> {
     @NotNull(message = "Id can't be null")
     private int id;

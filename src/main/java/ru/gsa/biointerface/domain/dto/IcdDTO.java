@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     private int id;
 

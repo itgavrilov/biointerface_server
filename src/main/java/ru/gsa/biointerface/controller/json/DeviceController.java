@@ -24,6 +24,7 @@ import java.util.TreeSet;
 @RestController
 @RequestMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
+    private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
     DeviceService service;
     @Autowired
@@ -74,5 +75,16 @@ public class DeviceController {
     public void delete(@RequestBody DeviceDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /devices/delete/(id={})", dto.getId());
+    }
+
+    @PostMapping(value = "/health")
+    @ResponseStatus(HttpStatus.OK)
+    public void health() {
+    }
+
+    @PostMapping(value = "/version")
+    @ResponseStatus(HttpStatus.OK)
+    public String version() {
+        return version;
     }
 }

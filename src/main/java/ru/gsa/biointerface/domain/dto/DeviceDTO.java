@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.Max;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")

@@ -24,6 +24,7 @@ import java.util.TreeSet;
 @RestController
 @RequestMapping(value = "/icds", produces = MediaType.APPLICATION_JSON_VALUE)
 public class IcdController {
+    private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
     IcdService service;
     @Autowired
@@ -74,5 +75,16 @@ public class IcdController {
     public void delete(@RequestBody IcdDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /icds/delete/(id={})", dto.getId());
+    }
+
+    @PostMapping(value = "/health")
+    @ResponseStatus(HttpStatus.OK)
+    public void health() {
+    }
+
+    @PostMapping(value = "/version")
+    @ResponseStatus(HttpStatus.OK)
+    public String version() {
+        return version;
     }
 }

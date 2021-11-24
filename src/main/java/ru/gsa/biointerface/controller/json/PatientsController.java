@@ -29,6 +29,7 @@ import java.util.TreeSet;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class PatientsController {
+    private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
     PatientService service;
     @Autowired
@@ -50,9 +51,9 @@ public class PatientsController {
         return dtos;
     }
 
-    @PostMapping("/getbyicd")
+    @PostMapping("/getByIcd")
     public Set<PatientDTO> getByIcd(@RequestBody IcdDTO icdDTO) {
-        log.info("REST GET /patients/getbyicd(icd_id={})", icdDTO.getId());
+        log.info("REST GET /patients/getByIcd(icdId={})", icdDTO.getId());
         Set<Patient> entities =
                 service.findAllByIcd(icdService.convertDtoToEntity(icdDTO));
         Set<PatientDTO> dtos = new TreeSet<>();
@@ -96,5 +97,16 @@ public class PatientsController {
     public void delete(@RequestBody PatientDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /patients/delete(id={})", dto.getId());
+    }
+
+    @PostMapping(value = "/health")
+    @ResponseStatus(HttpStatus.OK)
+    public void health() {
+    }
+
+    @PostMapping(value = "/version")
+    @ResponseStatus(HttpStatus.OK)
+    public String version() {
+        return version;
     }
 }
