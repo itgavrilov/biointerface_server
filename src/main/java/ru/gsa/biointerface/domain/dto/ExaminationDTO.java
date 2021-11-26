@@ -52,6 +52,7 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
 
     @Override
     public int compareTo(ExaminationDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

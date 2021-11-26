@@ -76,6 +76,7 @@ public class Icd implements Serializable, Comparable<Icd> {
 
     @Override
     public int compareTo(Icd o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

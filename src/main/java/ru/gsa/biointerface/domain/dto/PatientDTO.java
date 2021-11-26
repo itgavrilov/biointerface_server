@@ -62,6 +62,7 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
 
     @Override
     public int compareTo(PatientDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

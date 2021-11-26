@@ -48,6 +48,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
 
     @Override
     public int compareTo(SampleDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = examinationId - o.examinationId;
 
         if (result == 0)

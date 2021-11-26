@@ -45,6 +45,7 @@ public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> 
 
     @Override
     public int compareTo(ChannelNameDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

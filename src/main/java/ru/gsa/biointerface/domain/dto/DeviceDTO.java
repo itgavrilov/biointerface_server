@@ -47,6 +47,7 @@ public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
 
     @Override
     public int compareTo(DeviceDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

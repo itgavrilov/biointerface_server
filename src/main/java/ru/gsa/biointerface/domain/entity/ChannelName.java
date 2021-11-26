@@ -72,6 +72,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
 
     @Override
     public int compareTo(ChannelName o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

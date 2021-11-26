@@ -88,6 +88,7 @@ public class Examination implements Serializable, Comparable<Examination> {
 
     @Override
     public int compareTo(Examination o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {
