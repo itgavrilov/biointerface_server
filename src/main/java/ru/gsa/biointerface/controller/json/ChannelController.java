@@ -1,9 +1,14 @@
 package ru.gsa.biointerface.controller.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.ExaminationDTO;
@@ -13,6 +18,7 @@ import ru.gsa.biointerface.service.ChannelNameService;
 import ru.gsa.biointerface.service.ChannelService;
 import ru.gsa.biointerface.service.ExaminationService;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,16 +34,19 @@ import java.util.TreeSet;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelController {
+    private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
     ChannelService service;
     @Autowired
     ExaminationService examinationService;
     @Autowired
     ChannelNameService channelNameService;
+    @Autowired
+    ObjectMapper mapper;
 
-    @PostMapping("/getbyexamination")
+    @PostMapping("/getByExamination")
     public List<ChannelDTO> getByPatient(@RequestBody ExaminationDTO examinationDTO) {
-        log.info("REST GET /channels/getbyexamination(examination_id={})", examinationDTO.getId());
+        log.info("REST GET /channels/getByExamination(examinationId={})", examinationDTO.getId());
         List<Channel> entities =
                 service.findAllByExamination(
                         examinationService.convertDtoToEntity(examinationDTO)
@@ -50,9 +59,9 @@ public class ChannelController {
         return dtos;
     }
 
-    @PostMapping("/getbychannelname")
+    @PostMapping("/getByChannelName")
     public Set<ChannelDTO> getByDevice(@RequestBody ChannelNameDTO channelNameDTO) {
-        log.info("REST GET /channels/getbychannelname(channelName_id={})", channelNameDTO.getId());
+        log.info("REST GET /channels/getByChannelName(channelNameId={})", channelNameDTO.getId());
         Set<Channel> entities =
                 service.findAllByChannelName(
                         channelNameService.convertDtoToEntity(channelNameDTO)
@@ -65,18 +74,18 @@ public class ChannelController {
         return dtos;
     }
 
-    @GetMapping("/{examination_id}/{number}/")
-    public ChannelDTO get(@PathVariable int examination_id, @PathVariable int number) {
-        log.info("REST GET /channels/{}/{}", examination_id, number);
+    @GetMapping("/{examinationId}/{number}/")
+    public ChannelDTO get(@PathVariable int examinationId, @PathVariable int number) {
+        log.info("REST GET /channels/{}/{}", examinationId, number);
 
         return service.convertEntityToDto(
-                service.findById(new ChannelID(examination_id, number))
+                service.findById(new ChannelID(examinationId, number))
         );
     }
 
     @GetMapping("/get")
     public ChannelDTO getP(@RequestParam int examination_id, @RequestParam int number) {
-        log.info("REST GET /channels/get?examination_id={}&number={}", examination_id, number);
+        log.info("REST GET /channels/get?examinationId={}&number={}", examination_id, number);
 
         return service.convertEntityToDto(
                 service.findById(new ChannelID(examination_id, number))
@@ -84,21 +93,38 @@ public class ChannelController {
     }
 
     @PostMapping(value = "/save")
-    public ChannelDTO save(@RequestBody ChannelDTO dto) {
-
+    public ResponseEntity<String> save(@RequestBody ChannelDTO dto) throws JsonProcessingException {
         Channel entity = service.save(service.convertDtoToEntity(dto));
-        log.info("REST POST /channels/save(examination_id={}, number={})",
+        log.info("REST POST /channels/save(examinationId={}, number={})",
                 entity.getId().getExamination_id(),
                 entity.getId().getNumber());
+        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("channels/{examinationId}/{number}")
+                .buildAndExpand(entity.getId().getExamination_id(), entity.getId().getNumber()).toUri();
+        String body = mapper.writeValueAsString(
+                service.convertEntityToDto(entity)
+        );
 
-        return service.convertEntityToDto(entity);
+        return ResponseEntity.created(newResource).body(body);
     }
 
     @PostMapping(value = "/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ChannelDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
-        log.info("REST POST /channels/delete(examination_id={}, number={})",
-                dto.getExamination_id(),
+        log.info("REST POST /channels/delete(examinationId={}, number={})",
+                dto.getExaminationId(),
                 dto.getNumber());
+    }
+
+    @PostMapping(value = "/health")
+    @ResponseStatus(HttpStatus.OK)
+    public void health() {
+    }
+
+    @PostMapping(value = "/version")
+    @ResponseStatus(HttpStatus.OK)
+    public String version() {
+        return version;
     }
 }

@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -14,31 +15,33 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
     @NotNull(message = "Number can't be null")
     private int number;
 
-    @NotNull(message = "Examination id can't be null")
-    private int examination_id;
+    @NotNull(message = "ExaminationId can't be null")
+    private int examinationId;
 
-    private int channelName_id;
+    private int channelNameId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelDTO that = (ChannelDTO) o;
-        return number == that.number && examination_id == that.examination_id;
+        return number == that.number && examinationId == that.examinationId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(number, examination_id);
+        return Objects.hash(number, examinationId);
     }
 
     @Override
     public int compareTo(ChannelDTO o) {
-        int result = examination_id - o.examination_id;
+        if (o == null || getClass() != o.getClass()) return -1;
+        int result = examinationId - o.examinationId;
 
         if (result == 0)
             result = number - o.number;
@@ -51,8 +54,8 @@ public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
 
         return "Channel{" +
                 "number=" + number +
-                ", examination_id=" + examination_id +
-                ", channelName_id=" + channelName_id +
+                ", examination_id=" + examinationId +
+                ", channelName_id=" + channelNameId +
                 '}';
     }
 }

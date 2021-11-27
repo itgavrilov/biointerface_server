@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PatientDTO implements Serializable, Comparable<PatientDTO> {
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
@@ -40,7 +42,7 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
     @Past(message = "Birthday should be in past")
     private LocalDateTime birthday;
 
-    private int icd_id;
+    private int icdId;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
@@ -60,6 +62,7 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
 
     @Override
     public int compareTo(PatientDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {
@@ -81,7 +84,7 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
                 ", first_name='" + firstName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", birthday=" + formatter.format(birthday) +
-                ", icd_id=" + icd_id +
+                ", icd_id=" + icdId +
                 '}';
     }
 }

@@ -215,8 +215,8 @@ public class ExaminationService {
                         entity.getStarttime().toInstant(),
                         ZoneId.systemDefault())
                 )
-                .patient_id(patient_id)
-                .device_id(device_id)
+                .patientId(patient_id)
+                .deviceId(device_id)
                 .comment(entity.getComment())
                 .build();
     }
@@ -225,12 +225,12 @@ public class ExaminationService {
         Patient patient = null;
         Device device = null;
 
-        if (dto.getPatient_id() != 0) {
-            patient = patientService.findById(dto.getPatient_id());
+        if (dto.getPatientId() != 0) {
+            patient = patientService.findById(dto.getPatientId());
         }
 
-        if (dto.getDevice_id() != 0) {
-            device = deviceService.findById(dto.getDevice_id());
+        if (dto.getDeviceId() != 0) {
+            device = deviceService.findById(dto.getDeviceId());
         }
 
         Examination examination = Examination.builder()

@@ -158,7 +158,7 @@ public class PatientService {
                 .birthday(LocalDateTime.ofInstant(
                         entity.getBirthday().toInstant(),
                         ZoneId.systemDefault()))
-                .icd_id(icd_id)
+                .icdId(icd_id)
                 .comment(entity.getComment())
                 .build();
     }
@@ -166,8 +166,8 @@ public class PatientService {
     public Patient convertDtoToEntity(PatientDTO dto) {
         Icd icd = null;
 
-        if (dto.getIcd_id() != 0) {
-            icd = icdService.findById(dto.getIcd_id());
+        if (dto.getIcdId() != 0) {
+            icd = icdService.findById(dto.getIcdId());
         }
 
         Patient patient = Patient.builder()

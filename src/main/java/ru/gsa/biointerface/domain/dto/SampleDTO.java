@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.Min;
@@ -15,16 +16,17 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     @NotNull(message = "Id can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     private int id;
 
-    @NotNull(message = "Channel number can't be null")
-    private int channel_number;
+    @NotNull(message = "ChannelNumber can't be null")
+    private int channelNumber;
 
-    @NotNull(message = "Examination id can't be null")
-    private int examination_id;
+    @NotNull(message = "ExaminationId can't be null")
+    private int examinationId;
 
     @NotNull(message = "Value can't be null")
     private int value;
@@ -35,21 +37,22 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
         if (o == null || getClass() != o.getClass()) return false;
         SampleDTO sampleDTO = (SampleDTO) o;
         return id == sampleDTO.id
-                && channel_number == sampleDTO.channel_number
-                && examination_id == sampleDTO.examination_id;
+                && channelNumber == sampleDTO.channelNumber
+                && examinationId == sampleDTO.examinationId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, channel_number, examination_id);
+        return Objects.hash(id, channelNumber, examinationId);
     }
 
     @Override
     public int compareTo(SampleDTO o) {
-        int result = examination_id - o.examination_id;
+        if (o == null || getClass() != o.getClass()) return -1;
+        int result = examinationId - o.examinationId;
 
         if (result == 0)
-            result = channel_number - o.channel_number;
+            result = channelNumber - o.channelNumber;
 
         if (result == 0)
             result = id = o.id;
@@ -61,8 +64,8 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     public String toString() {
         return "SampleDTO{" +
                 "id=" + id +
-                ", channel_number=" + channel_number +
-                ", examination_id=" + examination_id +
+                ", channel_number=" + channelNumber +
+                ", examination_id=" + examinationId +
                 ", value=" + value +
                 '}';
     }

@@ -99,6 +99,7 @@ public class Patient implements Serializable, Comparable<Patient> {
 
     @Override
     public int compareTo(Patient o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {

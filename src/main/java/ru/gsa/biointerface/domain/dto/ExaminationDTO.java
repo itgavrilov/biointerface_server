@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> {
     @NotNull(message = "Id can't be null")
     private int id;
@@ -26,11 +28,11 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
     @Past(message = "Start time should be in past")
     private LocalDateTime starttime;
 
-    @NotNull(message = "Patient_id can't be null")
-    private int patient_id;
+    @NotNull(message = "PatientId can't be null")
+    private int patientId;
 
-    @NotNull(message = "Device_id can't be null")
-    private int device_id;
+    @NotNull(message = "DeviceId can't be null")
+    private int deviceId;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
@@ -50,6 +52,7 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
 
     @Override
     public int compareTo(ExaminationDTO o) {
+        if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
         if (id > o.id) {
@@ -68,8 +71,8 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
         return "Examination{" +
                 "id=" + id +
                 ", datetime=" + formatter.format(starttime) +
-                ", patientRecord_id=" + patient_id +
-                ", device_id=" + device_id +
+                ", patientRecord_id=" + patientId +
+                ", device_id=" + deviceId +
                 '}';
     }
 }
