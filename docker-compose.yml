@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  db:
+    image: db
+    container_name: db
+    build:
+      context: .
+      dockerfile: docker/db.Dockerfile
+#    command: "-c logging_collector=on"
+    volumes:
+      - db_data:/var/lib/postgresql/data/biointerface
+    restart: always
+    ports:
+      - "5432:5432"
+  biointerface_server:
+    image: biointerface_server
+    container_name: biointerface_server
+    build:
+      context: .
+      dockerfile: docker/app.Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/biointerface
+    volumes:
+      - logs:/app/logs
+    ports:
+      - "8080:8080"
+volumes:
+  db_data:
+  logs:

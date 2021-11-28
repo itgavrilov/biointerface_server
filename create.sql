@@ -1,13 +1,3 @@
-CREATE DATABASE biointerface
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'Russian_Russia.1251'
-    LC_CTYPE = 'Russian_Russia.1251'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-;
-
 CREATE TABLE IF NOT EXISTS icd
 (
     id      SERIAL PRIMARY KEY NOT NULL,
@@ -74,4 +64,4 @@ CREATE TABLE IF NOT EXISTS sample
 );
 
 INSERT INTO patient(id, second_name, first_name, patronymic, birthday, icd_id, comment)
-VALUES ('3', 'Иванов', 'Иван', 'Иванович', '1980-3-3', null, null);
+VALUES ('3', 'Иванов', 'Иван', 'Иванович', '1980-03-03', null, null);
