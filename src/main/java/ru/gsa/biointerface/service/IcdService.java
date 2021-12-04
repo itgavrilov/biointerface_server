@@ -22,8 +22,12 @@ import java.util.TreeSet;
 @Slf4j
 @Service
 public class IcdService {
+    private final IcdRepository repository;
+
     @Autowired
-    private IcdRepository repository;
+    public IcdService(IcdRepository repository) {
+        this.repository = repository;
+    }
 
     @PostConstruct
     private void init() {

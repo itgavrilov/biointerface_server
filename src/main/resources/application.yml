@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://localhost:5432/biointerface"
+    username: postgres
+    password: postgres
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        ddl-auto: validate
+        charset: UTF-8
+        character_encoding: UTF-8
+        use_unicode: true
+        autocommit: false
+        format_sql: true
+        cache:
+          use_second_level_cache: false
+          provider_class: org.hibernate.cache.NoCacheProvider
+
+  thymeleaf:
+    prefix: "/WEB-INF/templates/"
+    suffix: ".html"
+    encoding: utf-8
+    cache: false
+
+server:
+  port: 8080

@@ -20,8 +20,12 @@ import java.util.stream.Collectors;
 @Component
 public class ConnectionToDeviceHandlerFactory {
     private final List<HostHandler> hostHandlers = new ArrayList<>();
+    private final ApplicationContext context;
+
     @Autowired
-    private ApplicationContext context;
+    public ConnectionToDeviceHandlerFactory(ApplicationContext context) {
+        this.context = context;
+    }
 
     public void scanningSerialPort() {
         hostHandlers.clear();
