@@ -22,7 +22,10 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/channelNames", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+        value = "/channelNames",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelNameController {
     private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
@@ -49,14 +52,7 @@ public class ChannelNameController {
         return service.convertEntityToDto(service.findById(id));
     }
 
-    @GetMapping("/get")
-    public ChannelNameDTO getP(@RequestParam int id) {
-        log.info("REST GET /channelNames/get?id={}", id);
-
-        return service.convertEntityToDto(service.findById(id));
-    }
-
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping
     public ResponseEntity<String> save(@RequestBody ChannelNameDTO dto) throws JsonProcessingException {
         ChannelName entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /channelNames/save/(id={})", entity.getId());
@@ -70,19 +66,19 @@ public class ChannelNameController {
         return ResponseEntity.created(newResource).body(body);
     }
 
-    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ChannelNameDTO dto) {
         service.delete(service.convertDtoToEntity(dto));
         log.info("REST POST /channelNames/delete/(id={})", dto.getId());
     }
 
-    @PostMapping(value = "/health")
+    @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.OK)
     public void health() {
     }
 
-    @PostMapping(value = "/version")
+    @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
         return version;

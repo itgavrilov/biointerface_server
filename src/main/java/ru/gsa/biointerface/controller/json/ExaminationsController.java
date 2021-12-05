@@ -86,14 +86,14 @@ public class ExaminationsController {
         return service.convertEntityToDto(service.findById(id));
     }
 
-    @GetMapping("/get")
-    public ExaminationDTO getP(@RequestParam int id) {
-        log.info("REST GET /examinations/get?id={}", id);
-
-        return service.convertEntityToDto(service.findById(id));
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@RequestBody ExaminationDTO dto) {
+        service.delete(service.convertDtoToEntity(dto));
+        log.info("REST POST /examinations/delete/(id={})", dto.getId());
     }
 
-    @PostMapping(value = "/save")
+    @PutMapping
     public ResponseEntity<String> save(@RequestBody ExaminationDTO dto) throws JsonProcessingException {
         Examination entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /examinations/save/(id={})", entity.getId());
@@ -107,19 +107,12 @@ public class ExaminationsController {
         return ResponseEntity.created(newResource).body(body);
     }
 
-    @PostMapping(value = "/delete")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestBody ExaminationDTO dto) {
-        service.delete(service.convertDtoToEntity(dto));
-        log.info("REST POST /examinations/delete/(id={})", dto.getId());
-    }
-
-    @PostMapping(value = "/health")
+    @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.OK)
     public void health() {
     }
 
-    @PostMapping(value = "/version")
+    @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
         return version;

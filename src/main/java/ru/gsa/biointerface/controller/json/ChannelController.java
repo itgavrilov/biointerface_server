@@ -83,16 +83,16 @@ public class ChannelController {
         );
     }
 
-    @GetMapping("/get")
-    public ChannelDTO getP(@RequestParam int examination_id, @RequestParam int number) {
-        log.info("REST GET /channels/get?examinationId={}&number={}", examination_id, number);
-
-        return service.convertEntityToDto(
-                service.findById(new ChannelID(examination_id, number))
-        );
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@RequestBody ChannelDTO dto) {
+        service.delete(service.convertDtoToEntity(dto));
+        log.info("REST POST /channels/delete(examinationId={}, number={})",
+                dto.getExaminationId(),
+                dto.getNumber());
     }
 
-    @PostMapping(value = "/save")
+    @PutMapping
     public ResponseEntity<String> save(@RequestBody ChannelDTO dto) throws JsonProcessingException {
         Channel entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /channels/save(examinationId={}, number={})",
@@ -108,21 +108,12 @@ public class ChannelController {
         return ResponseEntity.created(newResource).body(body);
     }
 
-    @PostMapping(value = "/delete")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestBody ChannelDTO dto) {
-        service.delete(service.convertDtoToEntity(dto));
-        log.info("REST POST /channels/delete(examinationId={}, number={})",
-                dto.getExaminationId(),
-                dto.getNumber());
-    }
-
-    @PostMapping(value = "/health")
+    @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.OK)
     public void health() {
     }
 
-    @PostMapping(value = "/version")
+    @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
         return version;

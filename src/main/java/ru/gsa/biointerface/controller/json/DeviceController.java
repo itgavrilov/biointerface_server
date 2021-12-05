@@ -22,7 +22,10 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+        value = "/devices",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
     private static final String version = "0.0.1-SNAPSHOT";
     @Autowired
@@ -49,14 +52,14 @@ public class DeviceController {
         return service.convertEntityToDto(service.findById(id));
     }
 
-    @GetMapping("/get")
-    public DeviceDTO getP(@RequestParam int id) {
-        log.info("REST GET /devices/get?id={}", id);
-
-        return service.convertEntityToDto(service.findById(id));
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@RequestBody DeviceDTO dto) {
+        service.delete(service.convertDtoToEntity(dto));
+        log.info("REST POST /devices/delete/(id={})", dto.getId());
     }
 
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping
     public ResponseEntity<String> save(@RequestBody DeviceDTO dto) throws JsonProcessingException {
         Device entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /devices/save/(id={})", entity.getId());
@@ -70,19 +73,12 @@ public class DeviceController {
         return ResponseEntity.created(newResource).body(body);
     }
 
-    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestBody DeviceDTO dto) {
-        service.delete(service.convertDtoToEntity(dto));
-        log.info("REST POST /devices/delete/(id={})", dto.getId());
-    }
-
-    @PostMapping(value = "/health")
+    @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.OK)
     public void health() {
     }
 
-    @PostMapping(value = "/version")
+    @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
         return version;
