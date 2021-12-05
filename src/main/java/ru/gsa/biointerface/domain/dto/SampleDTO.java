@@ -18,6 +18,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SampleDTO implements Serializable, Comparable<SampleDTO> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     private int id;

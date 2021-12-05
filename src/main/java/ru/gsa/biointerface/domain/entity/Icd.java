@@ -20,6 +20,8 @@ import java.util.TreeSet;
 @Entity(name = "icd")
 @Table(name = "icd")
 public class Icd implements Serializable, Comparable<Icd> {
+    static final long SerialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

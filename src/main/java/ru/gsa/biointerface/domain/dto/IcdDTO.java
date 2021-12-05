@@ -17,6 +17,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class IcdDTO implements Serializable, Comparable<IcdDTO> {
+    static final long SerialVersionUID = 1L;
+
     private int id;
 
     @NotNull(message = "Name can't be null")

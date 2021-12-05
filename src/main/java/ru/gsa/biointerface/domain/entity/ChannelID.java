@@ -17,6 +17,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @Embeddable
 public class ChannelID implements Serializable, Comparable<ChannelID> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Examination id can't be null")
     private int examination_id;
 

@@ -20,6 +20,8 @@ import java.util.Objects;
 @Entity(name = "channel")
 @Table(name = "channel")
 public class Channel implements Serializable, Comparable<Channel> {
+    static final long SerialVersionUID = 1L;
+
     @EmbeddedId
     ChannelID id;
 

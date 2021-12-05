@@ -21,6 +21,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     private int id;
 

@@ -26,6 +26,8 @@ import java.util.Objects;
 @Entity(name = "examination")
 @Table(name = "examination")
 public class Examination implements Serializable, Comparable<Examination> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

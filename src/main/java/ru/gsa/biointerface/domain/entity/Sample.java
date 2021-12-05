@@ -19,6 +19,8 @@ import java.util.Objects;
 @Entity(name = "sample")
 @Table(name = "sample")
 public class Sample implements Serializable, Comparable<Sample> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     @EmbeddedId
