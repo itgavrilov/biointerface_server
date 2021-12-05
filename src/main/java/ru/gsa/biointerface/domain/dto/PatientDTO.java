@@ -19,6 +19,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PatientDTO implements Serializable, Comparable<PatientDTO> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
     private int id;

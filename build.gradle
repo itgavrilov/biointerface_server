@@ -18,8 +18,8 @@ repositories {
 
 def slf4jVersion = '2.0.0-alpha5'
 def log4jVersion = '2.14.1'
-def springBootVersion = '2.5.6'
-def junitVersion = '5.8.1'
+def springBootVersion = '2.6.1'
+def junitVersion = '5.8.2'
 def lombokVersion = '1.18.22'
 
 configurations.all {
@@ -30,7 +30,7 @@ dependencies {
     // сахар дря разработки.
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
-    // Атоперезапуск проекта при изменении classpath
+    // Автоперезапуск проекта при изменении classpath
     developmentOnly("org.springframework.boot:spring-boot-devtools:$springBootVersion")
 //-----------SerialPort----------------------
     implementation("com.fazecast:jSerialComm:2.7.0")
@@ -65,7 +65,7 @@ dependencies {
 //    implementation("javax.servlet:jstl:1.2")
 //    implementation("org.apache.tomcat.embed:tomcat-embed-jasper:10.0.12")
 //-----------Tests--------------------------
-    testImplementation("com.h2database:h2:1.4.200")
+    testImplementation('com.h2database:h2:2.0.202')
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter"
         exclude group: "org.slf4j", module: "slf4j-api"

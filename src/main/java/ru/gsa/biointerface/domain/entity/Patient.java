@@ -22,6 +22,8 @@ import java.util.TreeSet;
 @Entity(name = "patient")
 @Table(name = "patient")
 public class Patient implements Serializable, Comparable<Patient> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
     @Id

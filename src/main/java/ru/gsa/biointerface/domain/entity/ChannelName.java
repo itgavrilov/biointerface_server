@@ -22,6 +22,8 @@ import java.util.TreeSet;
 @Entity(name = "channel_name")
 @Table(name = "channel_name")
 public class ChannelName implements Serializable, Comparable<ChannelName> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

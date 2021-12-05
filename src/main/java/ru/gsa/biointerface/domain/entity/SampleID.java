@@ -17,6 +17,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @Embeddable
 public class SampleID implements Serializable, Comparable<SampleID> {
+    static final long SerialVersionUID = 1L;
+
     private int id;
 
     @Embedded

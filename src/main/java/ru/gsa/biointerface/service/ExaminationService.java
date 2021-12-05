@@ -2,6 +2,7 @@ package ru.gsa.biointerface.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.ExaminationDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
@@ -17,10 +18,8 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -28,16 +27,24 @@ import java.util.TreeSet;
 @Slf4j
 @Service
 public class ExaminationService {
+    private final ExaminationRepository repository;
+    private final PatientService patientService;
+    private final DeviceService deviceService;
+    private final ChannelService channelService;
+    private final SampleService sampleService;
+
     @Autowired
-    private ExaminationRepository repository;
-    @Autowired
-    private PatientService patientService;
-    @Autowired
-    private DeviceService deviceService;
-    @Autowired
-    private ChannelService channelService;
-    @Autowired
-    private SampleService sampleService;
+    public ExaminationService(ExaminationRepository repository,
+                              @Lazy PatientService patientService,
+                              @Lazy DeviceService deviceService,
+                              @Lazy ChannelService channelService,
+                              @Lazy SampleService sampleService) {
+        this.repository = repository;
+        this.patientService = patientService;
+        this.deviceService = deviceService;
+        this.channelService = channelService;
+        this.sampleService = sampleService;
+    }
 
     @PostConstruct
     private void init() {

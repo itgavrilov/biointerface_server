@@ -2,6 +2,7 @@ package ru.gsa.biointerface.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
@@ -25,10 +26,15 @@ import java.util.TreeSet;
 @Slf4j
 @Service
 public class PatientService {
+    private final PatientRepository repository;
+    private final IcdService icdService;
+
     @Autowired
-    private PatientRepository repository;
-    @Autowired
-    private IcdService icdService;
+    public PatientService(PatientRepository repository,
+                          @Lazy IcdService icdService) {
+        this.repository = repository;
+        this.icdService = icdService;
+    }
 
     private static Calendar localDateToDate(LocalDateTime localDate) {
         Calendar calendar = Calendar.getInstance();

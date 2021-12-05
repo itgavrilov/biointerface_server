@@ -21,8 +21,12 @@ import java.util.TreeSet;
 @Slf4j
 @Service
 public class DeviceService {
+    private final DeviceRepository repository;
+
     @Autowired
-    private DeviceRepository repository;
+    public DeviceService(DeviceRepository repository) {
+        this.repository = repository;
+    }
 
     @PostConstruct
     private void init() {

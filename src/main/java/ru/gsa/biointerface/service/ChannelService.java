@@ -2,6 +2,7 @@ package ru.gsa.biointerface.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
@@ -22,12 +23,18 @@ import java.util.*;
 @Slf4j
 @Service
 public class ChannelService {
+    private final ChannelRepository repository;
+    private final ExaminationService examinationService;
+    private final ChannelNameService channelNameService;
+
     @Autowired
-    private ChannelRepository repository;
-    @Autowired
-    private ExaminationService examinationService;
-    @Autowired
-    private ChannelNameService channelNameService;
+    public ChannelService(ChannelRepository repository,
+                          @Lazy ExaminationService examinationService,
+                          @Lazy ChannelNameService channelNameService) {
+        this.repository = repository;
+        this.examinationService = examinationService;
+        this.channelNameService = channelNameService;
+    }
 
     @PostConstruct
     private void init() {

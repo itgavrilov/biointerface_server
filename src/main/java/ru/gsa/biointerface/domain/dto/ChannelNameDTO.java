@@ -19,6 +19,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     private int id;
 

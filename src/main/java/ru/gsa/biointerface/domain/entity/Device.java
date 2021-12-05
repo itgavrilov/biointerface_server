@@ -23,6 +23,8 @@ import java.util.TreeSet;
 @Entity(name = "device")
 @Table(name = "device")
 public class Device implements Serializable, Comparable<Device> {
+    static final long SerialVersionUID = 1L;
+
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
     @Id

@@ -21,8 +21,12 @@ import java.util.TreeSet;
 @Slf4j
 @Service
 public class ChannelNameService {
+    private final ChannelNameRepository repository;
+
     @Autowired
-    private ChannelNameRepository repository;
+    public ChannelNameService(ChannelNameRepository repository) {
+        this.repository = repository;
+    }
 
     @PostConstruct
     private void init() {
