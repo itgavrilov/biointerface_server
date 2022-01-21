@@ -2,6 +2,14 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +36,8 @@ import java.util.TreeSet;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 15/11/2021
  */
 @Slf4j
+@RequiredArgsConstructor
+@Tag(name = "Channels", description = "controller channels")
 @RestController
 @RequestMapping(
         value = "/channels",
@@ -35,17 +45,22 @@ import java.util.TreeSet;
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelController {
     private static final String version = "0.0.1-SNAPSHOT";
-    @Autowired
-    ChannelService service;
-    @Autowired
-    ExaminationService examinationService;
-    @Autowired
-    ChannelNameService channelNameService;
-    @Autowired
-    ObjectMapper mapper;
 
+    private final ExaminationService examinationService;
+    private final ChannelNameService channelNameService;
+    private final ChannelService service;
+    private final ObjectMapper mapper;
+
+    @Operation(summary = "Get channels by examination")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully",
+//                    content = @Content(array = @ArraySchema(schema =
+//                    @Schema(implementation = DrawHistoryLightWeightResponse.class)))),
+//            @ApiResponse(responseCode = "404", description = "Object not found",
+//                    content = @Content(schema = @Schema(implementation = ResponseError.class))),
+//    })
     @PostMapping("/getByExamination")
-    public List<ChannelDTO> getByPatient(@RequestBody ExaminationDTO examinationDTO) {
+    public List<ChannelDTO> getByExamination(@RequestBody ExaminationDTO examinationDTO) {
         log.info("REST GET /channels/getByExamination(examinationId={})", examinationDTO.getId());
         List<Channel> entities =
                 service.findAllByExamination(

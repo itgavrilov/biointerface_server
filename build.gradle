@@ -60,6 +60,8 @@ dependencies {
 //    implementation("javax.servlet:jstl:1.2")
 //    implementation("org.apache.tomcat.embed:tomcat-embed-jasper:10.0.12")
 //-----------Tests--------------------------
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.4")
+//-----------Tests--------------------------
 //    testImplementation('com.h2database:h2:2.0.202')
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
         exclude group: "org.slf4j", module: "slf4j-api"

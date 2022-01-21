@@ -2,6 +2,8 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,8 @@ import java.util.TreeSet;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 15/11/2021
  */
 @Slf4j
+@RequiredArgsConstructor
+@Tag(name = "Devices", description = "Biointerface controllers")
 @RestController
 @RequestMapping(
         value = "/devices",
@@ -28,10 +32,9 @@ import java.util.TreeSet;
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
     private static final String version = "0.0.1-SNAPSHOT";
-    @Autowired
-    DeviceService service;
-    @Autowired
-    ObjectMapper mapper;
+
+    private final DeviceService service;
+    private final ObjectMapper mapper;
 
     @GetMapping
     public Set<DeviceDTO> getAll() {

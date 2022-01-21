@@ -14,13 +14,16 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = {
+        "ru.gsa.biointerface.config",
         "ru.gsa.biointerface.host",
         "ru.gsa.biointerface.service",
-        "ru.gsa.biointerface.repository"
+        "ru.gsa.biointerface.repository",
+        "ru.gsa.biointerface.controller"
 })
-@EnableJpaRepositories("ru.gsa.biointerface.repository")
 @EntityScan("ru.gsa.biointerface.domain.entity")
+@EnableJpaRepositories("ru.gsa.biointerface.repository")
 public class WebAppInit extends SpringBootServletInitializer {
+
     public static void main(String[] args) {
         SpringApplication.run(WebAppInit.class, args);
     }
@@ -30,5 +33,4 @@ public class WebAppInit extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(WebAppInit.class);
     }
-
 }
