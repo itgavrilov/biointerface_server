@@ -2,6 +2,7 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class PatientsController {
     private final IcdService icdService;
     private final ObjectMapper mapper;
 
+    @Operation(summary = "Get all patient records")
     @GetMapping
     public Set<PatientDTO> getAll() {
         log.info("REST GET /patients");
@@ -53,7 +55,8 @@ public class PatientsController {
         return dtos;
     }
 
-    @PostMapping("/getByIcd")
+    @Operation(summary = "Get all patient records by ICD disease code")
+    @PostMapping("/by-icd")
     public Set<PatientDTO> getByIcd(@RequestBody IcdDTO icdDTO) {
         log.info("REST GET /patients/getByIcd(icdId={})", icdDTO.getId());
         Set<Patient> entities =
@@ -66,6 +69,7 @@ public class PatientsController {
         return dtos;
     }
 
+    @Operation(summary = "Get patient record by ID")
     @GetMapping("/{id}")
     public PatientDTO get(@PathVariable int id) {
         log.info("REST GET /patients/{}", id);
@@ -73,6 +77,7 @@ public class PatientsController {
         return service.convertEntityToDto(service.findById(id));
     }
 
+    @Operation(summary = "Delete patient record by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody PatientDTO dto) {
@@ -80,6 +85,7 @@ public class PatientsController {
         log.info("REST POST /patients/delete(id={})", dto.getId());
     }
 
+    @Operation(summary = "Save patient record")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody PatientDTO dto) throws JsonProcessingException {
         Patient entity = service.save(service.convertDtoToEntity(dto));

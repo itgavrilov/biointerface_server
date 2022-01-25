@@ -2,6 +2,7 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,10 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Channel names", description = "Names for channel")
+@Tag(name = "Channel`s names", description = "Names for channel")
 @RestController
 @RequestMapping(
-        value = "/channelNames",
+        value = "/channel-names",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelNameController {
@@ -36,6 +37,7 @@ public class ChannelNameController {
     private final ChannelNameService service;
     private final ObjectMapper mapper;
 
+    @Operation(summary = "Get all channel`s names")
     @GetMapping
     public Set<ChannelNameDTO> getAll() {
         log.info("REST GET /channelNames");
@@ -48,6 +50,7 @@ public class ChannelNameController {
         return dtos;
     }
 
+    @Operation(summary = "Get channel`s name by ID")
     @GetMapping("/{id}")
     public ChannelNameDTO get(@PathVariable int id) {
         log.info("REST GET /channelNames/{}", id);
@@ -55,25 +58,27 @@ public class ChannelNameController {
         return service.convertEntityToDto(service.findById(id));
     }
 
+    @Operation(summary = "Delete channel`s name by ID")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@RequestBody ChannelNameDTO dto) {
+        service.delete(service.convertDtoToEntity(dto));
+        log.info("REST POST /channelNames/delete/(id={})", dto.getId());
+    }
+
+    @Operation(summary = "Save new channel`s name")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody ChannelNameDTO dto) throws JsonProcessingException {
         ChannelName entity = service.save(service.convertDtoToEntity(dto));
         log.info("REST POST /channelNames/save/(id={})", entity.getId());
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/channelNames/{id}")
+                .path("/{id}")
                 .buildAndExpand(entity.getId()).toUri();
         String body = mapper.writeValueAsString(
                 service.convertEntityToDto(entity)
         );
 
         return ResponseEntity.created(newResource).body(body);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestBody ChannelNameDTO dto) {
-        service.delete(service.convertDtoToEntity(dto));
-        log.info("REST POST /channelNames/delete/(id={})", dto.getId());
     }
 
     @GetMapping(value = "/health")

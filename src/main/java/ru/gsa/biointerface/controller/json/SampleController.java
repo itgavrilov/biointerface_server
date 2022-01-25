@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.controller.json;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class SampleController {
     private final SampleService service;
     private final ChannelService channelService;
 
+    @Operation(summary = "Get all readings of biopotential measurements by channel")
     @PostMapping
     public List<Integer> getByChannel(@RequestBody ChannelDTO channelDTO) {
         log.info("REST GET /samples/getbychannel(examination_id={}, id={})",

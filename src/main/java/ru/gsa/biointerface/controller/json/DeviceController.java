@@ -2,6 +2,7 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class DeviceController {
     private final DeviceService service;
     private final ObjectMapper mapper;
 
+    @Operation(summary = "Get all biointerface controllers")
     @GetMapping
     public Set<DeviceDTO> getAll() {
         log.info("REST GET /devices");
@@ -48,6 +50,7 @@ public class DeviceController {
         return dtos;
     }
 
+    @Operation(summary = "Get biointerface controller by ID")
     @GetMapping("/{id}")
     public DeviceDTO get(@PathVariable int id) {
         log.info("REST GET /devices/{}", id);
@@ -55,6 +58,7 @@ public class DeviceController {
         return service.convertEntityToDto(service.findById(id));
     }
 
+    @Operation(summary = "Delete biointerface controller by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody DeviceDTO dto) {
@@ -62,6 +66,7 @@ public class DeviceController {
         log.info("REST POST /devices/delete/(id={})", dto.getId());
     }
 
+    @Operation(summary = "Save new biointerface controller")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody DeviceDTO dto) throws JsonProcessingException {
         Device entity = service.save(service.convertDtoToEntity(dto));

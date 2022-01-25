@@ -2,6 +2,7 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public class ExaminationsController {
     private final DeviceService deviceService;
     private final ObjectMapper mapper;
 
+    @Operation(summary = "Get all results of biopotential measurements")
     @GetMapping
     public Set<ExaminationDTO> getAll() {
         log.info("REST GET /examinations");
@@ -54,7 +56,8 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @PostMapping("/getByPatient")
+    @Operation(summary = "Get all results of biopotential measurements by patient record")
+    @PostMapping("/by-patient")
     public Set<ExaminationDTO> getByPatient(@RequestBody PatientDTO patientDTO) {
         log.info("REST GET /examinations/getByPatient(patientId={})", patientDTO.getId());
         Set<Examination> entities =
@@ -67,7 +70,8 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @PostMapping("/getByDevice")
+    @Operation(summary = "Get all results of biopotential measurements by device")
+    @PostMapping("/by-device")
     public Set<ExaminationDTO> getByDevice(@RequestBody DeviceDTO deviceDTO) {
         log.info("REST GET /examinations/getByDevice(deviceId={})", deviceDTO.getId());
         Set<Examination> entities =
@@ -80,6 +84,7 @@ public class ExaminationsController {
         return dtos;
     }
 
+    @Operation(summary = "Get result of biopotential measurements by ID")
     @GetMapping("/{id}")
     public ExaminationDTO get(@PathVariable int id) {
         log.info("REST GET /examinations/{}", id);
@@ -87,6 +92,7 @@ public class ExaminationsController {
         return service.convertEntityToDto(service.findById(id));
     }
 
+    @Operation(summary = "Delete result of biopotential by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ExaminationDTO dto) {
@@ -94,6 +100,7 @@ public class ExaminationsController {
         log.info("REST POST /examinations/delete/(id={})", dto.getId());
     }
 
+    @Operation(summary = "Save result of biopotential")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody ExaminationDTO dto) throws JsonProcessingException {
         Examination entity = service.save(service.convertDtoToEntity(dto));
