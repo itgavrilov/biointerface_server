@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -12,40 +13,42 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Schema(name = "Patient", description = "patient record")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PatientDTO implements Serializable, Comparable<PatientDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "patient record ID")
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
     private int id;
 
-    @NotNull(message = "Second name can't be null")
+    @Schema(description = "patient second name")
     @NotBlank(message = "Second name can't be blank")
     @Size(min = 3, max = 20, message = "Second name should be have chars between 3-20")
     private String secondName;
 
-    @NotNull(message = "First name can't be null")
+    @Schema(description = "patient first name")
     @NotBlank(message = "First name can't be blank")
     @Size(min = 3, max = 20, message = "First name should be have chars between 3-20")
     private String firstName;
 
-    @NotNull(message = "Patronymic can't be null")
+    @Schema(description = "patient patronymic")
     @NotBlank(message = "Patronymic can't be blank")
     @Size(min = 3, max = 20, message = "Patronymic should be have chars between 3-20")
     private String patronymic;
 
+    @Schema(description = "patient birthday")
     @NotNull(message = "Birthday can't be null")
     @Past(message = "Birthday should be in past")
     private LocalDateTime birthday;
 
+    @Schema(description = "ICD ID")
     private int icdId;
 
+    @Schema(description = "patient comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 

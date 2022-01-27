@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -10,21 +11,22 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Schema(name = "Channel", description = "controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "serial number in controller")
     @NotNull(message = "Number can't be null")
     private int number;
 
+    @Schema(description = "examination`s ID")
     @NotNull(message = "ExaminationId can't be null")
     private int examinationId;
 
+    @Schema(description = "channel`s name ID")
     private int channelNameId;
 
     @Override

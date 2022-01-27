@@ -37,7 +37,7 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Channels", description = "Controller channels")
+@Tag(name = "Channels", description = "controller`s channels")
 @RestController
 @RequestMapping(
         value = "/channels",
@@ -51,7 +51,7 @@ public class ChannelController {
     private final ChannelService service;
     private final ObjectMapper mapper;
 
-    @Operation(summary = "Get channels by examination")
+    @Operation(summary = "get channels by examination")
 //    @ApiResponses(value = {
 //            @ApiResponse(responseCode = "200", description = "Successfully",
 //                    content = @Content(array = @ArraySchema(schema =
@@ -74,7 +74,7 @@ public class ChannelController {
         return dtos;
     }
 
-    @Operation(summary = "Get channels by сhannel`s name")
+    @Operation(summary = "get channels by сhannel`s name")
     @PostMapping("/by-channel-name")
     public Set<ChannelDTO> getByDevice(@RequestBody ChannelNameDTO channelNameDTO) {
         log.info("REST GET /channels/getByChannelName(channelNameId={})", channelNameDTO.getId());
@@ -90,7 +90,7 @@ public class ChannelController {
         return dtos;
     }
 
-    @Operation(summary = "Get channels by сhannel`s name ID and number")
+    @Operation(summary = "get channels by сhannel`s name ID and number")
     @GetMapping("/{examinationId}/{number}/")
     public ChannelDTO get(@PathVariable int examinationId, @PathVariable int number) {
         log.info("REST GET /channels/{}/{}", examinationId, number);
@@ -100,7 +100,7 @@ public class ChannelController {
         );
     }
 
-    @Operation(summary = "Delete channels by ID")
+    @Operation(summary = "delete channels by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ChannelDTO dto) {
@@ -110,7 +110,7 @@ public class ChannelController {
                 dto.getNumber());
     }
 
-    @Operation(summary = "Save new channel")
+    @Operation(summary = "save new channel")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody ChannelDTO dto) throws JsonProcessingException {
         Channel entity = service.save(service.convertDtoToEntity(dto));

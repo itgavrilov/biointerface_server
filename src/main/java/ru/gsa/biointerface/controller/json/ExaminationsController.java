@@ -29,7 +29,7 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Examinations", description = "Results of biopotential measurements")
+@Tag(name = "Examinations", description = "results of biopotential measurements")
 @RestController
 @RequestMapping(
         value = "/examinations",
@@ -43,7 +43,7 @@ public class ExaminationsController {
     private final DeviceService deviceService;
     private final ObjectMapper mapper;
 
-    @Operation(summary = "Get all results of biopotential measurements")
+    @Operation(summary = "get all results of biopotential measurements")
     @GetMapping
     public Set<ExaminationDTO> getAll() {
         log.info("REST GET /examinations");
@@ -56,7 +56,7 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @Operation(summary = "Get all results of biopotential measurements by patient record")
+    @Operation(summary = "get all results of biopotential measurements by patient record")
     @PostMapping("/by-patient")
     public Set<ExaminationDTO> getByPatient(@RequestBody PatientDTO patientDTO) {
         log.info("REST GET /examinations/getByPatient(patientId={})", patientDTO.getId());
@@ -70,7 +70,7 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @Operation(summary = "Get all results of biopotential measurements by device")
+    @Operation(summary = "get all results of biopotential measurements by device")
     @PostMapping("/by-device")
     public Set<ExaminationDTO> getByDevice(@RequestBody DeviceDTO deviceDTO) {
         log.info("REST GET /examinations/getByDevice(deviceId={})", deviceDTO.getId());
@@ -84,7 +84,7 @@ public class ExaminationsController {
         return dtos;
     }
 
-    @Operation(summary = "Get result of biopotential measurements by ID")
+    @Operation(summary = "get result of biopotential measurements by ID")
     @GetMapping("/{id}")
     public ExaminationDTO get(@PathVariable int id) {
         log.info("REST GET /examinations/{}", id);
@@ -92,7 +92,7 @@ public class ExaminationsController {
         return service.convertEntityToDto(service.findById(id));
     }
 
-    @Operation(summary = "Delete result of biopotential by ID")
+    @Operation(summary = "delete result of biopotential by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ExaminationDTO dto) {
@@ -100,7 +100,7 @@ public class ExaminationsController {
         log.info("REST POST /examinations/delete/(id={})", dto.getId());
     }
 
-    @Operation(summary = "Save result of biopotential")
+    @Operation(summary = "save result of biopotential")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody ExaminationDTO dto) throws JsonProcessingException {
         Examination entity = service.save(service.convertDtoToEntity(dto));

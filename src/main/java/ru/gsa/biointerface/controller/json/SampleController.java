@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Samples", description = "Readings of biopotential measurements")
+@Tag(name = "Samples", description = "readings of biopotential measurement")
 @RestController
 @RequestMapping(
         value = "/samples",
@@ -33,7 +33,7 @@ public class SampleController {
     private final SampleService service;
     private final ChannelService channelService;
 
-    @Operation(summary = "Get all readings of biopotential measurements by channel")
+    @Operation(summary = "get all readings of biopotential measurements by channel")
     @PostMapping
     public List<Integer> getByChannel(@RequestBody ChannelDTO channelDTO) {
         log.info("REST GET /samples/getbychannel(examination_id={}, id={})",

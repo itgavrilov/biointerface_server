@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -12,23 +13,24 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Schema(name = "ChannelName", description = "name for controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "channel`s name ID")
     @NotNull(message = "Id can't be null")
     private int id;
 
+    @Schema(description = "channel`s name")
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
 
+    @Schema(description = "channel`s name comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 

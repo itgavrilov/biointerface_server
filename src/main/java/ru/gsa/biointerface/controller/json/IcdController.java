@@ -37,7 +37,7 @@ public class IcdController {
     private final IcdService service;
     private final ObjectMapper mapper;
 
-    @Operation(summary = "Get all ICD disease codes")
+    @Operation(summary = "get all ICD disease codes")
     @GetMapping
     public Set<IcdDTO> getAll() {
         log.info("REST GET /icds");
@@ -50,7 +50,7 @@ public class IcdController {
         return dtos;
     }
 
-    @Operation(summary = "Get ICD disease code by ID")
+    @Operation(summary = "get ICD disease code by ID")
     @GetMapping("/{id}")
     public IcdDTO get(@PathVariable int id) {
         log.info("REST GET /icds/{}", id);
@@ -58,7 +58,7 @@ public class IcdController {
         return service.convertEntityToDto(service.findById(id));
     }
 
-    @Operation(summary = "Delete ICD disease code by ID")
+    @Operation(summary = "delete ICD disease code by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody IcdDTO dto) {
@@ -66,7 +66,7 @@ public class IcdController {
         log.info("REST POST /icds/delete/(id={})", dto.getId());
     }
 
-    @Operation(summary = "Save new ICD disease code")
+    @Operation(summary = "save new ICD disease code")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody IcdDTO dto) throws JsonProcessingException {
         Icd entity = service.save(service.convertDtoToEntity(dto));

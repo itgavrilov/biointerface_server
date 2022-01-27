@@ -25,7 +25,7 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Channel`s names", description = "Names for channel")
+@Tag(name = "Channel`s names", description = "names for controller`s channel")
 @RestController
 @RequestMapping(
         value = "/channel-names",
@@ -37,7 +37,7 @@ public class ChannelNameController {
     private final ChannelNameService service;
     private final ObjectMapper mapper;
 
-    @Operation(summary = "Get all channel`s names")
+    @Operation(summary = "get all channel`s names")
     @GetMapping
     public Set<ChannelNameDTO> getAll() {
         log.info("REST GET /channelNames");
@@ -50,7 +50,7 @@ public class ChannelNameController {
         return dtos;
     }
 
-    @Operation(summary = "Get channel`s name by ID")
+    @Operation(summary = "get channel`s name by ID")
     @GetMapping("/{id}")
     public ChannelNameDTO get(@PathVariable int id) {
         log.info("REST GET /channelNames/{}", id);
@@ -58,7 +58,7 @@ public class ChannelNameController {
         return service.convertEntityToDto(service.findById(id));
     }
 
-    @Operation(summary = "Delete channel`s name by ID")
+    @Operation(summary = "delete channel`s name by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody ChannelNameDTO dto) {
@@ -66,7 +66,7 @@ public class ChannelNameController {
         log.info("REST POST /channelNames/delete/(id={})", dto.getId());
     }
 
-    @Operation(summary = "Save new channel`s name")
+    @Operation(summary = "save new channel`s name")
     @PutMapping
     public ResponseEntity<String> save(@RequestBody ChannelNameDTO dto) throws JsonProcessingException {
         ChannelName entity = service.save(service.convertDtoToEntity(dto));
