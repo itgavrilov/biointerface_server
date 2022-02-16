@@ -1,10 +1,17 @@
 spring:
+  profiles:
+    active: dev
+  application:
+    name: biointerface_server
+
   datasource:
     url: jdbc:postgresql://localhost:5432/biointerface
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-
+    hikari:
+      maximum-pool-size: ${MAX_POOL_SIZE:20}
+      minimum-idle: ${MIN_POOL_IDLE:5}
   jpa:
     show-sql: false
     properties:
@@ -19,6 +26,16 @@ spring:
         cache:
           use_second_level_cache: false
           provider_class: org.hibernate.cache.NoCacheProvider
+  sql:
+    init:
+      platform: h2
+      encoding: UTF-8
+
+  flyway:
+    schemas: public
+    baselineOnMigrate: true
+    ignore-missing-migrations: true
+    table: flyway_schema_history
 
   thymeleaf:
     prefix: "/WEB-INF/templates/"
@@ -28,7 +45,13 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    context-path: /
+  error:
+    include-stacktrace: always
 
 springdoc:
+  api-docs:
+    enabled: true
   swagger-ui:
     path: /swagger

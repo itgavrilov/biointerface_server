@@ -1,20 +1,27 @@
 package ru.gsa.biointerface.controller.json;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
+import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.service.ChannelService;
 import ru.gsa.biointerface.service.SampleService;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 15/11/2021
@@ -31,26 +38,27 @@ public class SampleController {
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final SampleService service;
-    private final ChannelService channelService;
 
     @Operation(summary = "get all readings of biopotential measurements by channel")
-    @PostMapping
-    public List<Integer> getByChannel(@RequestBody ChannelDTO channelDTO) {
-        log.info("REST GET /samples/getbychannel(examination_id={}, id={})",
-                channelDTO.getNumber(),
-                channelDTO.getExaminationId());
-        List<Sample> entities =
-                service.findAllByChannel(
-                        channelService.convertDtoToEntity(channelDTO)
-                );
-        List<Integer> dtos = new LinkedList<>();
-        entities.forEach(entity -> dtos.add(entity.getValue()));
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully",
+                    content = @Content(array = @ArraySchema(
+                            schema = @Schema(implementation = ChannelDTO.class)))),
+            @ApiResponse(responseCode = "404", description = "Object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @GetMapping("/{examinationId}/{channelNumber}")
+    public ResponseEntity<List<Integer>> getByChannel(@PathVariable int examinationId, @PathVariable int channelNumber) {
+        log.info("REST GET /samples/{}/{}", channelNumber, examinationId);
+        List<Integer> responses = service.findAllByExaminationIdAndChannelNumber(examinationId, channelNumber).stream()
+                .map(Sample::getValue)
+                .collect(Collectors.toList());
 
-        return dtos;
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping(value = "/health")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void health() {
     }
 

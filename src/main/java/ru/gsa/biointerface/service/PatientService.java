@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
 
 import javax.annotation.PostConstruct;
@@ -71,7 +73,8 @@ public class PatientService {
         return entities;
     }
 
-    public Set<Patient> findAllByIcd(Icd icd) {
+    public Set<Patient> findAllByIcd(Integer icdId) {
+        Icd icd = icdService.getById(icdId);
         Set<Patient> entities = new TreeSet<>(repository.findAllByIcd(icd));
 
         if (entities.size() > 0) {
@@ -83,9 +86,8 @@ public class PatientService {
         return entities;
     }
 
-    public Patient findById(int id) {
-        if (id <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public Patient getById(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
         Optional<Patient> optional = repository.findById(id);
 
@@ -94,8 +96,7 @@ public class PatientService {
             return optional.get();
         } else {
             log.error("Patient(id={}) is not found in database", id);
-            throw new EntityNotFoundException(
-                    "Patient(id=" + id + ") is not found in database"
+            throw new NotFoundException("Patient(id=" + id + ") is not found in database"
             );
         }
     }
@@ -103,25 +104,25 @@ public class PatientService {
     @Transactional
     public Patient save(Patient entity) {
         if (entity == null)
-            throw new NullPointerException("Entity is null");
+            throw new BadRequestException("Entity is null");
         if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+            throw new BadRequestException("Id <= 0");
         if (entity.getSecondName() == null)
-            throw new NullPointerException("SecondName is null");
+            throw new BadRequestException("SecondName is null");
         if (entity.getSecondName().isBlank())
-            throw new IllegalArgumentException("SecondName is blank");
+            throw new BadRequestException("SecondName is blank");
         if (entity.getFirstName() == null)
-            throw new NullPointerException("FirstName is null");
+            throw new BadRequestException("FirstName is null");
         if (entity.getFirstName().isBlank())
-            throw new IllegalArgumentException("FirstName is blank");
+            throw new BadRequestException("FirstName is blank");
         if (entity.getPatronymic() == null)
-            throw new NullPointerException("MiddleName is null");
+            throw new BadRequestException("MiddleName is null");
         if (entity.getPatronymic().isBlank())
-            throw new IllegalArgumentException("MiddleName is blank");
+            throw new BadRequestException("MiddleName is blank");
         if (entity.getBirthday() == null)
-            throw new NullPointerException("Birthday is null");
+            throw new BadRequestException("Birthday is null");
         if (entity.getExaminations() == null)
-            throw new NullPointerException("Examinations is null");
+            throw new BadRequestException("Examinations is null");
 
         entity = repository.save(entity);
         log.info("Patient(id={}) is recorded in database", entity.getId());
@@ -130,22 +131,17 @@ public class PatientService {
     }
 
     @Transactional
-    public void delete(Patient entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public void delete(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
-        Optional<Patient> optional = repository.findById(entity.getId());
+        Optional<Patient> optional = repository.findById(id);
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
-            log.info("Patient(id={}) is deleted in database", optional.get().getId());
+            log.info("Patient(id={}) is deleted in database", id);
         } else {
-            log.error("Patient(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException(
-                    "Patient(id=" + entity.getId() + ") not found in database"
-            );
+            log.error("Patient(id={}) not found in database", id);
+            throw new NotFoundException("Patient(id=" + id + ") not found in database");
         }
     }
 
@@ -173,7 +169,7 @@ public class PatientService {
         Icd icd = null;
 
         if (dto.getIcdId() != 0) {
-            icd = icdService.findById(dto.getIcdId());
+            icd = icdService.getById(dto.getIcdId());
         }
 
         Patient patient = Patient.builder()

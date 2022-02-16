@@ -9,17 +9,17 @@ import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
@@ -68,25 +68,25 @@ public class ExaminationService {
         return entities;
     }
 
-    public Set<Examination> findByPatient(Patient patient) {
-        if (patient == null)
-            throw new NullPointerException("Patient is null");
+    public Set<Examination> findByPatient(int patientId) {
+        if (patientId <= 0) throw new NullPointerException("patientId <= 0");
 
+        Patient patient = patientService.getById(patientId);
         Set<Examination> entities = new TreeSet<>(repository.findAllByPatient(patient));
 
         if (entities.size() > 0) {
-            log.info("Get all examinations by patient(id={}) from database", patient.getId());
+            log.info("Get all examinations by patient(id={}) from database", patientId);
         } else {
-            log.info("Examinations by patient(id={}) is not found in database", patient.getId());
+            log.info("Examinations by patient(id={}) is not found in database", patientId);
         }
 
         return entities;
     }
 
-    public Set<Examination> findByDevice(Device device) {
-        if (device == null)
-            throw new NullPointerException("Device is null");
+    public Set<Examination> findByDevice(int deviceId) {
+        if (deviceId <= 0) throw new NullPointerException("deviceId <= 0");
 
+        Device device = deviceService.getById(deviceId);
         Set<Examination> entities = new TreeSet<>(repository.findAllByDevice(device));
 
         if (entities.size() > 0) {
@@ -98,36 +98,33 @@ public class ExaminationService {
         return entities;
     }
 
-    public Examination findById(Integer id) {
-        if (id == null)
-            throw new NullPointerException("Id is null");
-        if (id <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public Examination getById(int id) {
+        if (id <= 0) throw new IllegalArgumentException("id <= 0");
 
         Optional<Examination> optional = repository.findById(id);
 
         if (optional.isPresent()) {
-            log.info("Get examination(id={}) from database", optional.get().getId());
+            log.info("Get examination(id={}) from database", id);
 
             return optional.get();
         } else {
             log.error("Examination(id={}) is not found in database", id);
-            throw new EntityNotFoundException("Examination(id=" + id + ") is not found in database");
+            throw new NotFoundException("Examination(id=" + id + ") is not found in database");
         }
     }
 
     @Transactional
     public Examination save(Examination entity) {
         if (entity == null)
-            throw new NullPointerException("Entity is null");
+            throw new BadRequestException("Entity is null");
         if (entity.getStarttime() == null)
-            throw new NullPointerException("StartTime is null");
+            throw new BadRequestException("StartTime is null");
         if (entity.getPatient() == null)
-            throw new NullPointerException("Patient is null");
+            throw new BadRequestException("Patient is null");
         if (entity.getDevice() == null)
-            throw new NullPointerException("Device is null");
+            throw new BadRequestException("Device is null");
         if (entity.getChannels() == null)
-            throw new NullPointerException("Channels is null");
+            throw new BadRequestException("Channels is null");
 
         entity = repository.save(entity);
         log.info("Examination(id={}) is recorded in database", entity.getId());
@@ -136,28 +133,23 @@ public class ExaminationService {
     }
 
     @Transactional
-    public void delete(Examination entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public void delete(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
-        Optional<Examination> optional = repository.findById(entity.getId());
+        Optional<Examination> optional = repository.findById(id);
 
         if (optional.isPresent()) {
-            repository.delete(entity);
-            log.info("Examination(id={}) is deleted in database", entity.getId());
+            repository.delete(optional.get());
+            log.info("Examination(id={}) is deleted in database", id);
         } else {
-            log.info("Examination(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException(
-                    "Examination(id=" + entity.getId() + ") is not found in database"
-            );
+            log.info("Examination(id={}) not found in database", id);
+            throw new NotFoundException("Examination(id=" + id + ") is not found in database");
         }
     }
 
     public Examination loadWithGraphsById(int id) {
-        Examination entity = findById(id);
-        entity.setChannels(channelService.findAllByExamination(entity));
+        Examination entity = getById(id);
+        entity.setChannels(channelService.findAllByExamination(entity.getId()));
 
         for (Channel channel : entity.getChannels()) {
             channel.setSamples(sampleService.findAllByChannel(channel));
@@ -170,15 +162,15 @@ public class ExaminationService {
 
     public void recordingStart(Examination entity) throws Exception {
         if (entity == null)
-            throw new NullPointerException("Entity is null");
+            throw new BadRequestException("Entity is null");
         if (entity.getPatient() == null)
-            throw new NullPointerException("Patient is null");
+            throw new BadRequestException("Patient is null");
         if (entity.getDevice() == null)
-            throw new NullPointerException("Device is null");
+            throw new BadRequestException("Device is null");
         if (entity.getChannels() == null)
-            throw new NullPointerException("Channels is null");
+            throw new BadRequestException("Channels is null");
         if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
-            throw new IllegalArgumentException("Amount channels differs from amount in device");
+            throw new BadRequestException("Amount channels differs from amount in device");
 
         Optional<Examination> optional = repository.findById(entity.getId());
 
@@ -189,7 +181,7 @@ public class ExaminationService {
             log.error(
                     "Examination(id={}) does not yet exist in database. Recording is not start",
                     entity.getId());
-            throw new NullPointerException(
+            throw new NotFoundException(
                     "Examination(id=" + entity.getId() + ") does not yet exist in database. Recording is not start"
             );
         }
@@ -233,11 +225,11 @@ public class ExaminationService {
         Device device = null;
 
         if (dto.getPatientId() != 0) {
-            patient = patientService.findById(dto.getPatientId());
+            patient = patientService.getById(dto.getPatientId());
         }
 
         if (dto.getDeviceId() != 0) {
-            device = deviceService.findById(dto.getDeviceId());
+            device = deviceService.getById(dto.getDeviceId());
         }
 
         Examination examination = Examination.builder()

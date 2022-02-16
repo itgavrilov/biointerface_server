@@ -1,4 +1,4 @@
-package ru.gsa.biointerface;
+package ru.gsa.biointerface.exception;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.

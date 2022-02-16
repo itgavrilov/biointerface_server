@@ -1,14 +1,18 @@
 package ru.gsa.biointerface.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
+import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelRepository;
 
 import javax.annotation.PostConstruct;
@@ -21,20 +25,12 @@ import java.util.*;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 03/11/2021
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ChannelService {
     private final ChannelRepository repository;
     private final ExaminationService examinationService;
     private final ChannelNameService channelNameService;
-
-    @Autowired
-    public ChannelService(ChannelRepository repository,
-                          @Lazy ExaminationService examinationService,
-                          @Lazy ChannelNameService channelNameService) {
-        this.repository = repository;
-        this.examinationService = examinationService;
-        this.channelNameService = channelNameService;
-    }
 
     @PostConstruct
     private void init() {
@@ -58,7 +54,8 @@ public class ChannelService {
         return entities;
     }
 
-    public List<Channel> findAllByExamination(Examination examination) {
+    public List<Channel> findAllByExamination(int id) {
+        Examination examination = examinationService.getById(id);
         List<Channel> entities = repository.findAllByExamination(examination);
 
         if (entities.size() > 0) {
@@ -70,7 +67,8 @@ public class ChannelService {
         return entities;
     }
 
-    public Set<Channel> findAllByChannelName(ChannelName channelName) {
+    public Set<Channel> findAllByChannelName(int channelNameId) {
+        ChannelName channelName = channelNameService.findById(channelNameId);
         Set<Channel> entities = new TreeSet<>(
                 repository.findAllByChannelName(channelName));
 
@@ -83,10 +81,8 @@ public class ChannelService {
         return entities;
     }
 
-    public Channel findById(ChannelID id) {
-        if (id == null)
-            throw new NullPointerException("Id is null");
-
+    public Channel findById(int examinationId, int number) {
+        ChannelID id = new ChannelID(examinationId, number);
         Optional<Channel> optional = repository.findById(id);
 
         if (optional.isPresent()) {
@@ -95,7 +91,7 @@ public class ChannelService {
             return optional.get();
         } else {
             log.error("Channel(id={}) is not found in database", id);
-            throw new EntityNotFoundException("Channel(id=" + id + ") is not found in database");
+            throw new NotFoundException("Channel(id=" + id + ") is not found in database");
         }
     }
 
@@ -115,20 +111,16 @@ public class ChannelService {
     }
 
     @Transactional
-    public void delete(Channel entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId().getNumber() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
-
-        Optional<Channel> optional = repository.findById(entity.getId());
+    public void delete(int examinationId, int number) {
+        ChannelID id = new ChannelID(examinationId, number);
+        Optional<Channel> optional = repository.findById(id);
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
             log.info("Channel(id={}) is deleted in database", optional.get().getId());
         } else {
-            log.info("Channel(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException("Channel(id=" + entity.getId() + ") not found in database");
+            log.info("Channel(id={}) not found in database", id);
+            throw new NotFoundException("Channel(id=" + id + ") not found in database");
         }
     }
 
@@ -153,7 +145,7 @@ public class ChannelService {
         ChannelName channelName = null;
 
         if (dto.getExaminationId() != 0) {
-            examination = examinationService.findById(dto.getExaminationId());
+            examination = examinationService.getById(dto.getExaminationId());
             examination_id = examination.getId();
         }
 
