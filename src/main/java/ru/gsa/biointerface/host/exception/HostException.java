@@ -1,6 +1,6 @@
 package ru.gsa.biointerface.host.exception;
 
-import ru.gsa.biointerface.BiointerfaceExeption;
+import ru.gsa.biointerface.exception.BiointerfaceExeption;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 27.10.2021.

@@ -5,11 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.exception.NotFoundException;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -51,9 +52,8 @@ public class IcdService {
         return entities;
     }
 
-    public Icd findById(int id) {
-        if (id <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public Icd getById(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
         Optional<Icd> optional = repository.findById(id);
 
@@ -63,22 +63,22 @@ public class IcdService {
             return optional.get();
         } else {
             log.error("Icd(id={}) is not found in database", id);
-            throw new NoSuchElementException("Icd(id=" + id + ") is not found in database");
+            throw new NotFoundException("Icd(id=" + id + ") is not found in database");
         }
     }
 
     @Transactional
     public Icd save(Icd entity) {
         if (entity == null)
-            throw new NullPointerException("Entity is null");
+            throw new BadRequestException("Entity is null");
         if (entity.getName() == null)
-            throw new NullPointerException("Name is null");
+            throw new BadRequestException("Name is null");
         if (entity.getName().isBlank())
-            throw new IllegalArgumentException("Name is blank");
+            throw new BadRequestException("Name is blank");
         if (entity.getVersion() <= 0)
-            throw new IllegalArgumentException("Version <= 0");
+            throw new BadRequestException("Version <= 0");
         if (entity.getPatients() == null)
-            throw new NullPointerException("Patients is null");
+            throw new BadRequestException("Patients is null");
 
 
         entity = repository.save(entity);
@@ -88,20 +88,17 @@ public class IcdService {
     }
 
     @Transactional
-    public void delete(Icd entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public void delete(int id) {
+        if (id <= 0) throw new BadRequestException("Id <= 0");
 
-        Optional<Icd> optional = repository.findById(entity.getId());
+        Optional<Icd> optional = repository.findById(id);
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
-            log.info("Icd(id={}) is deleted in database", optional.get().getId());
+            log.info("Icd(id={}) is deleted in database", id);
         } else {
-            log.info("Icd(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException("Icd(id=" + entity.getId() + ") not found in database");
+            log.info("Icd(id={}) not found in database", id);
+            throw new NotFoundException("Icd(id=" + id + ") not found in database");
         }
     }
 

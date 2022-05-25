@@ -1,10 +1,13 @@
 package ru.gsa.biointerface.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.TransactionException;
 import ru.gsa.biointerface.repository.SampleRepository;
 
 import javax.annotation.PostConstruct;
@@ -15,14 +18,11 @@ import java.util.List;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 03/11/2021
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class SampleService {
     private final SampleRepository repository;
-
-    @Autowired
-    public SampleService(SampleRepository repository) {
-        this.repository = repository;
-    }
+    private final ChannelService channelService;
 
     @PostConstruct
     private void init() {
@@ -32,6 +32,12 @@ public class SampleService {
     @PreDestroy
     private void destroy() {
         log.info("SampleService is destruction");
+    }
+
+    public List<Sample> findAllByExaminationIdAndChannelNumber(int examinationId, int channelNumber) {
+        Channel channel = channelService.findById(examinationId, channelNumber);
+
+        return findAllByChannel(channel);
     }
 
     public List<Sample> findAllByChannel(Channel channel) {
@@ -48,12 +54,12 @@ public class SampleService {
 
     public void transactionOpen() throws Exception {
         repository.transactionOpen();
-        log.info("Transaction is open");
+        log.info("Transaction has been opened");
     }
 
     public void transactionClose() throws Exception {
         repository.transactionClose();
-        log.info("Transaction is close");
+        log.info("Transaction has been closed");
     }
 
     public boolean transactionIsOpen() {
@@ -61,10 +67,12 @@ public class SampleService {
     }
 
     public void setSampleInChannel(Channel channel, int value) throws Exception {
-        if (!transactionIsOpen())
-            throw new ServiceException("Recording not started");
+        if (!transactionIsOpen()) {
+            log.warn("Transaction is close");
+            throw new TransactionException("Recording not started");
+        }
         if (channel == null)
-            throw new NullPointerException("Channel is null");
+            throw new BadRequestException("Channel is null");
 
         List<Sample> samples = channel.getSamples();
         Sample sample =

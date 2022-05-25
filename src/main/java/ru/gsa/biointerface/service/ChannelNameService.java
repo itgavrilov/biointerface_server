@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.entity.ChannelName;
+import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 
 import javax.annotation.PostConstruct;
@@ -51,8 +53,7 @@ public class ChannelNameService {
     }
 
     public ChannelName findById(int id) {
-        if (id <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
         Optional<ChannelName> optional = repository.findById(id);
 
@@ -62,20 +63,20 @@ public class ChannelNameService {
             return optional.get();
         } else {
             log.error("ChannelName(id={}) is not found in database", id);
-            throw new EntityNotFoundException("ChannelName(id=" + id + ") is not found in database");
+            throw new NotFoundException("ChannelName(id=" + id + ") is not found in database");
         }
     }
 
     @Transactional
     public ChannelName save(ChannelName entity) {
         if (entity == null)
-            throw new NullPointerException("Entity is null");
+            throw new BadRequestException("Entity is null");
         if (entity.getName() == null)
-            throw new NullPointerException("Name is null");
+            throw new BadRequestException("Name is null");
         if (entity.getName().isBlank())
-            throw new IllegalArgumentException("Name is blank");
+            throw new BadRequestException("Name is blank");
         if (entity.getChannels() == null)
-            throw new NullPointerException("Channels is null");
+            throw new BadRequestException("Channels is null");
 
         entity = repository.save(entity);
         log.info("ChannelName(id={})  is recorded in database", entity.getId());
@@ -84,20 +85,17 @@ public class ChannelNameService {
     }
 
     @Transactional
-    public void delete(ChannelName entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public void delete(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
-        Optional<ChannelName> optional = repository.findById(entity.getId());
+        Optional<ChannelName> optional = repository.findById(id);
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
             log.info("ChannelName(id={}) is deleted in database", optional.get().getId());
         } else {
-            log.info("ChannelName(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException("ChannelName(id=" + entity.getId() + ") not found in database");
+            log.info("ChannelName(id={}) not found in database", id);
+            throw new NotFoundException("ChannelName(id=" + id + ") not found in database");
         }
     }
 

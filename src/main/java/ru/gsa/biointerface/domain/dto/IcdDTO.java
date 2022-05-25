@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -10,27 +11,30 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Schema(name = "Icd", description = "ICD disease code")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "ICD ID")
+    @NotNull(message = "Id can't be null")
+    @Min(value = 1, message = "Id can't be lass then 1")
     private int id;
 
-    @NotNull(message = "Name can't be null")
+    @Schema(description = "ICD name")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
 
+    @Schema(description = "ICD version")
     @NotNull(message = "Version can't be null")
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     private int version;
 
+    @Schema(description = "ICD comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 

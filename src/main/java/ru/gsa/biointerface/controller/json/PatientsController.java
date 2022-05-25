@@ -2,13 +2,21 @@ package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Patient;
@@ -18,11 +26,14 @@ import ru.gsa.biointerface.service.PatientService;
 import java.net.URI;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 15/11/2021
  */
 @Slf4j
+@RequiredArgsConstructor
+@Tag(name = "Patients", description = "patient records")
 @RestController
 @RequestMapping(
         value = "/patients",
@@ -30,81 +41,95 @@ import java.util.TreeSet;
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class PatientsController {
     private static final String version = "0.0.1-SNAPSHOT";
-    @Autowired
-    PatientService service;
-    @Autowired
-    IcdService icdService;
-    @Autowired
-    ObjectMapper mapper;
 
+    private final PatientService service;
+    private final ObjectMapper mapper;
+
+    @Operation(summary = "get all patient records")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successfully",
+                    content = @Content(
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = PatientDTO.class))))
+    })
     @GetMapping
-    public Set<PatientDTO> getAll() {
+    public ResponseEntity<Set<PatientDTO>> getAll() {
         log.info("REST GET /patients");
-        Set<Patient> entities = service.findAll();
-        Set<PatientDTO> dtos = new TreeSet<>();
-        for (Patient entity : entities) {
-            dtos.add(
-                    service.convertEntityToDto(entity)
-            );
-        }
+        Set<PatientDTO> responses = service.findAll().stream()
+                .map(service::convertEntityToDto)
+                .collect(Collectors.toSet());
 
-        return dtos;
+        return ResponseEntity.ok(responses);
     }
 
-    @PostMapping("/getByIcd")
-    public Set<PatientDTO> getByIcd(@RequestBody IcdDTO icdDTO) {
-        log.info("REST GET /patients/getByIcd(icdId={})", icdDTO.getId());
-        Set<Patient> entities =
-                service.findAllByIcd(icdService.convertDtoToEntity(icdDTO));
-        Set<PatientDTO> dtos = new TreeSet<>();
-        entities.forEach(entity -> dtos.add(
-                service.convertEntityToDto(entity)
-        ));
+    @Operation(summary = "get all patient records by ICD disease code")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successfully",
+                    content = @Content(
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = PatientDTO.class))))
+    })
+    @GetMapping("/by-icd/{icdId}")
+    public ResponseEntity<Set<PatientDTO>> getByIcd(@PathVariable int icdId) {
+        log.info("REST POST /patients/by-icd/{}", icdId);
+        Set<PatientDTO> responses = service.findAllByIcd(icdId).stream()
+                .map(service::convertEntityToDto)
+                .collect(Collectors.toSet());
 
-        return dtos;
+        return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "get patient record by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successfully",
+                    content = @Content(schema = @Schema(implementation = PatientDTO.class))),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/{id}")
-    public PatientDTO get(@PathVariable int id) {
+    public ResponseEntity<PatientDTO> getById(@PathVariable int id) {
         log.info("REST GET /patients/{}", id);
+        PatientDTO response = service.convertEntityToDto(service.getById(id));
 
-        return service.convertEntityToDto(service.findById(id));
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get")
-    public PatientDTO getP(@RequestParam int id) {
-        log.info("REST GET /patients/get?id={}", id);
+    @Operation(summary = "delete patient record by ID")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        service.delete(id);
+        log.info("REST DELETE /patients/{}", id);
 
-        return service.convertEntityToDto(service.findById(id));
+        return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value = "/save")
-    public ResponseEntity<String> save(@RequestBody PatientDTO dto) throws JsonProcessingException {
+    @Operation(summary = "save patient record")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "created",
+                    content = @Content(schema = @Schema(implementation = PatientDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping
+    public ResponseEntity<PatientDTO> save(@RequestBody PatientDTO dto) throws JsonProcessingException {
         Patient entity = service.save(service.convertDtoToEntity(dto));
-        log.info("REST POST /patients/save(id={})", entity.getId());
+        log.info("REST PUT /patients/{}", entity.getId());
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/patients/{id}")
                 .buildAndExpand(entity.getId()).toUri();
-        String body = mapper.writeValueAsString(
-                service.convertEntityToDto(entity)
-        );
+        PatientDTO response = service.convertEntityToDto(entity);
 
-        return ResponseEntity.created(newResource).body(body);
+        return ResponseEntity.created(newResource).body(response);
     }
 
-    @PostMapping(value = "/delete")
+    @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestBody PatientDTO dto) {
-        service.delete(service.convertDtoToEntity(dto));
-        log.info("REST POST /patients/delete(id={})", dto.getId());
-    }
-
-    @PostMapping(value = "/health")
-    @ResponseStatus(HttpStatus.OK)
     public void health() {
     }
 
-    @PostMapping(value = "/version")
+    @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
         return version;

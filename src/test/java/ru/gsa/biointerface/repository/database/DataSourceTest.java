@@ -25,8 +25,8 @@ class DataSourceTest {
             icd = icdService.save(icd);
 
             System.out.println("!!!!!!!!!!" + icd);
-            icdService.delete(icd);
-            Patient entity = service.findById(3);
+            icdService.delete(icd.getId());
+            Patient entity = service.getById(3);
 
             System.out.println("!!!!!!!!!!" + entity);
         } catch (Exception e) {

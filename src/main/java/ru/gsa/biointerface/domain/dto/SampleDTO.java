@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.Min;
@@ -11,25 +12,27 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Schema(name = "Sample", description = "reading of examination")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "sample serial number in examination")
     @NotNull(message = "Id can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     private int id;
 
+    @Schema(description = "channel serial number in controller")
     @NotNull(message = "ChannelNumber can't be null")
     private int channelNumber;
 
+    @Schema(description = "examination ID")
     @NotNull(message = "ExaminationId can't be null")
     private int examinationId;
 
+    @Schema(description = "sample value")
     @NotNull(message = "Value can't be null")
     private int value;
 

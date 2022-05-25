@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.stereotype.Component;
 import ru.gsa.biointerface.domain.entity.Sample;
-import ru.gsa.biointerface.repository.exception.InsertException;
-import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
-import ru.gsa.biointerface.repository.exception.TransactionStopException;
+import ru.gsa.biointerface.exception.TransactionException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -26,11 +24,11 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
     private EntityManagerFactory entityManagerFactory;
 
     @Override
-    public Sample insert(Sample entity) throws Exception {
+    public Sample insert(Sample entity) {
         if (entity == null)
             throw new NullPointerException("Entity is null");
         if (!transactionIsOpen())
-            throw new TransactionNotOpenException("Transaction is not active");
+            throw new TransactionException("Transaction is not active");
 
         JpaEntityInformation<Sample, ?> entityInformation =
                 JpaEntityInformationSupport.getEntityInformation(Sample.class, entityManager);
@@ -44,12 +42,12 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
             return entity;
         } catch (Exception e) {
             log.error("Insert sample error", e);
-            throw new InsertException(e);
+            throw new TransactionException("Insert sample error");
         }
     }
 
     @Override
-    public void transactionOpen() throws Exception {
+    public void transactionOpen() {
         try {
             entityManager = entityManagerFactory.createEntityManager();
             entityManager.getTransaction().begin();
@@ -57,14 +55,14 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
             transactionIsOpen = true;
         } catch (Exception e) {
             log.error("Transaction opening error", e);
-            throw new TransactionNotOpenException(e);
+            throw new TransactionException("Transaction opening error");
         }
     }
 
     @Override
-    public void transactionClose() throws Exception {
+    public void transactionClose() {
         if (!transactionIsOpen())
-            throw new TransactionNotOpenException("Transaction is not active");
+            throw new TransactionException("Transaction is not active");
 
         transactionIsOpen = false;
 
@@ -76,7 +74,7 @@ public class SampleRepositoryCustomImpl implements SampleRepositoryCustom {
             log.info("Transaction close is successful");
         } catch (Exception e) {
             log.error("Transaction closing error", e);
-            throw new TransactionStopException(e);
+            throw new TransactionException("Transaction closing error");
         }
     }
 

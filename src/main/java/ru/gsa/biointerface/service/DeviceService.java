@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 
 import javax.annotation.PostConstruct;
@@ -50,9 +52,8 @@ public class DeviceService {
         return entities;
     }
 
-    public Device findById(int id) {
-        if (id <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public Device getById(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
         Optional<Device> optional = repository.findById(id);
 
@@ -62,20 +63,20 @@ public class DeviceService {
             return optional.get();
         } else {
             log.error("Device(id={}) is not found in database", id);
-            throw new EntityNotFoundException("Device(id=" + id + ") is not found in database");
+            throw new NotFoundException("Device(id=" + id + ") is not found in database");
         }
     }
 
     @Transactional
     public Device save(Device entity) {
         if (entity == null)
-            throw new NullPointerException("Entity is null");
+            throw new BadRequestException("Entity is null");
         if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+            throw new BadRequestException("Id <= 0");
         if (entity.getAmountChannels() <= 0)
-            throw new IllegalArgumentException("Amount channels <= 0");
+            throw new BadRequestException("Amount channels <= 0");
         if (entity.getExaminations() == null)
-            throw new NullPointerException("Examinations is null");
+            throw new BadRequestException("Examinations is null");
 
         entity = repository.save(entity);
         log.info("Device(id={}) is recorded in database", entity.getId());
@@ -84,20 +85,17 @@ public class DeviceService {
     }
 
     @Transactional
-    public void delete(Device entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new IllegalArgumentException("Id <= 0");
+    public void delete(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
-        Optional<Device> optional = repository.findById(entity.getId());
+        Optional<Device> optional = repository.findById(id);
 
         if (optional.isPresent()) {
             repository.delete(optional.get());
-            log.info("Device(id={}) is deleted in database", optional.get().getId());
+            log.info("Device(id={}) is deleted in database", id);
         } else {
-            log.info("Device(id={}) not found in database", entity.getId());
-            throw new EntityNotFoundException("Device(id=" + entity.getId() + ") not found in database");
+            log.info("Device(id={}) not found in database", id);
+            throw new NotFoundException("Device(id=" + id + ") not found in database");
         }
     }
 

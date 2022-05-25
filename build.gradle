@@ -16,15 +16,11 @@ repositories {
     mavenCentral()
 }
 
-def slf4jVersion = '2.0.0-alpha5'
-def log4jVersion = '2.14.1'
-def springBootVersion = '2.6.1'
+def slf4jVersion = '1.7.32'
+def log4jVersion = '2.17.1'
+def springBootVersion = '2.6.2'
 def junitVersion = '5.8.2'
 def lombokVersion = '1.18.22'
-
-configurations.all {
-    exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
-}
 
 dependencies {
     // сахар дря разработки.
@@ -35,44 +31,48 @@ dependencies {
 //-----------SerialPort----------------------
     implementation("com.fazecast:jSerialComm:2.7.0")
 //-----------Logging------------------------
-    implementation("org.apache.logging.log4j:log4j-web:$log4jVersion")
-    implementation("org.apache.logging.log4j:log4j-slf4j18-impl:${log4jVersion}") {
+    implementation("org.slf4j:slf4j-api:${slf4jVersion}")
+    implementation("org.slf4j:jcl-over-slf4j:${slf4jVersion}"){
         exclude group: "org.slf4j", module: "slf4j-api"
     }
-
-    implementation("org.slf4j:slf4j-api:${slf4jVersion}")
-    implementation("org.slf4j:jcl-over-slf4j:${slf4jVersion}")
-    implementation("org.slf4j:jul-to-slf4j:${slf4jVersion}")
-//-----------Spring Boot-----------------------
-    implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
+    implementation("org.slf4j:jul-to-slf4j:${slf4jVersion}"){
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
+    implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
+    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
+    implementation("org.apache.logging.log4j:log4j-web:$log4jVersion")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"){
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
 //-----------Spring Date JPA-------------------
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion") {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter"
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     runtimeOnly("org.postgresql:postgresql:42.3.1")
 //-----------Validator-----------------------
-    implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion") {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter"
-    }
+    implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion")
 //-----------Spring MVC---------------------
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:$springBootVersion") {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter"
         exclude group: "org.slf4j", module: "slf4j-api"
     }
 //    для JSP. JSP не поддерживается Spring Boot
 //    implementation("javax.servlet:jstl:1.2")
 //    implementation("org.apache.tomcat.embed:tomcat-embed-jasper:10.0.12")
 //-----------Tests--------------------------
-    testImplementation('com.h2database:h2:2.0.202')
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.4")
+//-----------Tests--------------------------
+//    testImplementation('com.h2database:h2:2.0.202')
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter"
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitVersion")
 //    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
 //    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+configurations.all {
+    exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
 }
 
 test {

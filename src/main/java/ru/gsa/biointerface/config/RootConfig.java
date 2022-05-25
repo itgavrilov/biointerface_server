@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
@@ -16,11 +18,6 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  */
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = {
-        "ru.gsa.biointerface.host",
-        "ru.gsa.biointerface.repository",
-        "ru.gsa.biointerface.service"
-})
 public class RootConfig {
     @Bean
     public Jackson2ObjectMapperBuilder objectMapperBuilder() {

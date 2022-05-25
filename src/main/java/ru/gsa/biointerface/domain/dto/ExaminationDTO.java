@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -14,28 +15,31 @@ import java.util.Objects;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Schema(name = "Examination", description = "result of biopotential measurements")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "examination ID")
     @NotNull(message = "Id can't be null")
     private int id;
 
+    @Schema(description = "examination start time")
     @NotNull(message = "Start time can't be null")
     @Past(message = "Start time should be in past")
     private LocalDateTime starttime;
 
+    @Schema(description = "patient ID")
     @NotNull(message = "PatientId can't be null")
     private int patientId;
 
+    @Schema(description = "device ID")
     @NotNull(message = "DeviceId can't be null")
     private int deviceId;
 
+    @Schema(description = "examination comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 

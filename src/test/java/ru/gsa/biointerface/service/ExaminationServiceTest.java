@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.gsa.biointerface.domain.entity.*;
+import ru.gsa.biointerface.exception.TransactionException;
 import ru.gsa.biointerface.repository.*;
-import ru.gsa.biointerface.repository.exception.TransactionNotOpenException;
 
 import javax.persistence.EntityNotFoundException;
 import java.sql.Timestamp;
@@ -58,11 +58,11 @@ class ExaminationServiceTest {
     }
 
     @Test
-    void findAll() throws Exception {
+    void findAll() {
         Examination entity = new Examination(patient, device, comment);
         entity = repository.save(entity);
 
-        List<Examination> examinations = service.findAll();
+        Set<Examination> examinations = service.findAll();
         Assertions.assertTrue(examinations.contains(entity));
         repository.delete(entity);
         Assertions.assertFalse(repository.existsById(entity.getId()));
@@ -76,25 +76,25 @@ class ExaminationServiceTest {
     }
 
     @Test
-    void findById() throws Exception {
+    void findById() {
         Examination entity = new Examination(patient, device, comment);
         entity = repository.save(entity);
 
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> service.findById(-1));
+                () -> service.getById(-1));
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> service.findById(0));
+                () -> service.getById(0));
 
-        Examination entityTest = service.findById(entity.getId());
+        Examination entityTest = service.getById(entity.getId());
         Assertions.assertEquals(entity, entityTest);
         repository.delete(entity);
         Assertions.assertFalse(repository.existsById(entity.getId()));
     }
 
     @Test
-    void save() throws Exception {
+    void save() {
         Assertions.assertThrows(
                 NullPointerException.class,
                 () -> service.save(null));
@@ -234,7 +234,7 @@ class ExaminationServiceTest {
         channel = channelRepository.save(channel);
         entity.getChannels().add(channel);
         Assertions.assertThrows(
-                TransactionNotOpenException.class,
+                TransactionException.class,
                 () -> service.recordingStop());
         sampleRepository.transactionOpen();
         Assertions.assertDoesNotThrow(
@@ -264,14 +264,14 @@ class ExaminationServiceTest {
 
         Assertions.assertThrows(
                 NullPointerException.class,
-                () -> service.delete(null));
+                () -> service.delete(0));
         Assertions.assertThrows(
                 IllegalArgumentException.class,
                 () -> {
                     Examination entityTest =
                             new Examination(patient, device, comment);
                     entityTest.setId(-1);
-                    service.delete(entityTest);
+                    service.delete(entityTest.getId());
                 });
         Assertions.assertThrows(
                 IllegalArgumentException.class,
@@ -279,7 +279,7 @@ class ExaminationServiceTest {
                     Examination entityTest =
                             new Examination(patient, device, comment);
                     entityTest.setId(0);
-                    service.delete(entityTest);
+                    service.delete(entityTest.getId());
                 });
         int idTest = entity.getId();
         Assertions.assertThrows(
@@ -288,7 +288,7 @@ class ExaminationServiceTest {
                     Examination entityTest =
                             new Examination(patient, device, comment);
                     entityTest.setId(idTest + 1);
-                    service.delete(entityTest);
+                    service.delete(entityTest.getId());
                 });
 
         Optional<Examination> entityTest = repository.findById(entity.getId());
@@ -297,7 +297,7 @@ class ExaminationServiceTest {
         Optional<Channel> channelTest = channelRepository.findById(channel.getId());
         Assertions.assertTrue(channelTest.isPresent());
         Assertions.assertEquals(channel, channelTest.get());
-        service.delete(entityTest.get());
+        service.delete(entityTest.get().getId());
         Assertions.assertFalse(repository.existsById(entityTest.get().getId()));
         Assertions.assertFalse(channelRepository.existsById(channelTest.get().getId()));
     }
