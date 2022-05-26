@@ -2,24 +2,21 @@ package ru.gsa.biointerface.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
-import ru.gsa.biointerface.domain.entity.Channel;
-import ru.gsa.biointerface.domain.entity.ChannelID;
-import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.domain.Channel;
+import ru.gsa.biointerface.domain.ChannelID;
+import ru.gsa.biointerface.domain.ChannelName;
+import ru.gsa.biointerface.domain.Examination;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 03/11/2021
@@ -68,7 +65,7 @@ public class ChannelService {
     }
 
     public Set<Channel> findAllByChannelName(int channelNameId) {
-        ChannelName channelName = channelNameService.findById(channelNameId);
+        ChannelName channelName = channelNameService.getById(channelNameId);
         Set<Channel> entities = new TreeSet<>(
                 repository.findAllByChannelName(channelName));
 
@@ -122,58 +119,5 @@ public class ChannelService {
             log.info("Channel(id={}) not found in database", id);
             throw new NotFoundException("Channel(id=" + id + ") not found in database");
         }
-    }
-
-    public ChannelDTO convertEntityToDto(Channel entity) {
-        int channelName_id = 0;
-
-        if (entity.getChannelName() != null)
-            channelName_id = entity.getChannelName().getId();
-
-        return ChannelDTO.builder()
-                .number(entity.getId().getNumber())
-                .examinationId(
-                        entity.getId().getExamination_id()
-                )
-                .channelNameId(channelName_id)
-                .build();
-    }
-
-    public Channel convertDtoToEntity(ChannelDTO dto) {
-        Examination examination = null;
-        int examination_id = 0;
-        ChannelName channelName = null;
-
-        if (dto.getExaminationId() != 0) {
-            examination = examinationService.getById(dto.getExaminationId());
-            examination_id = examination.getId();
-        }
-
-        if (dto.getChannelNameId() != 0) {
-            channelName = channelNameService.findById(dto.getChannelNameId());
-        }
-
-        Channel channel = Channel.builder()
-                .id(new ChannelID(dto.getNumber(), examination_id))
-                .samples(new ArrayList<>())
-                .build();
-
-        if (examination != null) {
-            if (!examination.getChannels().contains(channel)) {
-                examination.addChannel(channel);
-            } else {
-                channel.setExamination(examination);
-            }
-        }
-
-        if (channelName != null) {
-            if (!channelName.getChannels().contains(channel)) {
-                channelName.addChannel(channel);
-            } else {
-                channel.setChannelName(channelName);
-            }
-        }
-
-        return channel;
     }
 }

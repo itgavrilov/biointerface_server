@@ -5,8 +5,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.domain.Icd;
+import ru.gsa.biointerface.domain.Patient;
 import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientService;
 

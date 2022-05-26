@@ -1,0 +1,16 @@
+package ru.gsa.biointerface.mapper;
+
+import org.mapstruct.Mapper;
+import ru.gsa.biointerface.domain.Icd;
+import ru.gsa.biointerface.dto.IcdDTO;
+
+/**
+ * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 26/05/2022
+ */
+@Mapper(componentModel = "spring")
+public interface IcdMapper {
+
+    IcdDTO toDTO(Icd icd);
+
+    Icd toEntity(IcdDTO icdDTO);
+}

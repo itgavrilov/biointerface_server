@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.stereotype.Component;
-import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.domain.Sample;
 import ru.gsa.biointerface.exception.TransactionException;
 
 import javax.persistence.EntityManager;

@@ -1,6 +1,6 @@
 package ru.gsa.biointerface.repository.customized;
 
-import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.domain.Sample;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021

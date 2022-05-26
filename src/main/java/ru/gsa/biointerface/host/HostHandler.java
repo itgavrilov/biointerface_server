@@ -1,8 +1,8 @@
 package ru.gsa.biointerface.host;
 
-import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.domain.ChannelName;
+import ru.gsa.biointerface.domain.Device;
+import ru.gsa.biointerface.domain.Patient;
 import ru.gsa.biointerface.host.cash.DataListener;
 
 /**

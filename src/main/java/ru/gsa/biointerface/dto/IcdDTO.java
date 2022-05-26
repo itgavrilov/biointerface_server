@@ -1,74 +1,54 @@
-package ru.gsa.biointerface.domain.entity;
+package ru.gsa.biointerface.dto;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Data;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
- * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
+ * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity(name = "icd")
-@Table(name = "icd")
-public class Icd implements Serializable, Comparable<Icd> {
+@Data
+@Schema(name = "Icd", description = "ICD disease code")
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     static final long SerialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "ICD ID")
+    @NotNull(message = "Id can't be null")
+    @Min(value = 1, message = "Id can't be lass then 1")
     private int id;
 
-    @NotNull(message = "Name can't be null")
+    @Schema(description = "ICD name")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    @Column(nullable = false, length = 35)
     private String name;
 
+    @Schema(description = "ICD version")
     @NotNull(message = "Version can't be null")
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
-    @Column(nullable = false)
     private int version;
 
+    @Schema(description = "ICD comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
-    @Column(length = 400)
     private String comment;
-
-    @NotNull(message = "Patient records can't be null")
-    @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Patient> patients;
-
-    public Icd(String name, int version, String comment) {
-        this.name = name;
-        this.version = version;
-        this.comment = comment;
-        patients = new TreeSet<>();
-    }
-
-    public void addPatient(Patient patient) {
-        patients.add(patient);
-        patient.setIcd(this);
-    }
-
-    public void removePatient(Patient patient) {
-        patients.remove(patient);
-        patient.setIcd(null);
-    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Icd icd = (Icd) o;
-        return id == icd.id;
+        IcdDTO icdDTO = (IcdDTO) o;
+        return id == icdDTO.id;
     }
 
     @Override
@@ -77,7 +57,7 @@ public class Icd implements Serializable, Comparable<Icd> {
     }
 
     @Override
-    public int compareTo(Icd o) {
+    public int compareTo(IcdDTO o) {
         if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 

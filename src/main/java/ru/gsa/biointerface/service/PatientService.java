@@ -4,19 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.dto.PatientDTO;
-import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.domain.Icd;
+import ru.gsa.biointerface.domain.Patient;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.Set;
@@ -143,53 +140,5 @@ public class PatientService {
             log.error("Patient(id={}) not found in database", id);
             throw new NotFoundException("Patient(id=" + id + ") not found in database");
         }
-    }
-
-    public PatientDTO convertEntityToDto(Patient entity) {
-        int icd_id = 0;
-
-        if (entity.getIcd() != null) {
-            icd_id = entity.getIcd().getId();
-        }
-
-        return PatientDTO.builder()
-                .id(entity.getId())
-                .firstName(entity.getFirstName())
-                .secondName(entity.getSecondName())
-                .patronymic(entity.getPatronymic())
-                .birthday(LocalDateTime.ofInstant(
-                        entity.getBirthday().toInstant(),
-                        ZoneId.systemDefault()))
-                .icdId(icd_id)
-                .comment(entity.getComment())
-                .build();
-    }
-
-    public Patient convertDtoToEntity(PatientDTO dto) {
-        Icd icd = null;
-
-        if (dto.getIcdId() != 0) {
-            icd = icdService.getById(dto.getIcdId());
-        }
-
-        Patient patient = Patient.builder()
-                .id(dto.getId())
-                .firstName(dto.getFirstName())
-                .secondName(dto.getSecondName())
-                .patronymic(dto.getPatronymic())
-                .birthday(localDateToDate(dto.getBirthday()))
-                .comment(dto.getComment())
-                .examinations(new TreeSet<>())
-                .build();
-
-        if (icd != null) {
-            if (!icd.getPatients().contains(patient)) {
-                icd.addPatient(patient);
-            } else {
-                patient.setIcd(icd);
-            }
-        }
-
-        return patient;
     }
 }

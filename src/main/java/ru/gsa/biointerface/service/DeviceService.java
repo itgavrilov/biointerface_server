@@ -3,15 +3,13 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.dto.DeviceDTO;
-import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.Device;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.Set;
@@ -97,22 +95,5 @@ public class DeviceService {
             log.info("Device(id={}) not found in database", id);
             throw new NotFoundException("Device(id=" + id + ") not found in database");
         }
-    }
-
-    public DeviceDTO convertEntityToDto(Device entity) {
-        return DeviceDTO.builder()
-                .id(entity.getId())
-                .amountChannels(entity.getAmountChannels())
-                .comment(entity.getComment())
-                .build();
-    }
-
-    public Device convertDtoToEntity(DeviceDTO dto) {
-        return Device.builder()
-                .id(dto.getId())
-                .amountChannels(dto.getAmountChannels())
-                .comment(dto.getComment())
-                .examinations(new TreeSet<>())
-                .build();
     }
 }

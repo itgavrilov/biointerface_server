@@ -3,16 +3,14 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
-import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.exception.NotFoundException;
+import ru.gsa.biointerface.domain.Icd;
 import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -100,24 +98,5 @@ public class IcdService {
             log.info("Icd(id={}) not found in database", id);
             throw new NotFoundException("Icd(id=" + id + ") not found in database");
         }
-    }
-
-    public IcdDTO convertEntityToDto(Icd entity) {
-        return IcdDTO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .version(entity.getVersion())
-                .comment(entity.getComment())
-                .build();
-    }
-
-    public Icd convertDtoToEntity(IcdDTO dto) {
-        return Icd.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .version(dto.getVersion())
-                .comment(dto.getComment())
-                .patients(new TreeSet<>())
-                .build();
     }
 }

@@ -1,18 +1,34 @@
 package ru.gsa.biointerface.service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.gsa.biointerface.domain.entity.*;
+import ru.gsa.biointerface.domain.Channel;
+import ru.gsa.biointerface.domain.Device;
+import ru.gsa.biointerface.domain.Examination;
+import ru.gsa.biointerface.domain.Patient;
+import ru.gsa.biointerface.domain.Sample;
 import ru.gsa.biointerface.exception.TransactionException;
-import ru.gsa.biointerface.repository.*;
+import ru.gsa.biointerface.repository.ChannelRepository;
+import ru.gsa.biointerface.repository.DeviceRepository;
+import ru.gsa.biointerface.repository.ExaminationRepository;
+import ru.gsa.biointerface.repository.PatientRepository;
+import ru.gsa.biointerface.repository.SampleRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 27.10.2021.

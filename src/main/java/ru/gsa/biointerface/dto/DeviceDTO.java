@@ -1,71 +1,48 @@
-package ru.gsa.biointerface.domain.entity;
+package ru.gsa.biointerface.dto;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Data;
 
-import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
- * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
+ * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Getter
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity(name = "device")
-@Table(name = "device")
-public class Device implements Serializable, Comparable<Device> {
+@Data
+@Schema(name = "Device", description = "biointerface controller")
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     static final long SerialVersionUID = 1L;
 
+    @Schema(description = "device ID")
     @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
-    @Id
     private int id;
 
+    @Schema(description = "device Amount channels")
     @NotNull(message = "Amount channels can't be null")
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
-    @Column(name = "amount_channels", nullable = false)
     private int amountChannels;
 
+    @Schema(description = "device comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
-    @Column(length = 400)
     private String comment;
-
-    @NotNull(message = "Examinations can't be null")
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
-    private Set<Examination> examinations;
-
-    public Device(int id, int amountChannels) {
-        this.id = id;
-        this.amountChannels = amountChannels;
-        examinations = new TreeSet<>();
-    }
-
-    public void addExamination(Examination examination) {
-        examinations.add(examination);
-        examination.setDevice(this);
-    }
-
-    public void removeExamination(Examination examination) {
-        examinations.remove(examination);
-        examination.setDevice(null);
-    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Device device = (Device) o;
-        return id == device.id;
+        DeviceDTO deviceDTO = (DeviceDTO) o;
+        return id == deviceDTO.id;
     }
 
     @Override
@@ -74,7 +51,7 @@ public class Device implements Serializable, Comparable<Device> {
     }
 
     @Override
-    public int compareTo(Device o) {
+    public int compareTo(DeviceDTO o) {
         if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 

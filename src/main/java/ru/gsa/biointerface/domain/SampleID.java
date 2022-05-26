@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.domain.entity;
+package ru.gsa.biointerface.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

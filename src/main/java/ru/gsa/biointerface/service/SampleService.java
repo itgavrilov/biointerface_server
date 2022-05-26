@@ -2,10 +2,9 @@ package ru.gsa.biointerface.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.entity.Channel;
-import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.domain.Channel;
+import ru.gsa.biointerface.domain.Sample;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.TransactionException;
 import ru.gsa.biointerface.repository.SampleRepository;

@@ -16,11 +16,12 @@ repositories {
     mavenCentral()
 }
 
-def slf4jVersion = '1.7.32'
-def log4jVersion = '2.17.1'
-def springBootVersion = '2.6.2'
+def slf4jVersion = '1.7.36'
+def log4jVersion = '2.17.2'
+def springBootVersion = '2.6.7'
 def junitVersion = '5.8.2'
-def lombokVersion = '1.18.22'
+def lombokVersion = '1.18.24'
+def mapstructVersion = '1.4.2.Final'
 
 dependencies {
     // сахар дря разработки.
@@ -29,7 +30,7 @@ dependencies {
     // Автоперезапуск проекта при изменении classpath
     developmentOnly("org.springframework.boot:spring-boot-devtools:$springBootVersion")
 //-----------SerialPort----------------------
-    implementation("com.fazecast:jSerialComm:2.7.0")
+    implementation('com.fazecast:jSerialComm:2.9.1')
 //-----------Logging------------------------
     implementation("org.slf4j:slf4j-api:${slf4jVersion}")
     implementation("org.slf4j:jcl-over-slf4j:${slf4jVersion}"){
@@ -48,7 +49,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
-    runtimeOnly("org.postgresql:postgresql:42.3.1")
+    runtimeOnly('org.postgresql:postgresql:42.3.4')
 //-----------Validator-----------------------
     implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion")
 //-----------Spring MVC---------------------
@@ -59,11 +60,15 @@ dependencies {
 //    для JSP. JSP не поддерживается Spring Boot
 //    implementation("javax.servlet:jstl:1.2")
 //    implementation("org.apache.tomcat.embed:tomcat-embed-jasper:10.0.12")
+//-----------Mapstruct-----------------------
+    implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    implementation("org.mapstruct:mapstruct-processor:$mapstructVersion")
+    implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 //-----------Tests--------------------------
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.4")
+    implementation('org.springdoc:springdoc-openapi-ui:1.6.8')
 //-----------Tests--------------------------
 //    testImplementation('com.h2database:h2:2.0.202')
-    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitVersion")

@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,22 +10,26 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
-import ru.gsa.biointerface.domain.dto.DeviceDTO;
-import ru.gsa.biointerface.domain.dto.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
-import ru.gsa.biointerface.domain.entity.ChannelName;
+import ru.gsa.biointerface.domain.ChannelName;
+import ru.gsa.biointerface.dto.ChannelNameDTO;
+import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.mapper.ChannelNameMapper;
 import ru.gsa.biointerface.service.ChannelNameService;
 
 import java.net.URI;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -41,9 +44,11 @@ import java.util.stream.Collectors;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelNameController {
+
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final ChannelNameService service;
+    private final ChannelNameMapper mapper;
 
     @Operation(summary = "get all channel`s names")
     @ApiResponses(value = {
@@ -56,7 +61,7 @@ public class ChannelNameController {
     public ResponseEntity<Set<ChannelNameDTO>> getAll() {
         log.info("REST GET /channelNames");
         Set<ChannelNameDTO> responses = service.findAll().stream()
-                .map(service::convertEntityToDto)
+                .map(mapper::toDTO)
                 .collect(Collectors.toSet());
 
         return ResponseEntity.ok(responses);
@@ -72,7 +77,7 @@ public class ChannelNameController {
     @GetMapping("/{id}")
     public ResponseEntity<ChannelNameDTO> get(@PathVariable int id) {
         log.info("REST GET /channelNames/{}", id);
-        ChannelNameDTO response= service.convertEntityToDto(service.findById(id));
+        ChannelNameDTO response = mapper.toDTO(service.getById(id));
 
         return ResponseEntity.ok(response);
     }
@@ -102,12 +107,12 @@ public class ChannelNameController {
     })
     @PutMapping
     public ResponseEntity<ChannelNameDTO> save(@RequestBody ChannelNameDTO dto) throws JsonProcessingException {
-        ChannelName entity = service.save(service.convertDtoToEntity(dto));
+        ChannelName entity = service.save(mapper.toEntity(dto));
         log.info("REST PUT /channelNames/{}", entity.getId());
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/channelNames/{id}")
                 .buildAndExpand(entity.getId()).toUri();
-        ChannelNameDTO response = service.convertEntityToDto(entity);
+        ChannelNameDTO response = mapper.toDTO(entity);
 
         return ResponseEntity.created(newResource).body(response);
     }
