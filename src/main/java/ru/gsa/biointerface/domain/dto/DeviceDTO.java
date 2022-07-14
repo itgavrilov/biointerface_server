@@ -12,24 +12,35 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@Builder
 @Schema(name = "Device", description = "biointerface controller")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     static final long SerialVersionUID = 1L;
 
-    @Schema(description = "device ID")
+    /**
+     * Идентификатор
+     */
+    @Schema(description = "Device ID")
     @Min(value = 1, message = "Id can't be lass then 1")
     private Integer id;
 
+    /**
+     * Количество каналов
+     */
     @Schema(description = "device Amount channels")
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
     private Integer amountChannels;
 
+    /**
+     * Комментарий
+     */
     @Schema(description = "device comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
@@ -39,7 +50,7 @@ public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeviceDTO deviceDTO = (DeviceDTO) o;
-        return id == deviceDTO.id;
+        return Objects.equals(id, deviceDTO.id);
     }
 
     @Override

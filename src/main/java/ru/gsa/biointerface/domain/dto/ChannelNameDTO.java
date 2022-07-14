@@ -6,32 +6,40 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) наименования канала контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@Builder
 @Schema(name = "ChannelName", description = "name for controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> {
     static final long SerialVersionUID = 1L;
 
-    @Schema(description = "channel`s name ID")
-    @NotNull(message = "Id can't be null")
-    private int id;
+    /**
+     * Идентификатор
+     */
+    @Schema(description = "Channel`s name ID")
+    private Integer id;
 
-    @Schema(description = "channel`s name")
-    @NotNull(message = "Name can't be null")
+    /**
+     * Наименование канала
+     */
+    @Schema(description = "Name")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
 
-    @Schema(description = "channel`s name comment")
+    /**
+     * Комментарий
+     */
+    @Schema(description = "Comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 
@@ -40,7 +48,7 @@ public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelNameDTO that = (ChannelNameDTO) o;
-        return id == that.id && name.equals(that.name);
+        return Objects.equals(id, that.id) && name.equals(that.name);
     }
 
     @Override

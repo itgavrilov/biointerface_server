@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,45 +27,69 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Сущность карточки пациента
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "patient")
 @Table(name = "patient")
 public class Patient implements Serializable, Comparable<Patient> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /**
+     * Фамилия
+     */
     @NotBlank(message = "Second name can't be blank")
     @Column(name = "second_name", nullable = false)
     private String secondName;
 
+    /**
+     * Имя
+     */
     @NotBlank(message = "First name can't be blank")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    /**
+     * Отчество
+     */
     @Column(name = "patronymic")
     private String patronymic;
 
+    /**
+     * Дата рождения {@link LocalDateTime}
+     */
     @Past(message = "Birthday should be in past")
     @Column(name = "birthday", nullable = false)
     private LocalDateTime birthday;
 
+    /**
+     * Болезни по ICD {@link Icd}
+     */
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "icd_id", referencedColumnName = "id")
     private Icd icd;
 
+    /**
+     * Комментарий
+     */
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(name = "comment", length = 400)
     private String comment;
 
+    /**
+     * Список исследований {@link Set<Examination>}
+     */
     @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     private Set<Examination> examinations;

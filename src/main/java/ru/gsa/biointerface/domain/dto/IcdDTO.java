@@ -12,28 +12,42 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) заболеване по международной классификации болезней (ICD)
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@Builder
 @Schema(name = "Icd", description = "ICD disease code")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор
+     */
     @Schema(description = "ICD ID")
     private Integer id;
 
-    @Schema(description = "ICD name")
+    /**
+     * Наименование заболевания по ICD
+     */
+    @Schema(description = "Name")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
 
-    @Schema(description = "ICD version")
+    /**
+     * Версия ICD
+     */
+    @Schema(description = "Version")
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     private Integer version;
 
-    @Schema(description = "ICD comment")
+    /**
+     * Комментарий
+     */
+    @Schema(description = "Comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 

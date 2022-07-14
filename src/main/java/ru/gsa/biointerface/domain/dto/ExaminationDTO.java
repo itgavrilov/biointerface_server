@@ -14,30 +14,47 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) исследования
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@Builder
 @Schema(name = "Examination", description = "result of biopotential measurements")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор
+     */
     @Schema(description = "examination ID")
     private Integer id;
 
+    /**
+     * Время начала исследования {@link LocalDateTime}
+     */
     @Schema(description = "examination start time")
     @Past(message = "Start time should be in past")
     private LocalDateTime starttime;
 
+    /**
+     * Идентификатор карточки пациента {@link PatientDTO#getId()}
+     */
     @Schema(description = "patient ID")
     @NotNull(message = "PatientId can't be null")
     private Integer patientId;
 
+    /**
+     * Идентификатор контроллера биоинтерфейса {@link DeviceDTO#getId()}
+     */
     @Schema(description = "device ID")
     @NotNull(message = "DeviceId can't be null")
     private Integer deviceId;
 
+    /**
+     * Комментарий
+     */
     @Schema(description = "examination comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
@@ -47,7 +64,7 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExaminationDTO entity = (ExaminationDTO) o;
-        return id == entity.id;
+        return Objects.equals(id, entity.id);
     }
 
     @Override

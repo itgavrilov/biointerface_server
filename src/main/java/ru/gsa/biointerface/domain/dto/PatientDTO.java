@@ -14,37 +14,60 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) карточки пациента
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@Builder
 @Schema(name = "Patient", description = "patient record")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PatientDTO implements Serializable, Comparable<PatientDTO> {
     static final long SerialVersionUID = 1L;
 
-    @Schema(description = "patient record ID")
+    /**
+     * Идентификатор
+     */
+    @Schema(description = "Patient ID")
     private Integer id;
 
-    @Schema(description = "patient second name", required = true)
+    /**
+     * Фамилия
+     */
+    @Schema(description = "Second name", required = true)
     @NotBlank(message = "Second name can't be blank")
     private String secondName;
 
-    @Schema(description = "patient first name", required = true)
+    /**
+     * Имя
+     */
+    @Schema(description = "First name", required = true)
     @NotBlank(message = "First name can't be blank")
     private String firstName;
 
-    @Schema(description = "patient patronymic")
+    /**
+     * Отчество
+     */
+    @Schema(description = "Patronymic")
     private String patronymic;
 
-    @Schema(description = "patient birthday", required = true)
+    /**
+     * Дата рождения {@link LocalDateTime}
+     */
+    @Schema(description = "Birthday", required = true)
     @Past(message = "Birthday should be in past")
     private LocalDateTime birthday;
 
+    /**
+     * Идентификатор заболевания по ICD {@link IcdDTO#getId()}
+     */
     @Schema(description = "ICD ID")
     private Integer icdId;
 
-    @Schema(description = "patient comment")
+    /**
+     * Комментарий
+     */
+    @Schema(description = "Comment")
     @Max(value = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 

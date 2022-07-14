@@ -14,7 +14,6 @@ import ru.gsa.biointerface.repository.ChannelRepository;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -101,12 +100,9 @@ public class ChannelService {
         Channel entity;
 
         if(optional.isEmpty()) {
-            entity = Channel.builder()
-                    .examination(examinationService.getById(dto.getExaminationId()))
-                    .channelName(channelNameService.getById(dto.getChannelNameId()))
-                    .id(new ChannelID(dto.getNumber(), dto.getExaminationId()))
-                    .samples(new ArrayList<>())
-                    .build();
+            entity = new Channel(dto.getNumber(),
+                    examinationService.getById(dto.getExaminationId()),
+                    channelNameService.getById(dto.getChannelNameId()));
         } else {
             entity = optional.get();
 
