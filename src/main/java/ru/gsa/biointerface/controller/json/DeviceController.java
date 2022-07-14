@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,14 +12,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
-import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,9 +45,11 @@ import java.util.stream.Collectors;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
+
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final DeviceService service;
+    private final DeviceMapper mapper;
 
     @Operation(summary = "get all biointerface controllers")
     @ApiResponses(value = {
@@ -53,7 +62,7 @@ public class DeviceController {
     public ResponseEntity<Set<DeviceDTO>> getAll() {
         log.info("REST GET /devices");
         Set<DeviceDTO> responses = service.findAll().stream()
-                .map(service::convertEntityToDto)
+                .map(mapper::toDTO)
                 .collect(Collectors.toSet());
 
         return ResponseEntity.ok(responses);
@@ -69,7 +78,7 @@ public class DeviceController {
     @GetMapping("/{id}")
     public ResponseEntity<DeviceDTO> get(@PathVariable int id) {
         log.info("REST GET /devices/{}", id);
-        DeviceDTO response = service.convertEntityToDto(service.getById(id));
+        DeviceDTO response = mapper.toDTO(service.getById(id));
 
         return ResponseEntity.ok(response);
     }
@@ -98,13 +107,13 @@ public class DeviceController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<DeviceDTO> save(@RequestBody DeviceDTO dto) throws JsonProcessingException {
-        Device entity = service.save(service.convertDtoToEntity(dto));
-        log.info("REST PUT /devices/{}", entity.getId());
+    public ResponseEntity<DeviceDTO> save(@Valid @RequestBody DeviceDTO dto){
+        log.info("REST PUT /devices");
+        Device entity = service.save(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/devices/{id}")
                 .buildAndExpand(entity.getId()).toUri();
-        DeviceDTO response = service.convertEntityToDto(entity);
+        DeviceDTO response = mapper.toDTO(entity);
 
         return ResponseEntity.created(newResource).body(response);
     }

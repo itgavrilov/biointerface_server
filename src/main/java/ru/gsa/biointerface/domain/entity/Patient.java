@@ -1,12 +1,29 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,49 +41,38 @@ import java.util.TreeSet;
 public class Patient implements Serializable, Comparable<Patient> {
     static final long SerialVersionUID = 1L;
 
-    @NotNull(message = "Id can't be null")
-    @Min(value = 1, message = "Id can't be lass then 1")
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @NotNull(message = "Second name can't be null")
     @NotBlank(message = "Second name can't be blank")
-    @Size(min = 3, max = 20, message = "Second name should be have chars between 3-20")
-    @Column(name = "second_name", nullable = false, length = 20)
+    @Column(name = "second_name", nullable = false)
     private String secondName;
 
-    @NotNull(message = "First name can't be null")
     @NotBlank(message = "First name can't be blank")
-    @Size(min = 3, max = 20, message = "First name should be have chars between 3-20")
-    @Column(name = "first_name", nullable = false, length = 20)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @NotNull(message = "Patronymic can't be null")
-    @NotBlank(message = "Patronymic can't be blank")
-    @Size(min = 3, max = 20, message = "Patronymic should be have chars between 3-20")
-    @Column(nullable = false, length = 20)
+    @Column(name = "patronymic")
     private String patronymic;
 
-    @NotNull(message = "Birthday can't be null")
     @Past(message = "Birthday should be in past")
-    @Temporal(TemporalType.DATE)
-    @Column(nullable = false)
-    private Calendar birthday;
+    @Column(name = "birthday", nullable = false)
+    private LocalDateTime birthday;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "icd_id", referencedColumnName = "id")
     private Icd icd;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
-    @Column(length = 400)
+    @Column(name = "comment", length = 400)
     private String comment;
 
     @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     private Set<Examination> examinations;
 
-    public Patient(int id, String secondName, String firstName, String patronymic, Calendar birthday, Icd icd, String comment) {
-        this.id = id;
+    public Patient(String secondName, String firstName, String patronymic, LocalDateTime birthday, Icd icd, String comment) {
         this.secondName = secondName;
         this.firstName = firstName;
         this.patronymic = patronymic;
@@ -115,7 +121,7 @@ public class Patient implements Serializable, Comparable<Patient> {
 
     @Override
     public String toString() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String icd_id = "-";
 
         if (icd != null) {
@@ -127,7 +133,7 @@ public class Patient implements Serializable, Comparable<Patient> {
                 ", second_name='" + secondName + '\'' +
                 ", first_name='" + firstName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", birthday=" + formatter.format(birthday.getTime()) +
+                ", birthday=" + birthday.format(formatter) +
                 ", icd_id=" + icd_id +
                 '}';
     }

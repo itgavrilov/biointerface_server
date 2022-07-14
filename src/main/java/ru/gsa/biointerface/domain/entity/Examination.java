@@ -1,17 +1,29 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,16 +40,13 @@ import java.util.Objects;
 public class Examination implements Serializable, Comparable<Examination> {
     static final long SerialVersionUID = 1L;
 
-    @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull(message = "Start time can't be null")
-    @Past(message = "Start time should be in past")
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date starttime;
+    @PastOrPresent(message = "Start time should be in past or present")
+    @Column(name = "starttime", nullable = false)
+    private LocalDateTime starttime;
 
     @NotNull(message = "Patient can't be null")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
@@ -50,15 +59,14 @@ public class Examination implements Serializable, Comparable<Examination> {
     private Device device;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
-    @Column(length = 400)
+    @Column(name = "comment", length = 400)
     private String comment;
 
-    @NotNull(message = "Channels can't be null")
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
 
     public Examination(Patient patient, Device device, String comment) {
-        this.starttime = Timestamp.valueOf(LocalDateTime.now());
+        this.starttime = LocalDateTime.now();
         this.comment = comment;
         this.device = device;
         this.patient = patient;

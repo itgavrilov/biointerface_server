@@ -1,8 +1,20 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -39,8 +51,8 @@ public class Channel implements Serializable, Comparable<Channel> {
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
 
-    public Channel(Integer id, Examination examination, ChannelName channelName) {
-        this.id = new ChannelID(id, examination.getId());
+    public Channel(Integer number, Examination examination, ChannelName channelName) {
+        this.id = new ChannelID(number, examination.getId());
         this.examination = examination;
         this.channelName = channelName;
         this.samples = new LinkedList<>();
@@ -84,7 +96,7 @@ public class Channel implements Serializable, Comparable<Channel> {
 
         return "Channel{" +
                 "number=" + id.getNumber() +
-                ", examination_id=" + id.getExamination_id() +
+                ", examination_id=" + id.getExaminationId() +
                 ", channelName_id=" + channelNameId +
                 '}';
     }

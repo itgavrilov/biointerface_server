@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,28 +10,28 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
-import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
-import ru.gsa.biointerface.domain.dto.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.ExaminationDTO;
-import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
-import ru.gsa.biointerface.domain.entity.ChannelID;
-import ru.gsa.biointerface.service.ChannelNameService;
+import ru.gsa.biointerface.mapper.ChannelMapper;
 import ru.gsa.biointerface.service.ChannelService;
-import ru.gsa.biointerface.service.ExaminationService;
 
+import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +49,8 @@ public class ChannelController {
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final ChannelService service;
+    private final ChannelMapper mapper;
+
 
     @Operation(summary = "get channels by examination")
     @ApiResponses(value = {
@@ -63,7 +64,7 @@ public class ChannelController {
     public ResponseEntity<List<ChannelDTO>> getByExamination(@PathVariable int examinationId) {
         log.info("REST GET /channels/by-examination/{}", examinationId);
         List<ChannelDTO> response = service.findAllByExamination(examinationId).stream()
-                .map(service::convertEntityToDto)
+                .map(mapper::toDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
@@ -81,10 +82,10 @@ public class ChannelController {
     public ResponseEntity<Set<ChannelDTO>> getByDevice(@PathVariable int channelNameId) {
         log.info("REST GET /channels/by-channel-name/{}", channelNameId);
         Set<Channel> entities = service.findAllByChannelName(channelNameId);
-        Set<ChannelDTO> dtos = new TreeSet<>();
-        entities.forEach(entity -> dtos.add(
-                service.convertEntityToDto(entity)
-        ));
+        Set<ChannelDTO> dtos = entities.stream()
+                .sorted()
+                .map(mapper::toDTO)
+                .collect(Collectors.toSet());
 
         return ResponseEntity.ok(dtos);
     }
@@ -99,7 +100,7 @@ public class ChannelController {
     @GetMapping("/{examinationId}/{number}")
     public ResponseEntity<ChannelDTO> get(@PathVariable int examinationId, @PathVariable int number) {
         log.info("REST GET /channels/{}/{}", examinationId, number);
-        ChannelDTO response = service.convertEntityToDto(service.findById(examinationId, number));
+        ChannelDTO response = mapper.toDTO(service.findById(examinationId, number));
 
         return ResponseEntity.ok(response);
     }
@@ -129,15 +130,15 @@ public class ChannelController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<ChannelDTO> save(@RequestBody ChannelDTO dto) throws JsonProcessingException {
-        Channel entity = service.save(service.convertDtoToEntity(dto));
+    public ResponseEntity<ChannelDTO> save(@Valid @RequestBody ChannelDTO dto) throws JsonProcessingException {
+        Channel entity = service.save(dto);
         log.info("REST PUT /channels/{}/{}",
-                entity.getId().getExamination_id(),
+                entity.getId().getExaminationId(),
                 entity.getId().getNumber());
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("channels/{examinationId}/{number}")
-                .buildAndExpand(entity.getId().getExamination_id(), entity.getId().getNumber()).toUri();
-        ChannelDTO response = service.convertEntityToDto(entity);
+                .buildAndExpand(entity.getId().getExaminationId(), entity.getId().getNumber()).toUri();
+        ChannelDTO response = mapper.toDTO(entity);
 
         return ResponseEntity.created(newResource).body(response);
     }

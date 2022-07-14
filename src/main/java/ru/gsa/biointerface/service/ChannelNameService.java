@@ -11,7 +11,6 @@ import ru.gsa.biointerface.repository.ChannelNameRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.Set;
@@ -52,7 +51,7 @@ public class ChannelNameService {
         return entities;
     }
 
-    public ChannelName findById(int id) {
+    public ChannelName getById(int id) {
         if (id <= 0) throw new IllegalArgumentException("Id <= 0");
 
         Optional<ChannelName> optional = repository.findById(id);
@@ -65,6 +64,25 @@ public class ChannelNameService {
             log.error("ChannelName(id={}) is not found in database", id);
             throw new NotFoundException("ChannelName(id=" + id + ") is not found in database");
         }
+    }
+
+    @Transactional
+    public ChannelName save(ChannelNameDTO dto) {
+        Optional<ChannelName> optional = repository.findById(dto.getId());
+        ChannelName entity;
+
+        if(optional.isEmpty()){
+            entity = new ChannelName(dto.getName(), dto.getComment());
+        } else {
+            entity = optional.get();
+            entity.setName(dto.getName());
+            entity.setComment(dto.getComment());
+        }
+
+        entity = repository.save(entity);
+        log.info("ChannelName(id={})  is recorded in database", entity.getId());
+
+        return entity;
     }
 
     @Transactional
@@ -97,22 +115,5 @@ public class ChannelNameService {
             log.info("ChannelName(id={}) not found in database", id);
             throw new NotFoundException("ChannelName(id=" + id + ") not found in database");
         }
-    }
-
-    public ChannelNameDTO convertEntityToDto(ChannelName entity) {
-        return ChannelNameDTO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .comment(entity.getComment())
-                .build();
-    }
-
-    public ChannelName convertDtoToEntity(ChannelNameDTO dto) {
-        return ChannelName.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .comment(dto.getComment())
-                .channels(new TreeSet<>())
-                .build();
     }
 }

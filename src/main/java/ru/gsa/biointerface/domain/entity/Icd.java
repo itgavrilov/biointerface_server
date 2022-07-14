@@ -1,9 +1,23 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -26,23 +40,20 @@ public class Icd implements Serializable, Comparable<Icd> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    @Column(nullable = false, length = 35)
+    @Column(name = "name", nullable = false, length = 35)
     private String name;
 
-    @NotNull(message = "Version can't be null")
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
-    @Column(nullable = false)
-    private int version;
+    @Column(name = "version", nullable = false)
+    private Integer version;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(length = 400)
     private String comment;
 
-    @NotNull(message = "Patient records can't be null")
     @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Patient> patients;
 

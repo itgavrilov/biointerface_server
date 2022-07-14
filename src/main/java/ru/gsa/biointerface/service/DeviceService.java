@@ -11,7 +11,6 @@ import ru.gsa.biointerface.repository.DeviceRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.Set;
@@ -68,6 +67,28 @@ public class DeviceService {
     }
 
     @Transactional
+    public Device save(DeviceDTO dto) {
+        Optional<Device> optional = repository.findById(dto.getId());
+        Device entity;
+
+        if(optional.isEmpty()){
+            entity = new Device(dto.getId(),
+                    dto.getAmountChannels(),
+                    dto.getComment()
+                    );
+        } else {
+            entity = optional.get();
+            entity.setAmountChannels(dto.getAmountChannels());
+            entity.setComment(dto.getComment());
+        }
+
+        entity = repository.save(entity);
+        log.info("Device(id={}) is recorded in database", entity.getId());
+
+        return entity;
+    }
+
+    @Transactional
     public Device save(Device entity) {
         if (entity == null)
             throw new BadRequestException("Entity is null");
@@ -97,22 +118,5 @@ public class DeviceService {
             log.info("Device(id={}) not found in database", id);
             throw new NotFoundException("Device(id=" + id + ") not found in database");
         }
-    }
-
-    public DeviceDTO convertEntityToDto(Device entity) {
-        return DeviceDTO.builder()
-                .id(entity.getId())
-                .amountChannels(entity.getAmountChannels())
-                .comment(entity.getComment())
-                .build();
-    }
-
-    public Device convertDtoToEntity(DeviceDTO dto) {
-        return Device.builder()
-                .id(dto.getId())
-                .amountChannels(dto.getAmountChannels())
-                .comment(dto.getComment())
-                .examinations(new TreeSet<>())
-                .build();
     }
 }

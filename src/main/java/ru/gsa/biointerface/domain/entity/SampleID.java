@@ -65,7 +65,7 @@ public class SampleID implements Serializable, Comparable<SampleID> {
 
         if (channel_id != null) {
             channelId = String.valueOf(channel_id.getNumber());
-            examinationId = String.valueOf(channel_id.getExamination_id());
+            examinationId = String.valueOf(channel_id.getExaminationId());
         }
         return "Sample{" +
                 "id=" + id +

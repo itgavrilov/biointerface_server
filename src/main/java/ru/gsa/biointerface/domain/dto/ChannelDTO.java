@@ -2,7 +2,8 @@ package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

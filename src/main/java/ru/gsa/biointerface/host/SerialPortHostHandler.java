@@ -6,7 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.gsa.biointerface.domain.entity.*;
+import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.ChannelName;
+import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.entity.Examination;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.host.cash.Cash;
 import ru.gsa.biointerface.host.cash.DataListener;
 import ru.gsa.biointerface.host.cash.SampleCash;
@@ -285,7 +289,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             throw new IllegalArgumentException("amountChannels <= 0 or > 8");
 
         if (device == null || device.getId() != serialNumber) {
-            device = new Device(serialNumber, amountChannels);
+            device = new Device(serialNumber, amountChannels, "Found automatically");
             examination = null;
             patient = null;
 

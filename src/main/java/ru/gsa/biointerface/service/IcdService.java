@@ -5,14 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -68,18 +67,18 @@ public class IcdService {
     }
 
     @Transactional
-    public Icd save(Icd entity) {
-        if (entity == null)
-            throw new BadRequestException("Entity is null");
-        if (entity.getName() == null)
-            throw new BadRequestException("Name is null");
-        if (entity.getName().isBlank())
-            throw new BadRequestException("Name is blank");
-        if (entity.getVersion() <= 0)
-            throw new BadRequestException("Version <= 0");
-        if (entity.getPatients() == null)
-            throw new BadRequestException("Patients is null");
+    public Icd save(IcdDTO dto) {
+        Optional<Icd> optional = repository.findById(dto.getId());
+        Icd entity;
 
+        if(optional.isEmpty()){
+            entity = new Icd(dto.getName(), dto.getVersion(), dto.getComment());
+        } else {
+            entity = optional.get();
+            entity.setName(dto.getName());
+            entity.setVersion(dto.getVersion());
+            entity.setComment(dto.getComment());
+        }
 
         entity = repository.save(entity);
         log.info("Icd(id={}) is recorded in database", entity.getId());
@@ -100,24 +99,5 @@ public class IcdService {
             log.info("Icd(id={}) not found in database", id);
             throw new NotFoundException("Icd(id=" + id + ") not found in database");
         }
-    }
-
-    public IcdDTO convertEntityToDto(Icd entity) {
-        return IcdDTO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .version(entity.getVersion())
-                .comment(entity.getComment())
-                .build();
-    }
-
-    public Icd convertDtoToEntity(IcdDTO dto) {
-        return Icd.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .version(dto.getVersion())
-                .comment(dto.getComment())
-                .patients(new TreeSet<>())
-                .build();
     }
 }

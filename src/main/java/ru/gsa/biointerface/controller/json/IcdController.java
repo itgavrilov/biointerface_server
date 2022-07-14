@@ -1,7 +1,6 @@
 package ru.gsa.biointerface.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,16 +13,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.mapper.IcdMapper;
 import ru.gsa.biointerface.service.IcdService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -38,10 +45,12 @@ import java.util.stream.Collectors;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class IcdController {
+
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final IcdService service;
-    private final ObjectMapper mapper;
+    private final IcdMapper mapper;
+
 
     @Operation(summary = "get all ICD disease codes")
     @ApiResponses(value = {
@@ -54,7 +63,7 @@ public class IcdController {
     public ResponseEntity<Set<IcdDTO>> getAll() {
         log.info("REST GET /icds");
         Set<IcdDTO> responses = service.findAll().stream()
-                .map(service::convertEntityToDto)
+                .map(mapper::toDTO)
                 .collect(Collectors.toSet());
 
         return ResponseEntity.ok(responses);
@@ -70,7 +79,7 @@ public class IcdController {
     @GetMapping("/{id}")
     public ResponseEntity<IcdDTO> get(@PathVariable int id) {
         log.info("REST GET /icds/{}", id);
-        IcdDTO response = service.convertEntityToDto(service.getById(id));
+        IcdDTO response = mapper.toDTO(service.getById(id));
 
         return ResponseEntity.ok(response);
     }
@@ -99,13 +108,13 @@ public class IcdController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<IcdDTO> save(@RequestBody IcdDTO dto) throws JsonProcessingException {
-        Icd entity = service.save(service.convertDtoToEntity(dto));
-        log.info("REST PUT /icds/{}", entity.getId());
+    public ResponseEntity<IcdDTO> save(@Valid @RequestBody IcdDTO dto) throws JsonProcessingException {
+        log.info("REST PUT /icds");
+        Icd entity = service.save(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/icds/{id}")
                 .buildAndExpand(entity.getId()).toUri();
-        IcdDTO response = service.convertEntityToDto(entity);
+        IcdDTO response = mapper.toDTO(entity);
 
         return ResponseEntity.created(newResource).body(response);
     }

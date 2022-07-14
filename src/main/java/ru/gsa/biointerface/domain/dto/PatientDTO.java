@@ -2,9 +2,12 @@ package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,35 +24,28 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
     static final long SerialVersionUID = 1L;
 
     @Schema(description = "patient record ID")
-    @NotNull(message = "Id can't be null")
-    @Min(value = 1, message = "Id can't be lass then 1")
-    private int id;
+    private Integer id;
 
-    @Schema(description = "patient second name")
+    @Schema(description = "patient second name", required = true)
     @NotBlank(message = "Second name can't be blank")
-    @Size(min = 3, max = 20, message = "Second name should be have chars between 3-20")
     private String secondName;
 
-    @Schema(description = "patient first name")
+    @Schema(description = "patient first name", required = true)
     @NotBlank(message = "First name can't be blank")
-    @Size(min = 3, max = 20, message = "First name should be have chars between 3-20")
     private String firstName;
 
     @Schema(description = "patient patronymic")
-    @NotBlank(message = "Patronymic can't be blank")
-    @Size(min = 3, max = 20, message = "Patronymic should be have chars between 3-20")
     private String patronymic;
 
-    @Schema(description = "patient birthday")
-    @NotNull(message = "Birthday can't be null")
+    @Schema(description = "patient birthday", required = true)
     @Past(message = "Birthday should be in past")
     private LocalDateTime birthday;
 
     @Schema(description = "ICD ID")
-    private int icdId;
+    private Integer icdId;
 
     @Schema(description = "patient comment")
-    @Size(max = 400, message = "Comment can't be more than 400 chars")
+    @Max(value = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 
     @Override

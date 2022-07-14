@@ -33,7 +33,7 @@ spring:
 
   flyway:
     schemas: public
-    baselineOnMigrate: true
+#    baselineOnMigrate: true
     ignore-missing-migrations: true
     table: flyway_schema_history
 
