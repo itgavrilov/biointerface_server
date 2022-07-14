@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,13 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.Device;
-import ru.gsa.biointerface.dto.DeviceDTO;
-import ru.gsa.biointerface.dto.ErrorResponse;
-import ru.gsa.biointerface.dto.IcdDTO;
+import ru.gsa.biointerface.domain.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,9 +107,9 @@ public class DeviceController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<DeviceDTO> save(@RequestBody DeviceDTO dto) throws JsonProcessingException {
-        Device entity = service.save(mapper.toEntity(dto));
-        log.info("REST PUT /devices/{}", entity.getId());
+    public ResponseEntity<DeviceDTO> save(@Valid @RequestBody DeviceDTO dto){
+        log.info("REST PUT /devices");
+        Device entity = service.save(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/devices/{id}")
                 .buildAndExpand(entity.getId()).toUri();

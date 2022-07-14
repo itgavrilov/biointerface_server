@@ -3,7 +3,8 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.Device;
+import ru.gsa.biointerface.domain.dto.DeviceDTO;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
@@ -63,6 +64,28 @@ public class DeviceService {
             log.error("Device(id={}) is not found in database", id);
             throw new NotFoundException("Device(id=" + id + ") is not found in database");
         }
+    }
+
+    @Transactional
+    public Device save(DeviceDTO dto) {
+        Optional<Device> optional = repository.findById(dto.getId());
+        Device entity;
+
+        if(optional.isEmpty()){
+            entity = new Device(dto.getId(),
+                    dto.getAmountChannels(),
+                    dto.getComment()
+                    );
+        } else {
+            entity = optional.get();
+            entity.setAmountChannels(dto.getAmountChannels());
+            entity.setComment(dto.getComment());
+        }
+
+        entity = repository.save(entity);
+        log.info("Device(id={}) is recorded in database", entity.getId());
+
+        return entity;
     }
 
     @Transactional

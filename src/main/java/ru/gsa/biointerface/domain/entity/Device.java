@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.domain;
+package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
@@ -34,28 +33,26 @@ import java.util.TreeSet;
 public class Device implements Serializable, Comparable<Device> {
     static final long SerialVersionUID = 1L;
 
-    @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
     @Id
-    private int id;
+    private Integer id;
 
-    @NotNull(message = "Amount channels can't be null")
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
     @Column(name = "amount_channels", nullable = false)
-    private int amountChannels;
+    private Integer amountChannels;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(length = 400)
     private String comment;
 
-    @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     private Set<Examination> examinations;
 
-    public Device(int id, int amountChannels) {
+    public Device(int id, int amountChannels, String comment) {
         this.id = id;
         this.amountChannels = amountChannels;
+        this.comment = comment;
         examinations = new TreeSet<>();
     }
 

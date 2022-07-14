@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.Channel;
-import ru.gsa.biointerface.domain.Device;
-import ru.gsa.biointerface.domain.Examination;
-import ru.gsa.biointerface.domain.Patient;
+import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.entity.Examination;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ExaminationRepository;
@@ -113,16 +113,16 @@ public class ExaminationService {
 
     @Transactional
     public Examination save(Examination entity) {
-        if (entity == null)
-            throw new BadRequestException("Entity is null");
-        if (entity.getStarttime() == null)
-            throw new BadRequestException("StartTime is null");
-        if (entity.getPatient() == null)
-            throw new BadRequestException("Patient is null");
-        if (entity.getDevice() == null)
-            throw new BadRequestException("Device is null");
-        if (entity.getChannels() == null)
-            throw new BadRequestException("Channels is null");
+//        if (entity == null)
+//            throw new BadRequestException("Entity is null");
+//        if (entity.getStarttime() == null)
+//            throw new BadRequestException("StartTime is null");
+//        if (entity.getPatient() == null)
+//            throw new BadRequestException("Patient is null");
+//        if (entity.getDevice() == null)
+//            throw new BadRequestException("Device is null");
+//        if (entity.getChannels() == null)
+//            throw new BadRequestException("Channels is null");
 
         entity = repository.save(entity);
         log.info("Examination(id={}) is recorded in database", entity.getId());

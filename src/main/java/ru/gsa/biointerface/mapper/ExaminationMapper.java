@@ -2,11 +2,11 @@ package ru.gsa.biointerface.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.gsa.biointerface.domain.Channel;
-import ru.gsa.biointerface.domain.Device;
-import ru.gsa.biointerface.domain.Examination;
-import ru.gsa.biointerface.domain.Patient;
-import ru.gsa.biointerface.dto.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.ExaminationDTO;
+import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.entity.Examination;
+import ru.gsa.biointerface.domain.entity.Patient;
 
 import java.util.List;
 
@@ -20,5 +20,7 @@ public interface ExaminationMapper {
     @Mapping(target = "deviceId", source = "examination.device.id")
     ExaminationDTO toDTO(Examination examination);
 
+    @Mapping(target = "id", source = "examinationDTO.id")
+    @Mapping(target = "comment", source = "examinationDTO.comment")
     Examination toEntity(ExaminationDTO examinationDTO, Patient patient, Device device, List<Channel> channels);
 }

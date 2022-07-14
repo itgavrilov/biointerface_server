@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.ChannelName;
-import ru.gsa.biointerface.dto.ChannelNameDTO;
-import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
+import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.mapper.ChannelNameMapper;
 import ru.gsa.biointerface.service.ChannelNameService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -106,9 +107,9 @@ public class ChannelNameController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<ChannelNameDTO> save(@RequestBody ChannelNameDTO dto) throws JsonProcessingException {
-        ChannelName entity = service.save(mapper.toEntity(dto));
-        log.info("REST PUT /channelNames/{}", entity.getId());
+    public ResponseEntity<ChannelNameDTO> save(@Valid @RequestBody ChannelNameDTO dto) throws JsonProcessingException {
+        log.info("REST PUT /channelNames");
+        ChannelName entity = service.save(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/channelNames/{id}")
                 .buildAndExpand(entity.getId()).toUri();

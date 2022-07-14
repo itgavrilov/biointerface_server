@@ -3,7 +3,8 @@ package ru.gsa.biointerface.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.ChannelName;
+import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
+import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
@@ -63,6 +64,25 @@ public class ChannelNameService {
             log.error("ChannelName(id={}) is not found in database", id);
             throw new NotFoundException("ChannelName(id=" + id + ") is not found in database");
         }
+    }
+
+    @Transactional
+    public ChannelName save(ChannelNameDTO dto) {
+        Optional<ChannelName> optional = repository.findById(dto.getId());
+        ChannelName entity;
+
+        if(optional.isEmpty()){
+            entity = new ChannelName(dto.getName(), dto.getComment());
+        } else {
+            entity = optional.get();
+            entity.setName(dto.getName());
+            entity.setComment(dto.getComment());
+        }
+
+        entity = repository.save(entity);
+        log.info("ChannelName(id={})  is recorded in database", entity.getId());
+
+        return entity;
     }
 
     @Transactional

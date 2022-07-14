@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.Icd;
-import ru.gsa.biointerface.domain.Patient;
-import ru.gsa.biointerface.exception.BadRequestException;
+import ru.gsa.biointerface.domain.dto.PatientDTO;
+import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
 
@@ -99,27 +99,28 @@ public class PatientService {
     }
 
     @Transactional
-    public Patient save(Patient entity) {
-        if (entity == null)
-            throw new BadRequestException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new BadRequestException("Id <= 0");
-        if (entity.getSecondName() == null)
-            throw new BadRequestException("SecondName is null");
-        if (entity.getSecondName().isBlank())
-            throw new BadRequestException("SecondName is blank");
-        if (entity.getFirstName() == null)
-            throw new BadRequestException("FirstName is null");
-        if (entity.getFirstName().isBlank())
-            throw new BadRequestException("FirstName is blank");
-        if (entity.getPatronymic() == null)
-            throw new BadRequestException("MiddleName is null");
-        if (entity.getPatronymic().isBlank())
-            throw new BadRequestException("MiddleName is blank");
-        if (entity.getBirthday() == null)
-            throw new BadRequestException("Birthday is null");
-        if (entity.getExaminations() == null)
-            throw new BadRequestException("Examinations is null");
+    public Patient save(PatientDTO dto) {
+        Optional<Patient> optional = repository.findById(dto.getId());
+        Icd icd = icdService.getById(dto.getIcdId());
+        Patient entity;
+
+        if(optional.isEmpty()){
+            entity = new Patient(dto.getSecondName(),
+                    dto.getFirstName(),
+                    dto.getPatronymic(),
+                    dto.getBirthday(),
+                    icd,
+                    dto.getComment()
+                    );
+        } else {
+            entity = optional.get();
+            entity.setSecondName(dto.getSecondName());
+            entity.setFirstName(dto.getFirstName());
+            entity.setPatronymic(dto.getPatronymic());
+            entity.setBirthday(dto.getBirthday());
+            entity.setIcd(icd);
+            entity.setComment(dto.getComment());
+        }
 
         entity = repository.save(entity);
         log.info("Patient(id={}) is recorded in database", entity.getId());

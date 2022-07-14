@@ -2,9 +2,8 @@ package ru.gsa.biointerface.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.gsa.biointerface.domain.Icd;
-import ru.gsa.biointerface.domain.Patient;
-import ru.gsa.biointerface.dto.PatientDTO;
+import ru.gsa.biointerface.domain.dto.PatientDTO;
+import ru.gsa.biointerface.domain.entity.Patient;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 26/05/2022
@@ -14,6 +13,4 @@ public interface PatientMapper {
 
     @Mapping(target = "icdId", source = "patient.icd.id")
     PatientDTO toDTO(Patient patient);
-
-    Patient toEntity(PatientDTO patientDTO, Icd icd);
 }

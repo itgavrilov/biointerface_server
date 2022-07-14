@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.domain;
+package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +14,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
@@ -30,52 +31,55 @@ import java.util.TreeSet;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "channel_name")
-@Table(name = "channel_name")
-public class ChannelName implements Serializable, Comparable<ChannelName> {
+@Entity(name = "icd")
+@Table(name = "icd")
+public class Icd implements Serializable, Comparable<Icd> {
     static final long SerialVersionUID = 1L;
 
-    @NotNull(message = "Id can't be null")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    @Column(length = 35, unique = true, nullable = false)
+    @Column(name = "name", nullable = false, length = 35)
     private String name;
+
+    @Min(value = 10, message = "Version can't be lass then 10")
+    @Max(value = 99, message = "Version can't be more than 99")
+    @Column(name = "version", nullable = false)
+    private Integer version;
 
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(length = 400)
     private String comment;
 
-    @NotNull(message = "Channels can't be null")
-    @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Channel> channels;
+    @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Patient> patients;
 
-    public ChannelName(String name, String comment) {
+    public Icd(String name, int version, String comment) {
         this.name = name;
+        this.version = version;
         this.comment = comment;
-        channels = new TreeSet<>();
+        patients = new TreeSet<>();
     }
 
-    public void addChannel(Channel channel) {
-        channels.add(channel);
-        channel.setChannelName(this);
+    public void addPatient(Patient patient) {
+        patients.add(patient);
+        patient.setIcd(this);
     }
 
-    public void removeChannel(Channel channel) {
-        channels.remove(channel);
-        channel.setChannelName(null);
+    public void removePatient(Patient patient) {
+        patients.remove(patient);
+        patient.setIcd(null);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChannelName that = (ChannelName) o;
-        return id == that.id && name.equals(that.name);
+        Icd icd = (Icd) o;
+        return id == icd.id;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     }
 
     @Override
-    public int compareTo(ChannelName o) {
+    public int compareTo(Icd o) {
         if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
@@ -99,10 +103,10 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
 
     @Override
     public String toString() {
-        return "ChannelName{" +
-                "id='" + id + '\'' +
-                "name='" + name + '\'' +
-                "comment='" + comment + '\'' +
+        return "Icd{" +
+                "id=" + id +
+                ", ICD='" + name + '\'' +
+                ", version=" + version +
                 '}';
     }
 }

@@ -22,18 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.Channel;
-import ru.gsa.biointerface.domain.ChannelName;
-import ru.gsa.biointerface.domain.Examination;
-import ru.gsa.biointerface.dto.ChannelDTO;
-import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.ChannelDTO;
+import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.mapper.ChannelMapper;
-import ru.gsa.biointerface.service.ChannelNameService;
 import ru.gsa.biointerface.service.ChannelService;
-import ru.gsa.biointerface.service.ExaminationService;
 
+import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,8 +49,6 @@ public class ChannelController {
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final ChannelService service;
-    private final ExaminationService examinationService;
-    private final ChannelNameService channelNameService;
     private final ChannelMapper mapper;
 
 
@@ -136,16 +130,14 @@ public class ChannelController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<ChannelDTO> save(@RequestBody ChannelDTO dto) throws JsonProcessingException {
-        Examination examination = examinationService.getById(dto.getExaminationId());
-        ChannelName channelName = channelNameService.getById(dto.getChannelNameId());
-        Channel entity = service.save(mapper.toEntity(dto, examination, channelName, new ArrayList<>()));
+    public ResponseEntity<ChannelDTO> save(@Valid @RequestBody ChannelDTO dto) throws JsonProcessingException {
+        Channel entity = service.save(dto);
         log.info("REST PUT /channels/{}/{}",
-                entity.getId().getExamination_id(),
+                entity.getId().getExaminationId(),
                 entity.getId().getNumber());
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("channels/{examinationId}/{number}")
-                .buildAndExpand(entity.getId().getExamination_id(), entity.getId().getNumber()).toUri();
+                .buildAndExpand(entity.getId().getExaminationId(), entity.getId().getNumber()).toUri();
         ChannelDTO response = mapper.toDTO(entity);
 
         return ResponseEntity.created(newResource).body(response);

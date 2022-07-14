@@ -3,16 +3,18 @@ package ru.gsa.biointerface.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.Channel;
-import ru.gsa.biointerface.domain.ChannelID;
-import ru.gsa.biointerface.domain.ChannelName;
-import ru.gsa.biointerface.domain.Examination;
+import ru.gsa.biointerface.domain.dto.ChannelDTO;
+import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.ChannelID;
+import ru.gsa.biointerface.domain.entity.ChannelName;
+import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +27,7 @@ import java.util.TreeSet;
 @RequiredArgsConstructor
 @Service
 public class ChannelService {
+
     private final ChannelRepository repository;
     private final ExaminationService examinationService;
     private final ChannelNameService channelNameService;
@@ -93,14 +96,37 @@ public class ChannelService {
     }
 
     @Transactional
-    public Channel save(Channel entity) {
-        if (entity == null)
-            throw new NullPointerException("Entity is null");
-        if (entity.getExamination() == null)
-            throw new NullPointerException("Examination is null");
-        if (entity.getSamples() == null)
-            throw new NullPointerException("Samples is null");
+    public Channel save(ChannelDTO dto) {
+        Optional<Channel> optional = repository.getByNumberAndExaminationId(dto.getNumber(), dto.getExaminationId());
+        Channel entity;
 
+        if(optional.isEmpty()) {
+            entity = Channel.builder()
+                    .examination(examinationService.getById(dto.getExaminationId()))
+                    .channelName(channelNameService.getById(dto.getChannelNameId()))
+                    .id(new ChannelID(dto.getNumber(), dto.getExaminationId()))
+                    .samples(new ArrayList<>())
+                    .build();
+        } else {
+            entity = optional.get();
+
+            if(dto.getExaminationId() != entity.getExamination().getId()){
+                entity.setExamination(examinationService.getById(dto.getExaminationId()));
+            }
+
+            if(dto.getChannelNameId() != entity.getChannelName().getId()){
+                entity.setChannelName(channelNameService.getById(dto.getChannelNameId()));
+            }
+        }
+
+        entity = save(entity);
+        log.info("Channel(id={})  is recorded in database", entity.getId());
+
+        return entity;
+    }
+
+    @Transactional
+    public Channel save(Channel entity) {
         entity = repository.save(entity);
         log.info("Channel(id={})  is recorded in database", entity.getId());
 

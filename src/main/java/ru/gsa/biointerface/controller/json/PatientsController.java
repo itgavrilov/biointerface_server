@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,14 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.Icd;
-import ru.gsa.biointerface.domain.Patient;
-import ru.gsa.biointerface.dto.ErrorResponse;
-import ru.gsa.biointerface.dto.PatientDTO;
+import ru.gsa.biointerface.domain.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.PatientDTO;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.mapper.PatientMapper;
 import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -121,10 +120,9 @@ public class PatientsController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<PatientDTO> save(@RequestBody PatientDTO dto) throws JsonProcessingException {
-        Icd icd = icdService.getById(dto.getIcdId());
-        Patient entity = service.save(mapper.toEntity(dto, icd));
-        log.info("REST PUT /patients/{}", entity.getId());
+    public ResponseEntity<PatientDTO> save(@Valid @RequestBody PatientDTO dto) {
+        log.info("REST PUT /patients");
+        Patient entity = service.save(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/patients/{id}")
                 .buildAndExpand(entity.getId()).toUri();

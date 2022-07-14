@@ -1,9 +1,10 @@
-package ru.gsa.biointerface.domain;
+package ru.gsa.biointerface.domain.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -20,13 +21,15 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
     static final long SerialVersionUID = 1L;
 
     @NotNull(message = "Examination id can't be null")
-    private int examination_id;
+    @Column(name = "examination_id")
+    private int examinationId;
 
     @NotNull(message = "Number can't be null")
+    @Column(name = "number")
     private int number;
 
-    public ChannelID(int examination_id, int number) {
-        this.examination_id = examination_id;
+    public ChannelID(int examinationId, int number) {
+        this.examinationId = examinationId;
         this.number = number;
     }
 
@@ -35,18 +38,18 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelID channelID = (ChannelID) o;
-        return examination_id == channelID.examination_id && number == channelID.number;
+        return examinationId == channelID.examinationId && number == channelID.number;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(examination_id, number);
+        return Objects.hash(examinationId, number);
     }
 
     @Override
     public int compareTo(ChannelID o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = examination_id - o.examination_id;
+        int result = examinationId - o.examinationId;
 
         if (result == 0)
             result = number - o.number;
@@ -58,7 +61,7 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
     public String toString() {
         return "Channel{" +
                 "number=" + number +
-                ", examinationEntity_id=" + examination_id +
+                ", examinationEntity_id=" + examinationId +
                 '}';
     }
 }

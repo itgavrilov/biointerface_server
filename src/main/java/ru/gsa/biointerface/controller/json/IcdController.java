@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.Icd;
-import ru.gsa.biointerface.dto.ErrorResponse;
-import ru.gsa.biointerface.dto.IcdDTO;
+import ru.gsa.biointerface.domain.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.mapper.IcdMapper;
 import ru.gsa.biointerface.service.IcdService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,9 +108,9 @@ public class IcdController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping
-    public ResponseEntity<IcdDTO> save(@RequestBody IcdDTO dto) throws JsonProcessingException {
-        Icd entity = service.save(mapper.toEntity(dto));
-        log.info("REST PUT /icds/{}", entity.getId());
+    public ResponseEntity<IcdDTO> save(@Valid @RequestBody IcdDTO dto) throws JsonProcessingException {
+        log.info("REST PUT /icds");
+        Icd entity = service.save(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/icds/{id}")
                 .buildAndExpand(entity.getId()).toUri();

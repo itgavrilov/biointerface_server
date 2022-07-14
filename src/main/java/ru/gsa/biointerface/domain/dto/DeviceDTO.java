@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,7 +7,6 @@ import lombok.Data;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
@@ -23,15 +22,13 @@ public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     static final long SerialVersionUID = 1L;
 
     @Schema(description = "device ID")
-    @NotNull(message = "Id can't be null")
     @Min(value = 1, message = "Id can't be lass then 1")
-    private int id;
+    private Integer id;
 
     @Schema(description = "device Amount channels")
-    @NotNull(message = "Amount channels can't be null")
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
-    private int amountChannels;
+    private Integer amountChannels;
 
     @Schema(description = "device comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")

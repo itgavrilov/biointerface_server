@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.domain;
+package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,8 +51,8 @@ public class Channel implements Serializable, Comparable<Channel> {
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
 
-    public Channel(Integer id, Examination examination, ChannelName channelName) {
-        this.id = new ChannelID(id, examination.getId());
+    public Channel(Integer number, Examination examination, ChannelName channelName) {
+        this.id = new ChannelID(number, examination.getId());
         this.examination = examination;
         this.channelName = channelName;
         this.samples = new LinkedList<>();
@@ -96,7 +96,7 @@ public class Channel implements Serializable, Comparable<Channel> {
 
         return "Channel{" +
                 "number=" + id.getNumber() +
-                ", examination_id=" + id.getExamination_id() +
+                ", examination_id=" + id.getExaminationId() +
                 ", channelName_id=" + channelNameId +
                 '}';
     }
