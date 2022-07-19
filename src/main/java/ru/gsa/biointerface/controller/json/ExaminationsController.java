@@ -13,14 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
@@ -29,7 +22,6 @@ import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.mapper.ExaminationMapper;
-import ru.gsa.biointerface.service.ChannelService;
 import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
 import ru.gsa.biointerface.service.PatientService;
@@ -46,17 +38,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Examinations", description = "results of biopotential measurements")
 @RestController
-@RequestMapping(
-        value = "/examinations",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/examinations", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ExaminationsController {
+
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final ExaminationService service;
     private final PatientService patientService;
     private final DeviceService deviceService;
-    private final ChannelService channelService;
     private final ExaminationMapper mapper;
 
     @Operation(summary = "get all results of biopotential measurements")
@@ -148,7 +137,7 @@ public class ExaminationsController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ExaminationDTO> save(@RequestBody ExaminationDTO dto) throws JsonProcessingException {
         Patient patient = patientService.getById(dto.getPatientId());
         Device device = deviceService.getById(dto.getDeviceId());

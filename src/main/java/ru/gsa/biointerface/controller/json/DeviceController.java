@@ -12,14 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
@@ -40,10 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Devices", description = "biointerface controllers")
 @RestController
-@RequestMapping(
-        value = "/devices",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
 
     private static final String version = "0.0.1-SNAPSHOT";
@@ -106,7 +96,7 @@ public class DeviceController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DeviceDTO> save(@Valid @RequestBody DeviceDTO dto){
         log.info("REST PUT /devices");
         Device entity = service.save(dto);

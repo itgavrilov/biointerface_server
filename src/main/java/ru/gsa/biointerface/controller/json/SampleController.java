@@ -12,11 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Sample;
@@ -32,10 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Samples", description = "readings of biopotential measurement")
 @RestController
-@RequestMapping(
-        value = "/samples",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/samples", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SampleController {
 
     private static final String version = "0.0.1-SNAPSHOT";
