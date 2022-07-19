@@ -13,14 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
@@ -41,16 +34,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Channels", description = "controller`s channels")
 @RestController
-@RequestMapping(
-        value = "/channels",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/channels", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelController {
+
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final ChannelService service;
     private final ChannelMapper mapper;
-
 
     @Operation(summary = "get channels by examination")
     @ApiResponses(value = {
@@ -129,7 +119,7 @@ public class ChannelController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ChannelDTO> save(@Valid @RequestBody ChannelDTO dto) throws JsonProcessingException {
         Channel entity = service.save(dto);
         log.info("REST PUT /channels/{}/{}",

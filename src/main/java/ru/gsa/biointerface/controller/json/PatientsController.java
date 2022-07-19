@@ -12,20 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.mapper.PatientMapper;
-import ru.gsa.biointerface.service.IcdService;
 import ru.gsa.biointerface.service.PatientService;
 
 import javax.validation.Valid;
@@ -40,16 +32,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Patients", description = "patient records")
 @RestController
-@RequestMapping(
-        value = "/patients",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PatientsController {
 
     private static final String version = "0.0.1-SNAPSHOT";
 
     private final PatientService service;
-    private final IcdService icdService;
     private final PatientMapper mapper;
 
     @Operation(summary = "get all patient records")
@@ -119,7 +107,7 @@ public class PatientsController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PatientDTO> save(@Valid @RequestBody PatientDTO dto) {
         log.info("REST PUT /patients");
         Patient entity = service.save(dto);
