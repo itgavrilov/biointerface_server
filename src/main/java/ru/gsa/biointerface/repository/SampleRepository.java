@@ -14,5 +14,6 @@ import java.util.List;
  */
 @Repository
 public interface SampleRepository extends JpaRepository<Sample, SampleID>, SampleRepositoryCustom {
+
     List<Sample> findAllByChannel(Channel channel);
 }

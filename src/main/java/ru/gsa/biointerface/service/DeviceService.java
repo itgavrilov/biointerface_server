@@ -1,122 +1,121 @@
 package ru.gsa.biointerface.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
+ * CRUD-сервис для работы с контроллерами биоинтерфейсов
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeviceService {
-    private final DeviceRepository repository;
 
-    @Autowired
-    public DeviceService(DeviceRepository repository) {
-        this.repository = repository;
-    }
+    private final DeviceRepository repository;
 
     @PostConstruct
     private void init() {
-        log.info("DeviceService is init");
+        log.debug("DeviceService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        log.info("DeviceService is destruction");
+        log.debug("DeviceService is destruction");
     }
 
-    public Set<Device> findAll() {
-        Set<Device> entities = new TreeSet<>(repository.findAll());
-
-        if (entities.size() > 0) {
-            log.info("Get all devices from database");
-        } else {
-            log.info("Devices is not found in database");
-        }
-
-        return entities;
+    /**
+     * Получение списка устройств
+     *
+     * @return Список устройств {@link List<Device>}
+     */
+    public List<Device> findAll() {
+        return repository.findAll();
     }
 
-    public Device getById(int id) {
-        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
-
-        Optional<Device> optional = repository.findById(id);
-
-        if (optional.isPresent()) {
-            log.info("Get device(id={}) from database", optional.get().getId());
-
-            return optional.get();
-        } else {
-            log.error("Device(id={}) is not found in database", id);
-            throw new NotFoundException("Device(id=" + id + ") is not found in database");
-        }
+    /**
+     * Получение списка устройств с пагинацией
+     *
+     * @param pageable Пагинация {@link Pageable}
+     * @return Список устройств с пагинацией {@link Page<Device>}
+     */
+    public Page<Device> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
+    /**
+     * Получение контроллера биоинтерфейса по id
+     *
+     * @param id Идентификатор {@link Device#getId()}
+     * @return Контроллер биоинтерфейса {@link Device}
+     * @throws NotFoundException если устройстройсвто с id не найдено
+     */
+    public Device getById(Integer id) {
+        return repository.getOrThrow(id);
+    }
+
+    /**
+     * Создание/обновление контроллера биоинтерфейса
+     *
+     * @param dto DTO контроллера биоинтерфейса {@link DeviceDTO}
+     * @return Контроллер биоинтерфейса {@link Device}
+     */
     @Transactional
     public Device save(DeviceDTO dto) {
         Optional<Device> optional = repository.findById(dto.getId());
         Device entity;
 
-        if(optional.isEmpty()){
-            entity = new Device(dto.getId(),
-                    dto.getAmountChannels(),
-                    dto.getComment()
-                    );
+        if (optional.isEmpty()) {
+            entity = new Device(dto.getId(), dto.getAmountChannels(), dto.getComment());
         } else {
             entity = optional.get();
             entity.setAmountChannels(dto.getAmountChannels());
             entity.setComment(dto.getComment());
         }
 
-        entity = repository.save(entity);
-        log.info("Device(id={}) is recorded in database", entity.getId());
+        entity = save(entity);
 
         return entity;
     }
 
+    /**
+     * Создание/обновление контроллера биоинтерфейса
+     *
+     * @param entity DTO контроллера биоинтерфейса {@link DeviceDTO}
+     * @return Контроллер биоинтерфейса {@link Device}
+     */
     @Transactional
     public Device save(Device entity) {
-        if (entity == null)
-            throw new BadRequestException("Entity is null");
-        if (entity.getId() <= 0)
-            throw new BadRequestException("Id <= 0");
-        if (entity.getAmountChannels() <= 0)
-            throw new BadRequestException("Amount channels <= 0");
-        if (entity.getExaminations() == null)
-            throw new BadRequestException("Examinations is null");
-
         entity = repository.save(entity);
-        log.info("Device(id={}) is recorded in database", entity.getId());
+        log.debug("Device(id={}) is save", entity.getId());
 
         return entity;
     }
 
+    /**
+     * Удаление контроллера биоинтерфейса
+     *
+     * @param id Идентификатор {@link Device#getId()}
+     * @throws NotFoundException если устройстройсвто с id не найдено
+     */
     @Transactional
-    public void delete(int id) {
-        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
-
-        Optional<Device> optional = repository.findById(id);
-
-        if (optional.isPresent()) {
-            repository.delete(optional.get());
-            log.info("Device(id={}) is deleted in database", id);
-        } else {
-            log.info("Device(id={}) not found in database", id);
-            throw new NotFoundException("Device(id=" + id + ") not found in database");
-        }
+    public void delete(Integer id) {
+        Device entity = repository.getOrThrow(id);
+        repository.delete(entity);
+        log.debug("Device(id={}) is deleted", id);
     }
 }

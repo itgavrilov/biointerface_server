@@ -1,8 +1,9 @@
 package ru.gsa.biointerface.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
@@ -13,105 +14,83 @@ import ru.gsa.biointerface.repository.PatientRepository;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
+ * CRUD-сервис для работы с карточками пациентов
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository repository;
     private final IcdService icdService;
 
-    @Autowired
-    public PatientService(PatientRepository repository,
-                          @Lazy IcdService icdService) {
-        this.repository = repository;
-        this.icdService = icdService;
-    }
-
-    private static Calendar localDateToDate(LocalDateTime localDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear();
-        //noinspection MagicConstant
-        calendar.set(
-                localDate.getYear(),
-                localDate.getMonthValue() - 1,
-                localDate.getDayOfMonth()
-        );
-
-        return calendar;
-    }
-
     @PostConstruct
     private void init() {
-        log.info("PatientService is init");
+        log.debug("PatientService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        log.info("PatientService is destruction");
+        log.debug("PatientService is destruction");
     }
 
-    public Set<Patient> findAll() {
-        Set<Patient> entities = new TreeSet<>(repository.findAll());
-
-        if (entities.size() > 0) {
-            log.info("Get all patients from database");
-        } else {
-            log.info("Patient is not found in database");
-        }
-
-        return entities;
+    /**
+     * Получение списка карточек пациентов c учетом идентификатора заболивания
+     *
+     * @param icdId Идентификатор заболивания(необязательный) {@link Icd#getId()}
+     * @return Список карточек пациентов {@link List<Patient>}
+     */
+    public List<Patient> getAll(Integer icdId) {
+        return repository.findAllByIcd(icdId);
     }
 
-    public Set<Patient> findAllByIcd(Integer icdId) {
-        Icd icd = icdService.getById(icdId);
-        Set<Patient> entities = new TreeSet<>(repository.findAllByIcd(icd));
-
-        if (entities.size() > 0) {
-            log.info("Get all patients by icd from database");
-        } else {
-            log.info("Patient by icd is not found in database");
-        }
-
-        return entities;
+    /**
+     * Получение списка карточек пациентов c учетом идентификатора заболивания с пагинацией
+     *
+     * @param icdId    Идентификатор заболивания(необязательный) {@link Icd#getId()}
+     * @param pageable Пагинация {@link Pageable}
+     * @return Список карточек пациентов с пагинацией {@link Page<Patient>}
+     */
+    public Page<Patient> getAll(Integer icdId, Pageable pageable) {
+        return repository.findAllByIcd(icdId, pageable);
     }
 
-    public Patient getById(int id) {
-        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
-
-        Optional<Patient> optional = repository.findById(id);
-
-        if (optional.isPresent()) {
-            log.info("Get Patient(id={}) from database", optional.get().getId());
-            return optional.get();
-        } else {
-            log.error("Patient(id={}) is not found in database", id);
-            throw new NotFoundException("Patient(id=" + id + ") is not found in database"
-            );
-        }
+    /**
+     * Получение карточки пациента по id
+     *
+     * @param id Идентификатор {@link Patient#getId()}
+     * @return Карточка пациента {@link Patient}
+     * @throws NotFoundException если карточки пациента с id не найдено
+     */
+    public Patient getById(Integer id) {
+        return repository.getOrThrow(id);
     }
 
+    /**
+     * Создание/обновление карточки пациента
+     *
+     * @param dto DTO карточки пациента {@link PatientDTO}
+     * @return Карточка пациента {@link Patient}
+     */
     @Transactional
     public Patient save(PatientDTO dto) {
         Optional<Patient> optional = repository.findById(dto.getId());
         Icd icd = icdService.getById(dto.getIcdId());
         Patient entity;
 
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             entity = new Patient(dto.getSecondName(),
                     dto.getFirstName(),
                     dto.getPatronymic(),
                     dto.getBirthday(),
                     icd,
                     dto.getComment()
-                    );
+            );
         } else {
             entity = optional.get();
             entity.setSecondName(dto.getSecondName());
@@ -123,23 +102,21 @@ public class PatientService {
         }
 
         entity = repository.save(entity);
-        log.info("Patient(id={}) is recorded in database", entity.getId());
+        log.debug("Patient(id={}) is save", entity.getId());
 
         return entity;
     }
 
+    /**
+     * Удаление карточки пациента
+     *
+     * @param id Идентификатор {@link Patient#getId()}
+     * @throws NotFoundException если карточки пациента с id не найдено
+     */
     @Transactional
-    public void delete(int id) {
-        if (id <= 0) throw new IllegalArgumentException("Id <= 0");
-
-        Optional<Patient> optional = repository.findById(id);
-
-        if (optional.isPresent()) {
-            repository.delete(optional.get());
-            log.info("Patient(id={}) is deleted in database", id);
-        } else {
-            log.error("Patient(id={}) not found in database", id);
-            throw new NotFoundException("Patient(id=" + id + ") not found in database");
-        }
+    public void delete(Integer id) {
+        Patient entity = repository.getOrThrow(id);
+        repository.delete(entity);
+        log.debug("Patient(id={}) is deleted", id);
     }
 }

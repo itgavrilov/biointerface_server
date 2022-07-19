@@ -1,10 +1,13 @@
 package ru.gsa.biointerface.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.exception.NotFoundException;
 
 import java.util.List;
 
@@ -13,7 +16,24 @@ import java.util.List;
  */
 @Repository
 public interface ExaminationRepository extends JpaRepository<Examination, Integer> {
-    List<Examination> findAllByPatient(Patient patient);
 
-    List<Examination> findAllByDevice(Device device);
+    default Examination getOrThrow(Integer id) {
+        return findById(id).orElseThrow(() -> new NotFoundException(String.format(
+                "Examination(id=%s) is not found", id)));
+    }
+
+    @Query(nativeQuery = true,
+            value = "select * from examination as e " +
+                    "where (:patientId is null or e.patient_id = :patientId) " +
+                    "and (:deviceId is null or e.device_id = :deviceId) ")
+    List<Examination> findAllByPatientIdAndDeviceId(@Param("patientId") Integer patientId,
+                                                    @Param("deviceId") Integer deviceId);
+
+    @Query(nativeQuery = true,
+            value = "select * from examination as e " +
+                    "where (:patientId is null or e.patient_id = :patientId) " +
+                    "and (:deviceId is null or e.device_id = :deviceId) ")
+    Page<Examination> findAllByPatientIdAndDeviceId(@Param("patientId") Integer patientId,
+                                                    @Param("deviceId") Integer deviceId,
+                                                    Pageable pageable);
 }

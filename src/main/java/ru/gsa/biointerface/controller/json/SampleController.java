@@ -41,14 +41,14 @@ public class SampleController {
                     content = @Content(array = @ArraySchema(
                             schema = @Schema(implementation = ChannelDTO.class)))),
             @ApiResponse(responseCode = "404", description = "Object not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-    })
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),})
     @GetMapping("/{examinationId}/{channelNumber}")
     public ResponseEntity<List<Integer>> getByChannel(@PathVariable int examinationId, @PathVariable int channelNumber) {
-        log.info("REST GET /samples/{}/{}", channelNumber, examinationId);
+        log.debug("REST GET /samples/{}/{}", channelNumber, examinationId);
         List<Integer> responses = service.findAllByExaminationIdAndChannelNumber(examinationId, channelNumber).stream()
                 .map(Sample::getValue)
                 .collect(Collectors.toList());
+        log.debug("End REST GET /samples/{}/{}", channelNumber, examinationId);
 
         return ResponseEntity.ok(responses);
     }
@@ -56,11 +56,13 @@ public class SampleController {
     @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void health() {
+        log.debug("REST GET /health");
     }
 
     @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
+        log.debug("REST GET /version");
         return version;
     }
 }
