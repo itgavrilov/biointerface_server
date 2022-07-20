@@ -1,22 +1,18 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Сущность контроллера биоинтерфейса
@@ -26,6 +22,7 @@ import java.util.TreeSet;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "device")
 @Table(name = "device")
 public class Device implements Serializable, Comparable<Device> {
@@ -54,16 +51,16 @@ public class Device implements Serializable, Comparable<Device> {
     private String comment;
 
     /**
-     * Список исследований {@link Set<Examination>}
+     * Список исследований {@link List<Examination>}
      */
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
-    private Set<Examination> examinations;
+    private List<Examination> examinations;
 
     public Device(int id, int amountChannels, String comment) {
         this.id = id;
         this.amountChannels = amountChannels;
         this.comment = comment;
-        examinations = new TreeSet<>();
+        examinations = new ArrayList<>();
     }
 
     public void addExamination(Examination examination) {

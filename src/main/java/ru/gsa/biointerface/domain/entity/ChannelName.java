@@ -1,24 +1,18 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Сущность наименования канала контроллера биоинтерфейса
@@ -28,6 +22,7 @@ import java.util.TreeSet;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "channel_name")
 @Table(name = "channel_name")
 public class ChannelName implements Serializable, Comparable<ChannelName> {
@@ -57,16 +52,16 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     private String comment;
 
     /**
-     * Список каналов с этим наименованием {@link Set<Channel>}
+     * Список каналов с этим наименованием {@link List<Channel>}
      */
     @NotNull(message = "Channels can't be null")
     @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Channel> channels;
+    private List<Channel> channels;
 
     public ChannelName(String name, String comment) {
         this.name = name;
         this.comment = comment;
-        channels = new TreeSet<>();
+        channels = new ArrayList<>();
     }
 
     public void addChannel(Channel channel) {
@@ -84,7 +79,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelName that = (ChannelName) o;
-        return id == that.id && name.equals(that.name);
+        return Objects.equals(id, that.id) && name.equals(that.name);
     }
 
     @Override

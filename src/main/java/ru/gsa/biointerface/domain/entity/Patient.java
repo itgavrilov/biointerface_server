@@ -1,20 +1,11 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
@@ -22,9 +13,9 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Сущность карточки пациента
@@ -34,6 +25,7 @@ import java.util.TreeSet;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "patient")
 @Table(name = "patient")
 public class Patient implements Serializable, Comparable<Patient> {
@@ -88,11 +80,11 @@ public class Patient implements Serializable, Comparable<Patient> {
     private String comment;
 
     /**
-     * Список исследований {@link Set<Examination>}
+     * Список исследований {@link List<Examination>}
      */
     @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    private Set<Examination> examinations;
+    private List<Examination> examinations;
 
     public Patient(String secondName, String firstName, String patronymic, LocalDateTime birthday, Icd icd, String comment) {
         this.secondName = secondName;
@@ -101,7 +93,7 @@ public class Patient implements Serializable, Comparable<Patient> {
         this.birthday = birthday;
         this.comment = comment;
         this.icd = icd;
-        examinations = new TreeSet<>();
+        examinations = new ArrayList<>();
     }
 
     public void addExamination(Examination examination) {
@@ -119,7 +111,7 @@ public class Patient implements Serializable, Comparable<Patient> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Patient that = (Patient) o;
-        return id == that.id;
+        return Objects.equals(id, that.id);
     }
 
     @Override
