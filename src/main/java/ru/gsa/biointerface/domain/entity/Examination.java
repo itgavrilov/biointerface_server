@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,40 +26,58 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * Сущность исследования
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "examination")
 @Table(name = "examination")
 public class Examination implements Serializable, Comparable<Examination> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
+    /**
+     * Время начала исследования
+     */
     @PastOrPresent(message = "Start time should be in past or present")
     @Column(name = "starttime", nullable = false)
     private LocalDateTime starttime;
 
+    /**
+     * Карточка пациента
+     */
     @NotNull(message = "Patient can't be null")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "patient_id", referencedColumnName = "id", nullable = false)
     private Patient patient;
 
+    /**
+     * Контроллер биоинтерфейса
+     */
     @NotNull(message = "Device can't be null")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "device_id", referencedColumnName = "id", nullable = false)
     private Device device;
 
+    /**
+     * Комментарий
+     */
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(name = "comment", length = 400)
     private String comment;
 
+    /**
+     * Список каналов контроллера биоинтерфейса {@link List<Channel>}
+     */
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
 

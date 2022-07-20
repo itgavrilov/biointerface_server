@@ -55,11 +55,11 @@ CREATE TABLE IF NOT EXISTS channel
 
 CREATE TABLE IF NOT EXISTS sample
 (
-    id             INTEGER NOT NULL,
+    number         INTEGER NOT NULL,
     channel_number INTEGER NOT NULL,
     examination_id INTEGER NOT NULL,
     value          INTEGER NOT NULL,
-    PRIMARY KEY (id, channel_number, examination_id),
+    PRIMARY KEY (number, channel_number, examination_id),
     FOREIGN KEY (channel_number, examination_id) REFERENCES channel (number, examination_id) ON DELETE CASCADE
 );
 

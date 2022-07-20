@@ -6,11 +6,13 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * Сущность идентификатора канала контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
@@ -20,11 +22,17 @@ import java.util.Objects;
 public class ChannelID implements Serializable, Comparable<ChannelID> {
     static final long SerialVersionUID = 1L;
 
-    @NotNull(message = "Examination id can't be null")
+    /**
+     * Идентификатор исследования {@link Examination}
+     */
+    @Min(value = 0, message = "Examination id can't be lass then 0")
     @Column(name = "examination_id")
     private int examinationId;
 
-    @NotNull(message = "Number can't be null")
+    /**
+     * Порядковый номер
+     */
+    @Min(value = 0, message = "Number can't be lass then 0")
     @Column(name = "number")
     private int number;
 
@@ -38,7 +46,7 @@ public class ChannelID implements Serializable, Comparable<ChannelID> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelID channelID = (ChannelID) o;
-        return examinationId == channelID.examinationId && number == channelID.number;
+        return Objects.equals(examinationId, channelID.examinationId) && Objects.equals(number, channelID.number);
     }
 
     @Override

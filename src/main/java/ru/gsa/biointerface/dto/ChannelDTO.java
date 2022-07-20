@@ -1,41 +1,52 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) канала контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@Builder
 @Schema(name = "Channel", description = "controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
     static final long SerialVersionUID = 1L;
 
-    @Schema(description = "serial number in controller")
-    @NotNull(message = "Number can't be null")
-    private int number;
-
+    /**
+     * Идентификатор исследования {@link ExaminationDTO#getId()}
+     */
     @Schema(description = "examination`s ID")
-    @NotNull(message = "ExaminationId can't be null")
-    private int examinationId;
+    @Min(value = 0, message = "Examination id can't be lass then 0")
+    private Integer examinationId;
 
+    /**
+     * Номер
+     */
+    @Schema(description = "serial number in controller")
+    @Min(value = 0, message = "Number can't be lass then 0")
+    private Integer number;
+
+    /**
+     * Идентификатор наименования канала контроллера биоинтерфейса {@link ChannelNameDTO#getId()}
+     */
     @Schema(description = "channel`s name ID")
-    private int channelNameId;
+    private Integer channelNameId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelDTO that = (ChannelDTO) o;
-        return number == that.number && examinationId == that.examinationId;
+        return Objects.equals(number, that.number) && Objects.equals(examinationId, that.examinationId);
     }
 
     @Override

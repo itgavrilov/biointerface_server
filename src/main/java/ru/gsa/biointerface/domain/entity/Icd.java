@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,36 +22,51 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Сущность заболевания по международной классификации болезней (ICD)
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "icd")
 @Table(name = "icd")
 public class Icd implements Serializable, Comparable<Icd> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор ICD
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
+    /**
+     * Наименование заболевания по ICD
+     */
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     @Column(name = "name", nullable = false, length = 35)
     private String name;
 
+    /**
+     * Версия ICD
+     */
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     @Column(name = "version", nullable = false)
-    private Integer version;
+    private int version;
 
+    /**
+     * Комментарий
+     */
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(length = 400)
     private String comment;
 
+    /**
+     * Список карточек пациентов с этим заболеванием {@link Set<Patient>}
+     */
     @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Patient> patients;
 

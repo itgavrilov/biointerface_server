@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,28 +12,36 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
-@Schema(name = "Icd", description = "ICD disease code")
+@Builder
+@Schema(name = "Device", description = "biointerface controller")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class IcdDTO implements Serializable, Comparable<IcdDTO> {
+public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     static final long SerialVersionUID = 1L;
 
-    @Schema(description = "ICD ID")
+    /**
+     * Идентификатор
+     */
+    @Schema(description = "Device ID")
+    @Min(value = 1, message = "Id can't be lass then 1")
     private Integer id;
 
-    @Schema(description = "ICD name")
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    private String name;
+    /**
+     * Количество каналов
+     */
+    @Schema(description = "device Amount channels")
+    @Min(value = 1, message = "Amount channels can't be lass then 1")
+    @Max(value = 8, message = "Amount channels can't be more than 8")
+    private Integer amountChannels;
 
-    @Schema(description = "ICD version")
-    @Min(value = 10, message = "Version can't be lass then 10")
-    @Max(value = 99, message = "Version can't be more than 99")
-    private Integer version;
-
-    @Schema(description = "ICD comment")
+    /**
+     * Комментарий
+     */
+    @Schema(description = "device comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 
@@ -41,8 +49,8 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IcdDTO icdDTO = (IcdDTO) o;
-        return id == icdDTO.id;
+        DeviceDTO deviceDTO = (DeviceDTO) o;
+        return Objects.equals(id, deviceDTO.id);
     }
 
     @Override
@@ -51,7 +59,7 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     }
 
     @Override
-    public int compareTo(IcdDTO o) {
+    public int compareTo(DeviceDTO o) {
         if (o == null || getClass() != o.getClass()) return -1;
         int result = 0;
 
@@ -66,10 +74,9 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
 
     @Override
     public String toString() {
-        return "Icd{" +
+        return "Device{" +
                 "id=" + id +
-                ", ICD='" + name + '\'' +
-                ", version=" + version +
+                ", amountChannels=" + amountChannels +
                 '}';
     }
 }

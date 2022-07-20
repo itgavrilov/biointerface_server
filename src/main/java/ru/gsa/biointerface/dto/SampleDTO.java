@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * DTO (Data Transfer Object) измерения
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
 @Builder
@@ -20,31 +22,44 @@ import java.util.Objects;
 public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Порядковый номер измерения
+     */
     @Schema(description = "sample serial number in examination")
-    @NotNull(message = "Id can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
-    private int id;
+    private Integer id;
 
+    /**
+     * Номер канала контроллера биоинтерфейса {@link ChannelDTO#getNumber()}
+     */
     @Schema(description = "channel serial number in controller")
     @NotNull(message = "ChannelNumber can't be null")
-    private int channelNumber;
+    @Min(value = 0, message = "Id can't be lass then 0")
+    private Integer channelNumber;
 
+    /**
+     * Номер канала контроллера биоинтерфейса {@link ChannelDTO#getExaminationId()}
+     */
     @Schema(description = "examination ID")
     @NotNull(message = "ExaminationId can't be null")
-    private int examinationId;
+    @Min(value = 0, message = "Id can't be lass then 0")
+    private Integer examinationId;
 
+    /**
+     * Значение
+     */
     @Schema(description = "sample value")
     @NotNull(message = "Value can't be null")
-    private int value;
+    private Integer value;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SampleDTO sampleDTO = (SampleDTO) o;
-        return id == sampleDTO.id
-                && channelNumber == sampleDTO.channelNumber
-                && examinationId == sampleDTO.examinationId;
+        return Objects.equals(id, sampleDTO.id)
+                && Objects.equals(channelNumber, sampleDTO.channelNumber)
+                && Objects.equals(examinationId, sampleDTO.examinationId);
     }
 
     @Override

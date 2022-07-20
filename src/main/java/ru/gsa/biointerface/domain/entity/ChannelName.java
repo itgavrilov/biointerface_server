@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,32 +21,44 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Сущность наименования канала контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "channel_name")
 @Table(name = "channel_name")
 public class ChannelName implements Serializable, Comparable<ChannelName> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
+    /**
+     * Наименование канала
+     */
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     @Column(length = 35, unique = true, nullable = false)
     private String name;
 
+    /**
+     * Комментарий
+     */
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(length = 400)
     private String comment;
 
+    /**
+     * Список каналов с этим наименованием {@link Set<Channel>}
+     */
     @NotNull(message = "Channels can't be null")
     @OneToMany(mappedBy = "channelName", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Channel> channels;

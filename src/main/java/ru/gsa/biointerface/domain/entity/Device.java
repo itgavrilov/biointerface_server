@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,31 +19,43 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Сущность контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "device")
 @Table(name = "device")
 public class Device implements Serializable, Comparable<Device> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор
+     */
     @Min(value = 1, message = "Id can't be lass then 1")
     @Id
-    private Integer id;
+    private int id;
 
+    /**
+     * Количество каналов
+     */
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
     @Column(name = "amount_channels", nullable = false)
-    private Integer amountChannels;
+    private int amountChannels;
 
+    /**
+     * Комментарий
+     */
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     @Column(length = 400)
     private String comment;
 
+    /**
+     * Список исследований {@link Set<Examination>}
+     */
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     private Set<Examination> examinations;
 

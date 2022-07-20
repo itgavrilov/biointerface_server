@@ -12,14 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import ru.gsa.biointerface.domain.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
+import org.springframework.web.bind.annotation.*;
 import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.dto.ChannelDTO;
+import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.service.SampleService;
 
 import java.util.List;
@@ -32,10 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Samples", description = "readings of biopotential measurement")
 @RestController
-@RequestMapping(
-        value = "/samples",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/samples", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SampleController {
 
     private static final String version = "0.0.1-SNAPSHOT";
@@ -48,14 +41,14 @@ public class SampleController {
                     content = @Content(array = @ArraySchema(
                             schema = @Schema(implementation = ChannelDTO.class)))),
             @ApiResponse(responseCode = "404", description = "Object not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-    })
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),})
     @GetMapping("/{examinationId}/{channelNumber}")
     public ResponseEntity<List<Integer>> getByChannel(@PathVariable int examinationId, @PathVariable int channelNumber) {
-        log.info("REST GET /samples/{}/{}", channelNumber, examinationId);
+        log.debug("REST GET /samples/{}/{}", channelNumber, examinationId);
         List<Integer> responses = service.findAllByExaminationIdAndChannelNumber(examinationId, channelNumber).stream()
                 .map(Sample::getValue)
                 .collect(Collectors.toList());
+        log.debug("End REST GET /samples/{}/{}", channelNumber, examinationId);
 
         return ResponseEntity.ok(responses);
     }
@@ -63,11 +56,13 @@ public class SampleController {
     @GetMapping(value = "/health")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void health() {
+        log.debug("REST GET /health");
     }
 
     @GetMapping(value = "/version")
     @ResponseStatus(HttpStatus.OK)
     public String version() {
+        log.debug("REST GET /version");
         return version;
     }
 }

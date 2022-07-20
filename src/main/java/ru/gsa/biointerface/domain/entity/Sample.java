@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,23 +20,29 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * Сущность измерения
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "sample")
 @Table(name = "sample")
 public class Sample implements Serializable, Comparable<Sample> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор {@link SampleID}
+     */
     @NotNull(message = "Id can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     @EmbeddedId
     private SampleID id;
 
+    /**
+     * Канал контроллера биоинтерфейса {@link Channel}
+     */
     @NotNull(message = "Channel can't be null")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinColumns({
@@ -48,6 +52,9 @@ public class Sample implements Serializable, Comparable<Sample> {
     @MapsId("channel_id")
     private Channel channel;
 
+    /**
+     * Значение
+     */
     @NotNull(message = "Value can't be null")
     @Column(nullable = false)
     private int value;

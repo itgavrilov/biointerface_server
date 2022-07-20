@@ -1,7 +1,5 @@
 package ru.gsa.biointerface.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,31 +20,43 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * Сущность канала контроллера биоинтерфейса
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "channel")
 @Table(name = "channel")
 public class Channel implements Serializable, Comparable<Channel> {
     static final long SerialVersionUID = 1L;
 
+    /**
+     * Идентификатор {@link ChannelID}
+     */
     @EmbeddedId
     ChannelID id;
 
+    /**
+     * Исследование {@link Examination}
+     */
     @NotNull(message = "Examination can't be null")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
-    @MapsId("examination_id")
+    @MapsId("examinationId")
     private Examination examination;
 
+    /**
+     * Наименование канала контроллера биоинтерфейса {@link ChannelName}
+     */
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "channel_name_id", referencedColumnName = "id")
     private ChannelName channelName;
 
+    /**
+     * Массив измерений {@link List<Sample>}
+     */
     @NotNull(message = "Samples can't be null")
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
