@@ -50,7 +50,7 @@ public class DeviceController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public ResponseEntity<List<DeviceDTO>> getAll() {
         log.debug("REST GET /devices");
         List<DeviceDTO> responses = service.findAll().stream()
