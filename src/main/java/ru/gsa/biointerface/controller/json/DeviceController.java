@@ -16,10 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.DeviceDTO;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.dto.DeviceDTO;
+import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.dto.IcdDTO;
 import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
 
@@ -50,7 +50,7 @@ public class DeviceController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping
+    @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DeviceDTO>> getAll() {
         log.debug("REST GET /devices");
         List<DeviceDTO> responses = service.findAll().stream()

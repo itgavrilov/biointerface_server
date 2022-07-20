@@ -16,9 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.dto.ChannelDTO;
+import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.mapper.ChannelMapper;
 import ru.gsa.biointerface.service.ChannelService;
 

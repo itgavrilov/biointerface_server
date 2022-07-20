@@ -13,9 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.gsa.biointerface.domain.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Sample;
+import ru.gsa.biointerface.dto.ChannelDTO;
+import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.service.SampleService;
 
 import java.util.List;

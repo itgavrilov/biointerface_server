@@ -17,9 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.dto.IcdDTO;
 import ru.gsa.biointerface.mapper.IcdMapper;
 import ru.gsa.biointerface.service.IcdService;
 
