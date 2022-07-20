@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.ChannelID;
+import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.TransactionException;
@@ -11,44 +13,54 @@ import ru.gsa.biointerface.repository.SampleRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Cервис для работы с измерениями
+ * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 03/11/2021
  */
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SampleService {
+
     private final SampleRepository repository;
-    private final ChannelService channelService;
 
     @PostConstruct
     private void init() {
-        log.info("SampleService is init");
+        log.debug("SampleService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        log.info("SampleService is destruction");
+        log.debug("SampleService is destruction");
     }
 
-    public List<Sample> findAllByExaminationIdAndChannelNumber(int examinationId, int channelNumber) {
-        Channel channel = channelService.findById(examinationId, channelNumber);
-
-        return findAllByChannel(channel);
-    }
-
-    public List<Sample> findAllByChannel(Channel channel) {
-        List<Sample> entities = repository.findAllByChannel(channel);
-
-        if (entities.size() > 0) {
-            log.info("Get all samples by channel from database");
-        } else {
-            log.info("Samples by channel is not found in database");
+    /**
+     * Получение массива измерений для канала исследования
+     *
+     * @param examinationId Идентификатор исследования {@link Examination#getId()}
+     * @param channelNumber Номер канала {@link ChannelID#getNumber()}
+     * @return Массива измерений {@link List<Sample>}
+     */
+    public List<Sample> findAllByExaminationIdAndChannelNumber(Integer examinationId, Integer channelNumber) {
+        if (examinationId == null || channelNumber == null) {
+            return new ArrayList<>();
         }
 
-        return entities;
+        return repository.findAllByExaminationIdAndChannelNumber(examinationId, channelNumber);
+    }
+
+    /**
+     * Получение массива измерений для канала исследования
+     *
+     * @param channel Канал исследования
+     * @return Массива измерений {@link List<Sample>}
+     */
+    public List<Sample> findAllByChannel(Channel channel) {
+        return repository.findAllByChannel(channel);
     }
 
     public void transactionOpen() throws Exception {
@@ -61,17 +73,14 @@ public class SampleService {
         log.info("Transaction has been closed");
     }
 
-    public boolean transactionIsOpen() {
-        return repository.transactionIsOpen();
-    }
-
     public void setSampleInChannel(Channel channel, int value) throws Exception {
         if (!transactionIsOpen()) {
             log.warn("Transaction is close");
             throw new TransactionException("Recording not started");
         }
-        if (channel == null)
+        if (channel == null) {
             throw new BadRequestException("Channel is null");
+        }
 
         List<Sample> samples = channel.getSamples();
         Sample sample =
@@ -82,5 +91,9 @@ public class SampleService {
                 );
         sample = repository.insert(sample);
         samples.add(samples.size(), sample);
+    }
+
+    public boolean transactionIsOpen() {
+        return repository.transactionIsOpen();
     }
 }

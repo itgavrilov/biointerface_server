@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * CRUD-сервис для работы с исследованиями
+ * Cервис для работы с исследованиями
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10.09.2021.
  */
