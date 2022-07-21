@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ChannelNameServiceTest {
+class ChannelNameServiceUnitTest {
 
     private final EasyRandom generator = new EasyRandom();
 
