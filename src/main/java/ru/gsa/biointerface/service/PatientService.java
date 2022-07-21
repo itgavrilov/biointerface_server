@@ -45,7 +45,7 @@ public class PatientService {
      * @param icdId Идентификатор заболивания(необязательный) {@link Icd#getId()}
      * @return Список карточек пациентов {@link List<Patient>}
      */
-    public List<Patient> getAll(Integer icdId) {
+    public List<Patient> findAll(Integer icdId) {
         return repository.findAllByIcd(icdId);
     }
 
@@ -56,7 +56,7 @@ public class PatientService {
      * @param pageable Пагинация {@link Pageable}
      * @return Список карточек пациентов с пагинацией {@link Page<Patient>}
      */
-    public Page<Patient> getAll(Integer icdId, Pageable pageable) {
+    public Page<Patient> findAll(Integer icdId, Pageable pageable) {
         return repository.findAllByIcd(icdId, pageable);
     }
 

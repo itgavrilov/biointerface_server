@@ -15,7 +15,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.dto.ErrorResponse;
@@ -53,7 +61,7 @@ public class PatientsController {
             @Parameter(description = "ICD ID")
             @RequestParam(value = "icdId", required = false) Integer icdId) {
         log.debug("REST POST /patients wish icdId = {}", icdId);
-        List<PatientDTO> responses = service.getAll(icdId).stream()
+        List<PatientDTO> responses = service.findAll(icdId).stream()
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
         log.debug("End REST POST /patients wish icdId = {}", icdId);
@@ -72,7 +80,7 @@ public class PatientsController {
             @RequestParam(value = "icdId", required = false) Integer icdId,
             Pageable pageable) {
         log.debug("REST POST /patients/pageable wish icdId = {}", icdId);
-        Page<PatientDTO> responses = service.getAll(icdId, pageable)
+        Page<PatientDTO> responses = service.findAll(icdId, pageable)
                 .map(mapper::toDTO);
         log.debug("End REST POST /patients/pageable wish icdId = {}", icdId);
 

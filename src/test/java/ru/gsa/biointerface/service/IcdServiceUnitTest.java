@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -132,5 +133,21 @@ class IcdServiceUnitTest {
 
     @Test
     void delete() {
+        Icd entity = generator.nextObject(Icd.class);
+        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
+
+        assertDoesNotThrow(() -> service.delete(entity.getId()));
+        verify(repository).getOrThrow(entity.getId());
+        verify(repository).delete(entity);
+    }
+
+    @Test
+    void delete_rnd() {
+        int rnd = generator.nextInt();
+        String message = String.format("Icd(id=%s) is not found", rnd);
+        when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
+
+        assertThrows(NotFoundException.class, () -> service.delete(rnd), message);
+        verify(repository).getOrThrow(rnd);
     }
 }

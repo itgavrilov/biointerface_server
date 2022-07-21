@@ -5,7 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
@@ -39,18 +49,18 @@ public class Patient implements Serializable, Comparable<Patient> {
     private Integer id;
 
     /**
-     * Фамилия
-     */
-    @NotBlank(message = "Second name can't be blank")
-    @Column(name = "second_name", nullable = false)
-    private String secondName;
-
-    /**
      * Имя
      */
     @NotBlank(message = "First name can't be blank")
     @Column(name = "first_name", nullable = false)
     private String firstName;
+
+    /**
+     * Фамилия
+     */
+    @NotBlank(message = "Second name can't be blank")
+    @Column(name = "second_name", nullable = false)
+    private String secondName;
 
     /**
      * Отчество
@@ -87,8 +97,8 @@ public class Patient implements Serializable, Comparable<Patient> {
     private List<Examination> examinations;
 
     public Patient(String secondName, String firstName, String patronymic, LocalDateTime birthday, Icd icd, String comment) {
-        this.secondName = secondName;
         this.firstName = firstName;
+        this.secondName = secondName;
         this.patronymic = patronymic;
         this.birthday = birthday;
         this.comment = comment;
