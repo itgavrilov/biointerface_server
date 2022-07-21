@@ -14,7 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.dto.DeviceDTO;
@@ -115,7 +122,7 @@ public class DeviceController {
     @PutMapping
     public ResponseEntity<DeviceDTO> save(@Valid @RequestBody DeviceDTO dto){
         log.info("REST PUT /devices wish params: {}", dto);
-        Device entity = service.save(dto);
+        Device entity = service.update(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/devices/{id}")
                 .buildAndExpand(entity.getId()).toUri();

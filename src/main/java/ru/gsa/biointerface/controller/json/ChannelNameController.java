@@ -15,7 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.dto.ChannelNameDTO;
@@ -114,7 +121,7 @@ public class ChannelNameController {
     @PutMapping
     public ResponseEntity<ChannelNameDTO> save(@Valid @RequestBody ChannelNameDTO dto) throws JsonProcessingException {
         log.info("REST PUT /channelNames wish params: {}", dto);
-        ChannelName entity = service.save(dto);
+        ChannelName entity = service.saveOrUpdate(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/channelNames/{id}")
                 .buildAndExpand(entity.getId()).toUri();

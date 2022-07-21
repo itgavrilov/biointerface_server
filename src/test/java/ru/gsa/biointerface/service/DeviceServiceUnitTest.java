@@ -17,7 +17,6 @@ import ru.gsa.biointerface.repository.DeviceRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -114,21 +113,30 @@ class DeviceServiceUnitTest {
     }
 
     @Test
-    void save() {
-        DeviceDTO dto = generator.nextObject(DeviceDTO.class);
-        Device entity = new Device(
-                dto.getId(),
-                dto.getAmountChannels(),
-                dto.getComment(),
-                new ArrayList<>());
-        when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
-        when(repository.save(entity)).thenReturn(entity);
+    void update() {
+        Device entity = generator.nextObject(Device.class);
+        DeviceDTO dto = DeviceDTO.builder()
+                .id(entity.getId())
+                .amountChannels(generator.nextInt())
+                .comment(generator.nextObject(String.class))
+                .build();
+        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
-        Device entityTest = service.save(dto);
+        Device entityTest = service.update(dto);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
-        verify(repository).findById(entity.getId());
-        verify(repository).save(entity);
+        verify(repository).getOrThrow(entity.getId());
+    }
+
+    @Test
+    void update_rnd() {
+        DeviceDTO dto = generator.nextObject(DeviceDTO.class);
+        int rnd = dto.getId();
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
+        when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
+
+        assertThrows(NotFoundException.class, () -> service.delete(rnd), message);
+        verify(repository).getOrThrow(rnd);
     }
 
     @Test

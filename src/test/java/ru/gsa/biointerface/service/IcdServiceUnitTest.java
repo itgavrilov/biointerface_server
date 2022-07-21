@@ -124,7 +124,7 @@ class IcdServiceUnitTest {
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(repository.save(entity)).thenReturn(entity);
 
-        Icd entityTest = service.save(dto);
+        Icd entityTest = service.saveOrUpdate(dto);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
         verify(repository).findById(entity.getId());

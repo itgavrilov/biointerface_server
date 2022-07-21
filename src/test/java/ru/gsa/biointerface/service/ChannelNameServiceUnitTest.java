@@ -123,7 +123,7 @@ class ChannelNameServiceUnitTest {
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(repository.save(entity)).thenReturn(entity);
 
-        ChannelName entityTest = service.save(dto);
+        ChannelName entityTest = service.saveOrUpdate(dto);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
         verify(repository).findById(entity.getId());

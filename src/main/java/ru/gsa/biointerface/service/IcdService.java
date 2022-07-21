@@ -12,7 +12,6 @@ import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,8 +72,7 @@ public class IcdService {
      * @param dto DTO заболивания {@link IcdDTO}
      * @return Заболивание {@link Icd}
      */
-    @Transactional
-    public Icd save(IcdDTO dto) {
+    public Icd saveOrUpdate(IcdDTO dto) {
         Optional<Icd> optional = repository.findById(dto.getId());
         Icd entity;
 
@@ -99,7 +97,6 @@ public class IcdService {
      * @param id Идентификатор {@link Icd#getId()}
      * @throws NotFoundException если заболивание с id не найдено
      */
-    @Transactional
     public void delete(Integer id) {
         Icd entity = repository.getOrThrow(id);
         repository.delete(entity);

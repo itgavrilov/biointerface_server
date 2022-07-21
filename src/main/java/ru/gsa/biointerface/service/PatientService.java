@@ -13,7 +13,6 @@ import ru.gsa.biointerface.repository.PatientRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,8 +76,7 @@ public class PatientService {
      * @param dto DTO карточки пациента {@link PatientDTO}
      * @return Карточка пациента {@link Patient}
      */
-    @Transactional
-    public Patient save(PatientDTO dto) {
+    public Patient saveOrUpdate(PatientDTO dto) {
         Optional<Patient> optional = repository.findById(dto.getId());
         Icd icd = icdService.getById(dto.getIcdId());
         Patient entity;
@@ -113,7 +111,6 @@ public class PatientService {
      * @param id Идентификатор {@link Patient#getId()}
      * @throws NotFoundException если карточки пациента с id не найдено
      */
-    @Transactional
     public void delete(Integer id) {
         Patient entity = repository.getOrThrow(id);
         repository.delete(entity);

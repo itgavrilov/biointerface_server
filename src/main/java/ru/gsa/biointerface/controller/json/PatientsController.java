@@ -123,7 +123,7 @@ public class PatientsController {
     @PutMapping
     public ResponseEntity<PatientDTO> save(@Valid @RequestBody PatientDTO dto) {
         log.info("REST PUT /patients wish params: {}", dto);
-        Patient entity = service.save(dto);
+        Patient entity = service.saveOrUpdate(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/patients/{id}")
                 .buildAndExpand(entity.getId()).toUri();

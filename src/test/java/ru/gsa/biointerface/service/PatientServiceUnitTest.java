@@ -169,7 +169,7 @@ class PatientServiceUnitTest {
         when(repository.save(entity)).thenReturn(entity);
         when(icdService.getById(icd.getId())).thenReturn(icd);
 
-        Patient entityTest = service.save(dto);
+        Patient entityTest = service.saveOrUpdate(dto);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
         verify(repository).findById(entity.getId());
