@@ -1,10 +1,12 @@
 package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.dto.IcdDTO;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class IcdMapperUnitTest {
 
@@ -17,9 +19,14 @@ class IcdMapperUnitTest {
 
         IcdDTO dto = mapper.toDTO(entity);
 
-        Assertions.assertEquals(entity.getId(), dto.getId());
-        Assertions.assertEquals(entity.getName(), dto.getName());
-        Assertions.assertEquals(entity.getVersion(), dto.getVersion());
-        Assertions.assertEquals(entity.getComment(), dto.getComment());
+        assertNotNull(dto);
+        assertNotNull(dto.getId());
+        assertEquals(entity.getId(), dto.getId());
+        assertNotNull(dto.getName());
+        assertEquals(entity.getName(), dto.getName());
+        assertNotNull(dto.getVersion());
+        assertEquals(entity.getVersion(), dto.getVersion());
+        assertNotNull(dto.getComment());
+        assertEquals(entity.getComment(), dto.getComment());
     }
 }

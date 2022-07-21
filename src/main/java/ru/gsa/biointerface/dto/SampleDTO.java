@@ -25,14 +25,13 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     /**
      * Порядковый номер измерения
      */
-    @Schema(description = "sample serial number in examination")
-    @Min(value = 0, message = "Id can't be lass then 0")
-    private Integer id;
+    @Schema(description = "sample serial number in examination", required = true)
+    private Integer number;
 
     /**
      * Номер канала контроллера биоинтерфейса {@link ChannelDTO#getNumber()}
      */
-    @Schema(description = "channel serial number in controller")
+    @Schema(description = "channel serial number in controller", required = true)
     @NotNull(message = "ChannelNumber can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     private Integer channelNumber;
@@ -40,7 +39,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     /**
      * Номер канала контроллера биоинтерфейса {@link ChannelDTO#getExaminationId()}
      */
-    @Schema(description = "examination ID")
+    @Schema(description = "examination ID", required = true)
     @NotNull(message = "ExaminationId can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
     private Integer examinationId;
@@ -48,7 +47,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     /**
      * Значение
      */
-    @Schema(description = "sample value")
+    @Schema(description = "sample value", required = true)
     @NotNull(message = "Value can't be null")
     private Integer value;
 
@@ -57,14 +56,14 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SampleDTO sampleDTO = (SampleDTO) o;
-        return Objects.equals(id, sampleDTO.id)
+        return Objects.equals(number, sampleDTO.number)
                 && Objects.equals(channelNumber, sampleDTO.channelNumber)
                 && Objects.equals(examinationId, sampleDTO.examinationId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, channelNumber, examinationId);
+        return Objects.hash(number, channelNumber, examinationId);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
             result = channelNumber - o.channelNumber;
 
         if (result == 0)
-            result = id = o.id;
+            result = number = o.number;
 
         return result;
     }
@@ -84,7 +83,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     @Override
     public String toString() {
         return "SampleDTO{" +
-                "id=" + id +
+                "id=" + number +
                 ", channel_number=" + channelNumber +
                 ", examination_id=" + examinationId +
                 ", value=" + value +

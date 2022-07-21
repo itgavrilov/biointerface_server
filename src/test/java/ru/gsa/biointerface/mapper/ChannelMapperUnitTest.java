@@ -1,10 +1,12 @@
 package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.dto.ChannelDTO;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ChannelMapperUnitTest {
 
@@ -17,8 +19,12 @@ class ChannelMapperUnitTest {
 
         ChannelDTO dto = mapper.toDTO(entity);
 
-        Assertions.assertEquals(entity.getId().getNumber(), dto.getNumber());
-        Assertions.assertEquals(entity.getId().getExaminationId(), dto.getExaminationId());
-        Assertions.assertEquals(entity.getChannelName().getId(), dto.getChannelNameId());
+        assertNotNull(dto);
+        assertNotNull(dto.getNumber());
+        assertEquals(entity.getId().getNumber(), dto.getNumber());
+        assertNotNull(dto.getExaminationId());
+        assertEquals(entity.getId().getExaminationId(), dto.getExaminationId());
+        assertNotNull(dto.getChannelNameId());
+        assertEquals(entity.getChannelName().getId(), dto.getChannelNameId());
     }
 }

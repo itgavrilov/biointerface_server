@@ -1,10 +1,12 @@
 package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.dto.PatientDTO;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PatientMapperUnitTest {
 
@@ -17,12 +19,20 @@ class PatientMapperUnitTest {
 
         PatientDTO dto = mapper.toDTO(entity);
 
-        Assertions.assertEquals(entity.getId(), dto.getId());
-        Assertions.assertEquals(entity.getFirstName(), dto.getFirstName());
-        Assertions.assertEquals(entity.getSecondName(), dto.getSecondName());
-        Assertions.assertEquals(entity.getPatronymic(), dto.getPatronymic());
-        Assertions.assertEquals(entity.getBirthday(), dto.getBirthday());
-        Assertions.assertEquals(entity.getIcd().getId(), dto.getIcdId());
-        Assertions.assertEquals(entity.getComment(), dto.getComment());
+        assertNotNull(dto);
+        assertNotNull(dto.getId());
+        assertEquals(entity.getId(), dto.getId());
+        assertNotNull(dto.getFirstName());
+        assertEquals(entity.getFirstName(), dto.getFirstName());
+        assertNotNull(dto.getSecondName());
+        assertEquals(entity.getSecondName(), dto.getSecondName());
+        assertNotNull(dto.getPatronymic());
+        assertEquals(entity.getPatronymic(), dto.getPatronymic());
+        assertNotNull(dto.getBirthday());
+        assertEquals(entity.getBirthday(), dto.getBirthday());
+        assertNotNull(dto.getIcdId());
+        assertEquals(entity.getIcd().getId(), dto.getIcdId());
+        assertNotNull(dto.getComment());
+        assertEquals(entity.getComment(), dto.getComment());
     }
 }

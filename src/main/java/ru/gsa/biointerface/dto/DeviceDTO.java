@@ -27,13 +27,12 @@ public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
      * Идентификатор
      */
     @Schema(description = "Device ID")
-    @Min(value = 1, message = "Id can't be lass then 1")
     private Integer id;
 
     /**
      * Количество каналов
      */
-    @Schema(description = "device Amount channels")
+    @Schema(description = "device Amount channels", required = true)
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
     private Integer amountChannels;

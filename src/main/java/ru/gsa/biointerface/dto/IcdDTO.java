@@ -32,14 +32,14 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     /**
      * Наименование заболевания по ICD
      */
-    @Schema(description = "Name")
+    @Schema(description = "Name", required = true)
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
 
     /**
      * Версия ICD
      */
-    @Schema(description = "Version")
+    @Schema(description = "Version", required = true)
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     private Integer version;
@@ -56,7 +56,7 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IcdDTO icdDTO = (IcdDTO) o;
-        return id == icdDTO.id;
+        return Objects.equals(id, icdDTO.id);
     }
 
     @Override

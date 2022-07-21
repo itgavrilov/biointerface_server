@@ -31,7 +31,7 @@ public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> 
     /**
      * Наименование канала
      */
-    @Schema(description = "Name")
+    @Schema(description = "Name", required = true)
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;

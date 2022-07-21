@@ -24,14 +24,14 @@ public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
     /**
      * Идентификатор исследования {@link ExaminationDTO#getId()}
      */
-    @Schema(description = "examination`s ID")
+    @Schema(description = "examination`s ID", required = true)
     @Min(value = 0, message = "Examination id can't be lass then 0")
     private Integer examinationId;
 
     /**
      * Номер
      */
-    @Schema(description = "serial number in controller")
+    @Schema(description = "serial number in controller", required = true)
     @Min(value = 0, message = "Number can't be lass then 0")
     private Integer number;
 

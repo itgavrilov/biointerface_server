@@ -34,21 +34,21 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
     /**
      * Время начала исследования {@link LocalDateTime}
      */
-    @Schema(description = "examination start time")
+    @Schema(description = "examination start time", required = true)
     @Past(message = "Start time should be in past")
     private LocalDateTime starttime;
 
     /**
      * Идентификатор карточки пациента {@link PatientDTO#getId()}
      */
-    @Schema(description = "patient ID")
+    @Schema(description = "patient ID", required = true)
     @NotNull(message = "PatientId can't be null")
     private Integer patientId;
 
     /**
      * Идентификатор контроллера биоинтерфейса {@link DeviceDTO#getId()}
      */
-    @Schema(description = "device ID")
+    @Schema(description = "device ID", required = true)
     @NotNull(message = "DeviceId can't be null")
     private Integer deviceId;
 

@@ -1,10 +1,12 @@
 package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.dto.DeviceDTO;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DeviceMapperUnitTest {
 
@@ -17,8 +19,12 @@ class DeviceMapperUnitTest {
 
         DeviceDTO dto = mapper.toDTO(entity);
 
-        Assertions.assertEquals(entity.getId(), dto.getId());
-        Assertions.assertEquals(entity.getAmountChannels(), dto.getAmountChannels());
-        Assertions.assertEquals(entity.getComment(), dto.getComment());
+        assertNotNull(dto);
+        assertNotNull(dto.getId());
+        assertEquals(entity.getId(), dto.getId());
+        assertNotNull(dto.getAmountChannels());
+        assertEquals(entity.getAmountChannels(), dto.getAmountChannels());
+        assertNotNull(dto.getComment());
+        assertEquals(entity.getComment(), dto.getComment());
     }
 }
