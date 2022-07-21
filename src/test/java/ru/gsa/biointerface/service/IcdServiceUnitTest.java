@@ -43,9 +43,9 @@ class IcdServiceUnitTest {
         List<Icd> entities = generator.objects(Icd.class, 5).toList();
         when(repository.findAll()).thenReturn(entities);
 
-        List<Icd> entityTests2 = service.findAll();
-        assertNotNull(entityTests2);
-        assertIterableEquals(entities, entityTests2);
+        List<Icd> entityTests = service.findAll();
+        assertNotNull(entityTests);
+        assertIterableEquals(entities, entityTests);
         verify(repository).findAll();
     }
 
@@ -53,9 +53,9 @@ class IcdServiceUnitTest {
     void findAll_empty() {
         when(repository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Icd> entityTests1 = service.findAll();
-        assertNotNull(entityTests1);
-        assertIterableEquals(new ArrayList<>(), entityTests1);
+        List<Icd> entityTests = service.findAll();
+        assertNotNull(entityTests);
+        assertIterableEquals(new ArrayList<>(), entityTests);
         verify(repository).findAll();
     }
 
@@ -68,12 +68,12 @@ class IcdServiceUnitTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Icd> pageList = entities.subList(start, end);
-            Page<Icd> entityPage2 = new PageImpl<>(pageList, pageable, pageList.size());
-            when(repository.findAll(pageable)).thenReturn(entityPage2);
+            Page<Icd> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            when(repository.findAll(pageable)).thenReturn(entityPage);
 
-            Page<Icd> entityPageTests2 = service.findAll(pageable);
-            assertNotNull(entityPageTests2);
-            assertIterableEquals(entityPage2, entityPageTests2);
+            Page<Icd> entityPageTests = service.findAll(pageable);
+            assertNotNull(entityPageTests);
+            assertIterableEquals(entityPage, entityPageTests);
             verify(repository).findAll(pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -82,12 +82,12 @@ class IcdServiceUnitTest {
     @Test
     void findAllPageable_empty() {
         Pageable pageable = PageRequest.of(0, 5);
-        Page<Icd> entityPage1 = new PageImpl<>(new ArrayList<>(), pageable, 0);
-        when(repository.findAll(pageable)).thenReturn(entityPage1);
+        Page<Icd> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
+        when(repository.findAll(pageable)).thenReturn(entityPage);
 
         Page<Icd> entityPageTests1 = service.findAll(pageable);
         assertNotNull(entityPageTests1);
-        assertEquals(entityPage1, entityPageTests1);
+        assertEquals(entityPage, entityPageTests1);
         verify(repository).findAll(pageable);
     }
 
@@ -105,7 +105,7 @@ class IcdServiceUnitTest {
     @Test
     void getById_rnd() {
         int rnd = generator.nextInt();
-        String message = String.format("Icd(id=%s) is not found", rnd);
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 
         assertThrows(NotFoundException.class, () -> service.getById(rnd), message);
@@ -144,7 +144,7 @@ class IcdServiceUnitTest {
     @Test
     void delete_rnd() {
         int rnd = generator.nextInt();
-        String message = String.format("Icd(id=%s) is not found", rnd);
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 
         assertThrows(NotFoundException.class, () -> service.delete(rnd), message);

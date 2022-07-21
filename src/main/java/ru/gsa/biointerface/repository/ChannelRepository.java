@@ -19,6 +19,8 @@ import java.util.Optional;
 @Repository
 public interface ChannelRepository extends JpaRepository<Channel, ChannelID> {
 
+    String MASK_NOT_FOUND = "Channel(id=%s) is not found";
+
     default Optional<Channel> getByNumberAndExaminationId(Integer examinationId, Integer number) {
         ChannelID id = new ChannelID(number, examinationId);
 
@@ -32,7 +34,7 @@ public interface ChannelRepository extends JpaRepository<Channel, ChannelID> {
 
     default Channel getOrThrow(ChannelID id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Channel(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 
     @Query(nativeQuery = true,

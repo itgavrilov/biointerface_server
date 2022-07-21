@@ -17,9 +17,11 @@ import java.util.List;
 @Repository
 public interface ExaminationRepository extends JpaRepository<Examination, Integer> {
 
+    String MASK_NOT_FOUND = "Examination(id=%s) is not found";
+
     default Examination getOrThrow(Integer id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Examination(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 
     @Query(nativeQuery = true,

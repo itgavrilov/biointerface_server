@@ -12,8 +12,10 @@ import ru.gsa.biointerface.exception.NotFoundException;
 @Repository
 public interface DeviceRepository extends JpaRepository<Device, Integer> {
 
+    String MASK_NOT_FOUND = "Device(id=%s) is not found";
+
     default Device getOrThrow(Integer id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Device(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 }

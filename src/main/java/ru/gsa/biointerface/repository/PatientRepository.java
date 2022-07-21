@@ -18,9 +18,11 @@ import java.util.List;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
+    String MASK_NOT_FOUND = "Patient(id=%s) is not found";
+
     default Patient getOrThrow(Integer id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Patient(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 
     @Query(nativeQuery = true,

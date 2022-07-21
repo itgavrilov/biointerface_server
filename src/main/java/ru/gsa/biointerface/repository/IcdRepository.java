@@ -11,8 +11,10 @@ import ru.gsa.biointerface.exception.NotFoundException;
 @Repository
 public interface IcdRepository extends JpaRepository<Icd, Integer> {
 
+    String MASK_NOT_FOUND = "Icd(id=%s) is not found";
+
     default Icd getOrThrow(Integer id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Icd(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 }

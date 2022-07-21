@@ -11,8 +11,10 @@ import ru.gsa.biointerface.exception.NotFoundException;
 @Repository
 public interface ChannelNameRepository extends JpaRepository<ChannelName, Integer> {
 
+    String MASK_NOT_FOUND = "ChannelName(id=%s) is not found";
+
     default ChannelName getOrThrow(Integer id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "ChannelName(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 }

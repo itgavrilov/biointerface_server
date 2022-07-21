@@ -43,9 +43,9 @@ class ChannelNameServiceUnitTest {
         List<ChannelName> entities = generator.objects(ChannelName.class, 5).toList();
         when(repository.findAll()).thenReturn(entities);
 
-        List<ChannelName> entityTests2 = service.findAll();
-        assertNotNull(entityTests2);
-        assertIterableEquals(entities, entityTests2);
+        List<ChannelName> entityTests = service.findAll();
+        assertNotNull(entityTests);
+        assertIterableEquals(entities, entityTests);
         verify(repository).findAll();
     }
 
@@ -53,9 +53,9 @@ class ChannelNameServiceUnitTest {
     void findAll_empty() {
         when(repository.findAll()).thenReturn(new ArrayList<>());
 
-        List<ChannelName> entityTests1 = service.findAll();
-        assertNotNull(entityTests1);
-        assertIterableEquals(new ArrayList<>(), entityTests1);
+        List<ChannelName> entityTests = service.findAll();
+        assertNotNull(entityTests);
+        assertIterableEquals(new ArrayList<>(), entityTests);
         verify(repository).findAll();
     }
 
@@ -68,12 +68,12 @@ class ChannelNameServiceUnitTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<ChannelName> pageList = entities.subList(start, end);
-            Page<ChannelName> entityPage2 = new PageImpl<>(pageList, pageable, pageList.size());
-            when(repository.findAll(pageable)).thenReturn(entityPage2);
+            Page<ChannelName> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            when(repository.findAll(pageable)).thenReturn(entityPage);
 
             Page<ChannelName> entityPageTests2 = service.findAll(pageable);
             assertNotNull(entityPageTests2);
-            assertIterableEquals(entityPage2, entityPageTests2);
+            assertIterableEquals(entityPage, entityPageTests2);
             verify(repository).findAll(pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -82,12 +82,12 @@ class ChannelNameServiceUnitTest {
     @Test
     void findAllPageable_empty() {
         Pageable pageable = PageRequest.of(0, 5);
-        Page<ChannelName> entityPage1 = new PageImpl<>(new ArrayList<>(), pageable, 0);
-        when(repository.findAll(pageable)).thenReturn(entityPage1);
+        Page<ChannelName> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
+        when(repository.findAll(pageable)).thenReturn(entityPage);
 
-        Page<ChannelName> entityPageTests1 = service.findAll(pageable);
-        assertNotNull(entityPageTests1);
-        assertEquals(entityPage1, entityPageTests1);
+        Page<ChannelName> entityPageTests = service.findAll(pageable);
+        assertNotNull(entityPageTests);
+        assertEquals(entityPage, entityPageTests);
         verify(repository).findAll(pageable);
     }
 
@@ -105,7 +105,7 @@ class ChannelNameServiceUnitTest {
     @Test
     void getById_rnd() {
         int rnd = generator.nextInt();
-        String message = String.format("ChannelName(id=%s) is not found", rnd);
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 
         assertThrows(NotFoundException.class, () -> service.getById(rnd), message);
@@ -143,7 +143,7 @@ class ChannelNameServiceUnitTest {
     @Test
     void delete_rnd() {
         int rnd = generator.nextInt();
-        String message = String.format("ChannelName(id=%s) is not found", rnd);
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 
         assertThrows(NotFoundException.class, () -> service.delete(rnd), message);

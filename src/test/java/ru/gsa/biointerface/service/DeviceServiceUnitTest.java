@@ -43,9 +43,9 @@ class DeviceServiceUnitTest {
         List<Device> entities = generator.objects(Device.class, 5).toList();
         when(repository.findAll()).thenReturn(entities);
 
-        List<Device> entityTests2 = service.findAll();
-        assertNotNull(entityTests2);
-        assertIterableEquals(entities, entityTests2);
+        List<Device> entityTests = service.findAll();
+        assertNotNull(entityTests);
+        assertIterableEquals(entities, entityTests);
         verify(repository).findAll();
     }
 
@@ -53,9 +53,9 @@ class DeviceServiceUnitTest {
     void findAll_empty() {
         when(repository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Device> entityTests1 = service.findAll();
-        assertNotNull(entityTests1);
-        assertIterableEquals(new ArrayList<>(), entityTests1);
+        List<Device> entityTests = service.findAll();
+        assertNotNull(entityTests);
+        assertIterableEquals(new ArrayList<>(), entityTests);
         verify(repository).findAll();
     }
 
@@ -68,12 +68,12 @@ class DeviceServiceUnitTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Device> pageList = entities.subList(start, end);
-            Page<Device> entityPage2 = new PageImpl<>(pageList, pageable, pageList.size());
-            when(repository.findAll(pageable)).thenReturn(entityPage2);
+            Page<Device> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            when(repository.findAll(pageable)).thenReturn(entityPage);
 
-            Page<Device> entityPageTests2 = service.findAll(pageable);
-            assertNotNull(entityPageTests2);
-            assertIterableEquals(entityPage2, entityPageTests2);
+            Page<Device> entityPageTests = service.findAll(pageable);
+            assertNotNull(entityPageTests);
+            assertIterableEquals(entityPage, entityPageTests);
             verify(repository).findAll(pageable);
 
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
@@ -83,12 +83,12 @@ class DeviceServiceUnitTest {
     @Test
     void findAllPageable_empty() {
         Pageable pageable = PageRequest.of(0, 5);
-        Page<Device> entityPage1 = new PageImpl<>(new ArrayList<>(), pageable, 0);
-        when(repository.findAll(pageable)).thenReturn(entityPage1);
+        Page<Device> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
+        when(repository.findAll(pageable)).thenReturn(entityPage);
 
         Page<Device> entityPageTests1 = service.findAll(pageable);
         assertNotNull(entityPageTests1);
-        assertEquals(entityPage1, entityPageTests1);
+        assertEquals(entityPage, entityPageTests1);
         verify(repository).findAll(pageable);
     }
 
@@ -106,7 +106,7 @@ class DeviceServiceUnitTest {
     @Test
     void getById_rnd() {
         int rndId = generator.nextInt();
-        String message = String.format("Device(id=%s) is not found", rndId);
+        String message = String.format(repository.MASK_NOT_FOUND, rndId);
         when(repository.getOrThrow(rndId)).thenThrow(new NotFoundException(message));
 
         assertThrows(NotFoundException.class, () -> service.getById(rndId), message);
@@ -155,7 +155,7 @@ class DeviceServiceUnitTest {
     @Test
     void delete_rnd() {
         int rnd = generator.nextInt();
-        String message = String.format("Device(id=%s) is not found", rnd);
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 
         assertThrows(NotFoundException.class, () -> service.delete(rnd), message);
