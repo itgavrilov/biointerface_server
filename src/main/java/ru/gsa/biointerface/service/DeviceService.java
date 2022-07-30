@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с контроллерами биоинтерфейсов
@@ -63,7 +64,7 @@ public class DeviceService {
      * @return Контроллер биоинтерфейса {@link Device}
      * @throws NotFoundException если устройстройсвто с id не найдено
      */
-    public Device getById(Integer id) {
+    public Device getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -104,7 +105,7 @@ public class DeviceService {
      * @param id Идентификатор {@link Device#getId()}
      * @throws NotFoundException если устройстройсвто с id не найдено
      */
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Device entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("Device(id={}) is deleted", id);

@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Cервис для работы с измерениями
@@ -45,7 +46,7 @@ public class SampleService {
      * @param channelNumber Номер канала {@link ChannelID#getNumber()}
      * @return Массива измерений {@link List<Sample>}
      */
-    public List<Sample> findAllByExaminationIdAndChannelNumber(Integer examinationId, Integer channelNumber) {
+    public List<Sample> findAllByExaminationIdAndChannelNumber(UUID examinationId, Byte channelNumber) {
         if (examinationId == null || channelNumber == null) {
             return new ArrayList<>();
         }

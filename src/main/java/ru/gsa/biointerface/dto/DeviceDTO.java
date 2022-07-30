@@ -7,9 +7,11 @@ import lombok.Data;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) контроллера биоинтерфейса
@@ -20,14 +22,20 @@ import java.util.Objects;
 @Builder
 @Schema(name = "Device", description = "biointerface controller")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
+public class DeviceDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Schema(description = "Device ID")
-    private Integer id;
+    private UUID id;
+
+    /**
+     * Серийный номер
+     */
+    @NotBlank(message = "Number can't be blank")
+    private String number;
 
     /**
      * Количество каналов
@@ -48,8 +56,9 @@ public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DeviceDTO deviceDTO = (DeviceDTO) o;
-        return Objects.equals(id, deviceDTO.id);
+        DeviceDTO that = (DeviceDTO) o;
+
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -58,17 +67,11 @@ public class DeviceDTO implements Serializable, Comparable<DeviceDTO> {
     }
 
     @Override
-    public int compareTo(DeviceDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        DeviceDTO that = (DeviceDTO) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return number.compareTo(that.comment);
     }
 
     @Override

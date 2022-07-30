@@ -7,13 +7,13 @@ public class ConfigPacket extends AbstractPacket {
         super(PacketType.CONFIG, msg);
     }
 
-    public int getSerialNumber() {
+    public String getSerialNumber() {
         byte[] serialNumber = new byte[]{0, 0, msg[1], msg[0]};
 
-        return ByteBuffer.wrap(serialNumber).getInt();
+        return String.valueOf(ByteBuffer.wrap(serialNumber).getInt());
     }
 
-    public int getAmountChannels() {
+    public byte getAmountChannels() {
         return msg[2];
     }
 }

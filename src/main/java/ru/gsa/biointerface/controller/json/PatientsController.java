@@ -34,6 +34,7 @@ import ru.gsa.biointerface.service.PatientService;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -58,8 +59,8 @@ public class PatientsController {
                             array = @ArraySchema(schema = @Schema(implementation = PatientDTO.class))))})
     @GetMapping
     public ResponseEntity<List<PatientDTO>> getAll(
-            @Parameter(description = "ICD ID")
-            @RequestParam(value = "icdId", required = false) Integer icdId) {
+            @Parameter(description = "ICD's ID")
+            @RequestParam(value = "icdId", required = false) UUID icdId) {
         log.debug("REST POST /patients wish icdId = {}", icdId);
         List<PatientDTO> responses = service.findAll(icdId).stream()
                 .map(mapper::toDTO)
@@ -76,8 +77,8 @@ public class PatientsController {
                             array = @ArraySchema(schema = @Schema(implementation = PatientDTO.class))))})
     @GetMapping("/pageable")
     public ResponseEntity<Page<PatientDTO>> getAll(
-            @Parameter(description = "ICD ID")
-            @RequestParam(value = "icdId", required = false) Integer icdId,
+            @Parameter(description = "ICD's ID")
+            @RequestParam(value = "icdId", required = false) UUID icdId,
             Pageable pageable) {
         log.debug("REST POST /patients/pageable wish icdId = {}", icdId);
         Page<PatientDTO> responses = service.findAll(icdId, pageable)
@@ -94,7 +95,9 @@ public class PatientsController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/{id}")
-    public ResponseEntity<PatientDTO> getById(@PathVariable int id) {
+    public ResponseEntity<PatientDTO> getById(
+            @Parameter(description = "Patient's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /patients/{}", id);
         PatientDTO response = mapper.toDTO(service.getById(id));
         log.debug("End REST GET /patients/{}", id);
@@ -104,7 +107,9 @@ public class PatientsController {
 
     @Operation(summary = "delete patient record by ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Patient's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /patients/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /patients/{}", id);
@@ -121,7 +126,9 @@ public class PatientsController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<PatientDTO> save(@Valid @RequestBody PatientDTO dto) {
+    public ResponseEntity<PatientDTO> save(
+            @Parameter(description = "Patient's DTO", required = true)
+            @Valid @RequestBody PatientDTO dto) {
         log.info("REST PUT /patients wish params: {}", dto);
         Patient entity = service.saveOrUpdate(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()

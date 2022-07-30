@@ -29,7 +29,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity(name = "sample")
 @Table(name = "sample")
-public class Sample implements Serializable, Comparable<Sample> {
+public class Sample implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
@@ -80,8 +80,11 @@ public class Sample implements Serializable, Comparable<Sample> {
     }
 
     @Override
-    public int compareTo(Sample o) {
-        return id.compareTo(o.id);
+    public int compareTo(Object o) {
+        if (o == null || getClass() != o.getClass()) return -1;
+        Sample that = (Sample) o;
+
+        return id.compareTo(that.id);
     }
 
     @Override

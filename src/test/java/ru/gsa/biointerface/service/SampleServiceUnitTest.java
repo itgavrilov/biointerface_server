@@ -12,6 +12,7 @@ import ru.gsa.biointerface.repository.SampleRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,8 +35,8 @@ class SampleServiceUnitTest {
         Channel channel = generator.nextObject(Channel.class);
         List<Sample> entities = generator.objects(Sample.class, 5).toList();
         entities.forEach(e -> e.setChannel(channel));
-        int examinationId = channel.getId().getExaminationId();
-        int number = channel.getId().getNumber();
+        UUID examinationId = channel.getId().getExaminationId();
+        byte number = channel.getId().getNumber();
         when(repository.findAllByExaminationIdAndChannelNumber(examinationId, number)).thenReturn(entities);
 
         List<Sample> entityTests = service.findAllByExaminationIdAndChannelNumber(examinationId, number);
@@ -46,8 +47,8 @@ class SampleServiceUnitTest {
 
     @Test
     void findAllByExaminationIdAndChannelNumber_rnd() {
-        int examinationId = generator.nextInt();
-        int number = generator.nextInt();
+        UUID examinationId = UUID.randomUUID();
+        byte number = (byte) generator.nextInt();
         when(repository.findAllByExaminationIdAndChannelNumber(examinationId, number)).thenReturn(new ArrayList<>());
 
         List<Sample> entityTests = service.findAllByExaminationIdAndChannelNumber(examinationId, number);

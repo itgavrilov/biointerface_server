@@ -33,8 +33,8 @@ class ExaminationMapperUnitTest {
         assertEquals(entity.getDevice().getId(), dto.getDeviceId());
         assertNotNull(dto.getPatientId());
         assertEquals(entity.getPatient().getId(), dto.getPatientId());
-        assertNotNull(dto.getStarttime());
-        assertEquals(entity.getStarttime(), dto.getStarttime());
+        assertNotNull(dto.getDatetime());
+        assertEquals(entity.getDatetime(), dto.getDatetime());
         assertNotNull(dto.getComment());
         assertEquals(entity.getComment(), dto.getComment());
     }

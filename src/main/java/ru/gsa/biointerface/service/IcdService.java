@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с заболеваниями по международной классификации болезней (ICD)
@@ -62,7 +63,7 @@ public class IcdService {
      * @return Заболивание {@link Icd}
      * @throws NotFoundException если заболивание с id не найдено
      */
-    public Icd getById(Integer id) {
+    public Icd getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -97,7 +98,7 @@ public class IcdService {
      * @param id Идентификатор {@link Icd#getId()}
      * @throws NotFoundException если заболивание с id не найдено
      */
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Icd entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("Icd(id={}) is deleted", id);

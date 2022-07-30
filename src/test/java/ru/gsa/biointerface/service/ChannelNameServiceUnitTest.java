@@ -18,6 +18,7 @@ import ru.gsa.biointerface.repository.ChannelNameRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -104,7 +105,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void getById_rnd() {
-        int rnd = generator.nextInt();
+        UUID rnd = UUID.randomUUID();
         String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 
@@ -142,7 +143,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void delete_rnd() {
-        int rnd = generator.nextInt();
+        UUID rnd = UUID.randomUUID();
         String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
 

@@ -20,7 +20,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @Embeddable
-public class SampleID implements Serializable, Comparable<SampleID> {
+public class SampleID implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
@@ -28,7 +28,7 @@ public class SampleID implements Serializable, Comparable<SampleID> {
      */
     @Min(value = 0, message = "Number can't be lass then 0")
     @Column(name = "number")
-    private int number;
+    private long number;
 
     /**
      * Идентификатор канала контроллера биоинтерфейса {@link ChannelID}
@@ -45,8 +45,9 @@ public class SampleID implements Serializable, Comparable<SampleID> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SampleID sampleID = (SampleID) o;
-        return number == sampleID.number && Objects.equals(channel_id, sampleID.channel_id);
+        SampleID that = (SampleID) o;
+
+        return number == that.number && Objects.equals(channel_id, that.channel_id);
     }
 
     @Override
@@ -55,14 +56,15 @@ public class SampleID implements Serializable, Comparable<SampleID> {
     }
 
     @Override
-    public int compareTo(SampleID o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = channel_id.compareTo(o.channel_id);
+        SampleID that = (SampleID) o;
 
+        int result = channel_id.compareTo(that.channel_id);
         if (result == 0) {
-            if (number > o.number) {
+            if (number > that.number) {
                 result = 1;
-            } else if (number < o.number) {
+            } else if (number < that.number) {
                 result = -1;
             }
         }

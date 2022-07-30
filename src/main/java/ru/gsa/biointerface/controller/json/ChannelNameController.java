@@ -1,7 +1,7 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,6 +33,7 @@ import ru.gsa.biointerface.service.ChannelNameService;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +89,9 @@ public class ChannelNameController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/{id}")
-    public ResponseEntity<ChannelNameDTO> get(@PathVariable int id) {
+    public ResponseEntity<ChannelNameDTO> get(
+            @Parameter(description = "Channel name's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /channelNames/{}", id);
         ChannelNameDTO response = mapper.toDTO(service.getById(id));
         log.debug("End REST GET /channelNames/{}", id);
@@ -102,7 +105,9 @@ public class ChannelNameController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Channel name's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /channelNames/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /channelNames/{}", id);
@@ -119,7 +124,9 @@ public class ChannelNameController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<ChannelNameDTO> save(@Valid @RequestBody ChannelNameDTO dto) throws JsonProcessingException {
+    public ResponseEntity<ChannelNameDTO> save(
+            @Parameter(description = "Channel name's DTO", required = true)
+            @Valid @RequestBody ChannelNameDTO dto) {
         log.info("REST PUT /channelNames wish params: {}", dto);
         ChannelName entity = service.saveOrUpdate(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()

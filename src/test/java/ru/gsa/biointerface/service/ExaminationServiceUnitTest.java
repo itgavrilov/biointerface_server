@@ -18,6 +18,7 @@ import ru.gsa.biointerface.repository.ExaminationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -217,12 +218,12 @@ class ExaminationServiceUnitTest {
 
     @Test
     void getById_rnd() {
-        int rnd = generator.nextInt();
-        String message = String.format(repository.MASK_NOT_FOUND, rnd);
-        when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
+        UUID rndId = UUID.randomUUID();
+        String message = String.format(repository.MASK_NOT_FOUND, rndId);
+        when(repository.getOrThrow(rndId)).thenThrow(new NotFoundException(message));
 
-        assertThrows(NotFoundException.class, () -> service.getById(rnd), message);
-        verify(repository).getOrThrow(rnd);
+        assertThrows(NotFoundException.class, () -> service.getById(rndId), message);
+        verify(repository).getOrThrow(rndId);
     }
 
     @Test
@@ -248,12 +249,12 @@ class ExaminationServiceUnitTest {
 
     @Test
     void delete_rnd() {
-        int rnd = generator.nextInt();
-        String message = String.format(repository.MASK_NOT_FOUND, rnd);
-        when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
+        UUID rndId = UUID.randomUUID();
+        String message = String.format(repository.MASK_NOT_FOUND, rndId);
+        when(repository.getOrThrow(rndId)).thenThrow(new NotFoundException(message));
 
-        assertThrows(NotFoundException.class, () -> service.delete(rnd), message);
-        verify(repository).getOrThrow(rnd);
+        assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
+        verify(repository).getOrThrow(rndId);
     }
 
     @Test

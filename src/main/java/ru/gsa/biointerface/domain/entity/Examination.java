@@ -4,8 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
@@ -15,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Сущность исследования
@@ -27,22 +38,24 @@ import java.util.Objects;
 @AllArgsConstructor
 @Entity(name = "examination")
 @Table(name = "examination")
-public class Examination implements Serializable, Comparable<Examination> {
+public class Examination implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
 
     /**
      * Время начала исследования
      */
     @PastOrPresent(message = "Start time should be in past or present")
     @Column(name = "starttime", nullable = false)
-    private LocalDateTime starttime;
+    private LocalDateTime datetime;
 
     /**
      * Карточка пациента
@@ -74,7 +87,7 @@ public class Examination implements Serializable, Comparable<Examination> {
     private List<Channel> channels;
 
     public Examination(Patient patient, Device device, String comment) {
-        this.starttime = LocalDateTime.now();
+        this.datetime = LocalDateTime.now();
         this.comment = comment;
         this.device = device;
         this.patient = patient;
@@ -95,8 +108,8 @@ public class Examination implements Serializable, Comparable<Examination> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Examination entity = (Examination) o;
-        return id == entity.id;
+        Examination that = (Examination) o;
+        return id == that.id;
     }
 
     @Override
@@ -105,17 +118,11 @@ public class Examination implements Serializable, Comparable<Examination> {
     }
 
     @Override
-    public int compareTo(Examination o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        Examination that = (Examination) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return datetime.compareTo(that.datetime);
     }
 
     @Override
@@ -124,7 +131,7 @@ public class Examination implements Serializable, Comparable<Examination> {
 
         return "Examination{" +
                 "id=" + id +
-                ", datetime=" + formatter.format(starttime) +
+                ", datetime=" + formatter.format(datetime) +
                 ", patientRecord_id=" + patient.getId() +
                 ", device_id=" + device.getId() +
                 '}';

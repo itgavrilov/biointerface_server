@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с каналами контроллера биоинтерфейса
@@ -48,7 +49,7 @@ public class ChannelService {
      *                      контроллера биоинтерфейса(необязательный) {@link ChannelName#getId()}
      * @return Список каналов {@link List<Channel>}
      */
-    public List<Channel> findAll(Integer examinationId, Integer channelNameId) {
+    public List<Channel> findAll(UUID examinationId, UUID channelNameId) {
         return repository.findAllByExaminationIdAndChannelNameId(examinationId, channelNameId);
     }
 
@@ -60,7 +61,7 @@ public class ChannelService {
      * @return Канал {@link Channel}
      * @throws NotFoundException если канала с id не найдено
      */
-    public Channel getById(Integer examinationId, Integer number) {
+    public Channel getById(UUID examinationId, Byte number) {
         return repository.getOrThrow(examinationId, number);
     }
 
@@ -103,7 +104,7 @@ public class ChannelService {
      * @param number        Номер канала {@link ChannelID#getNumber()}
      * @throws NotFoundException если устройстройсвто с id не найдено
      */
-    public void delete(Integer examinationId, Integer number) {
+    public void delete(UUID examinationId, Byte number) {
         Channel entity = repository.getOrThrow(examinationId, number);
         repository.delete(entity);
         log.debug("Channel(examinationId={}, number={}) is deleted", examinationId, number);

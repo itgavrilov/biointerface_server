@@ -16,6 +16,7 @@ import ru.gsa.biointerface.repository.ChannelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,8 +137,8 @@ class ChannelServiceUnitTest {
     @Test
     void update_rnd() {
         ChannelDTO dto = generator.nextObject(ChannelDTO.class);
-        int rnd1 = dto.getExaminationId();
-        int rnd2 = dto.getNumber();
+        UUID rnd1 = dto.getExaminationId();
+        Byte rnd2 = dto.getNumber();
         String message = String.format(repository.MASK_NOT_FOUND, rnd1, rnd2);
         when(repository.getOrThrow(rnd1, rnd2)).thenThrow(new NotFoundException(message));
 
@@ -159,8 +160,8 @@ class ChannelServiceUnitTest {
     @Test
     void delete() {
         Channel entity = generator.nextObject(Channel.class);
-        int examinationId = entity.getId().getExaminationId();
-        int number = entity.getId().getNumber();
+        UUID examinationId = entity.getId().getExaminationId();
+        Byte number = entity.getId().getNumber();
         when(repository.getOrThrow(examinationId, number)).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(examinationId, number));
@@ -170,12 +171,12 @@ class ChannelServiceUnitTest {
 
     @Test
     void delete_rnd() {
-        int rnd1 = generator.nextInt();
-        int rnd2 = generator.nextInt();
-        String message = String.format(repository.MASK_NOT_FOUND, rnd1, rnd2);
-        when(repository.getOrThrow(rnd1, rnd2)).thenThrow(new NotFoundException(message));
+        UUID examinationId = UUID.randomUUID();
+        Byte number = (byte) generator.nextInt();
+        String message = String.format(repository.MASK_NOT_FOUND, examinationId, number);
+        when(repository.getOrThrow(examinationId, number)).thenThrow(new NotFoundException(message));
 
-        assertThrows(NotFoundException.class, () -> service.delete(rnd1, rnd2), message);
-        verify(repository).getOrThrow(rnd1, rnd2);
+        assertThrows(NotFoundException.class, () -> service.delete(examinationId, number), message);
+        verify(repository).getOrThrow(examinationId, number);
     }
 }

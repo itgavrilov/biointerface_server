@@ -10,6 +10,7 @@ import ru.gsa.biointerface.domain.entity.SampleID;
 import ru.gsa.biointerface.repository.customized.SampleRepositoryCustom;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
@@ -20,9 +21,9 @@ public interface SampleRepository extends JpaRepository<Sample, SampleID>, Sampl
     List<Sample> findAllByChannel(Channel channel);
 
     @Query(nativeQuery = true,
-            value = "select * from sample as s " +
+            value = "select * from main_service.sample as s " +
                     "where s.examination_id = :examinationId " +
                     "and s.channel_number = :channelNumber ")
-    List<Sample> findAllByExaminationIdAndChannelNumber(@Param("examinationId") int examinationId,
-                                                        @Param("channelNumber") int channelNumber);
+    List<Sample> findAllByExaminationIdAndChannelNumber(@Param("examinationId") UUID examinationId,
+                                                        @Param("channelNumber") byte channelNumber);
 }

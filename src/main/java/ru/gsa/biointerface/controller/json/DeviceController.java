@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.controller.json;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,6 +34,7 @@ import ru.gsa.biointerface.service.DeviceService;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -89,7 +91,9 @@ public class DeviceController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/{id}")
-    public ResponseEntity<DeviceDTO> get(@PathVariable int id) {
+    public ResponseEntity<DeviceDTO> get(
+            @Parameter(description = "Device's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /devices/{}", id);
         DeviceDTO response = mapper.toDTO(service.getById(id));
         log.debug("End REST GET /devices/{}", id);
@@ -103,7 +107,9 @@ public class DeviceController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Device's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /devices/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /devices/{}", id);
@@ -120,7 +126,9 @@ public class DeviceController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<DeviceDTO> save(@Valid @RequestBody DeviceDTO dto){
+    public ResponseEntity<DeviceDTO> save(
+            @Parameter(description = "Device's DTO", required = true)
+            @Valid @RequestBody DeviceDTO dto) {
         log.info("REST PUT /devices wish params: {}", dto);
         Device entity = service.update(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()

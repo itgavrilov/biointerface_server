@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) измерения
@@ -19,14 +20,14 @@ import java.util.Objects;
 @Data
 @Schema(name = "Sample", description = "reading of examination")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class SampleDTO implements Serializable, Comparable<SampleDTO> {
+public class SampleDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Порядковый номер измерения
      */
     @Schema(description = "sample serial number in examination", required = true)
-    private Integer number;
+    private Long number;
 
     /**
      * Номер канала контроллера биоинтерфейса {@link ChannelDTO#getNumber()}
@@ -34,7 +35,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     @Schema(description = "channel serial number in controller", required = true)
     @NotNull(message = "ChannelNumber can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
-    private Integer channelNumber;
+    private Byte channelNumber;
 
     /**
      * Номер канала контроллера биоинтерфейса {@link ChannelDTO#getExaminationId()}
@@ -42,7 +43,7 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     @Schema(description = "examination ID", required = true)
     @NotNull(message = "ExaminationId can't be null")
     @Min(value = 0, message = "Id can't be lass then 0")
-    private Integer examinationId;
+    private UUID examinationId;
 
     /**
      * Значение
@@ -55,10 +56,11 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SampleDTO sampleDTO = (SampleDTO) o;
-        return Objects.equals(number, sampleDTO.number)
-                && Objects.equals(channelNumber, sampleDTO.channelNumber)
-                && Objects.equals(examinationId, sampleDTO.examinationId);
+        SampleDTO that = (SampleDTO) o;
+
+        return Objects.equals(number, that.number)
+                && Objects.equals(channelNumber, that.channelNumber)
+                && Objects.equals(examinationId, that.examinationId);
     }
 
     @Override
@@ -67,15 +69,13 @@ public class SampleDTO implements Serializable, Comparable<SampleDTO> {
     }
 
     @Override
-    public int compareTo(SampleDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = examinationId - o.examinationId;
+        SampleDTO that = (SampleDTO) o;
 
-        if (result == 0)
-            result = channelNumber - o.channelNumber;
-
-        if (result == 0)
-            result = number = o.number;
+        int result = examinationId.compareTo(that.examinationId);
+        if (result == 0) result = channelNumber - that.channelNumber;
+        if (result == 0) result = number.compareTo(that.number);
 
         return result;
     }

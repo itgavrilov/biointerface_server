@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с наименованиями каналаов контроллера биоинтерфейса
@@ -62,7 +63,7 @@ public class ChannelNameService {
      * @return Наименование {@link ChannelName}
      * @throws NotFoundException если наименование с id не найдено
      */
-    public ChannelName getById(Integer id) {
+    public ChannelName getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -96,7 +97,7 @@ public class ChannelNameService {
      * @param id Идентификатор {@link ChannelName#getId()}
      * @throws NotFoundException если наименование с id не найдено
      */
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         ChannelName entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("ChannelName(id={}) is deleted", id);

@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -33,6 +32,7 @@ import ru.gsa.biointerface.service.ChannelService;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -59,10 +59,10 @@ public class ChannelController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),})
     @GetMapping
     public ResponseEntity<List<ChannelDTO>> findAll(
-            @Parameter(description = "ID examination")
-            @RequestParam(value = "examinationId", required = false) Integer examinationId,
-            @Parameter(description = "ID channelName")
-            @RequestParam(value = "channelNameId", required = false) Integer channelNameId) {
+            @Parameter(description = "Examination's ID")
+            @RequestParam(value = "examinationId", required = false) UUID examinationId,
+            @Parameter(description = "ChannelName's ID")
+            @RequestParam(value = "channelNameId", required = false) UUID channelNameId) {
         log.debug("REST GET /channels wish params: examinationId={}, channelNameId={}", examinationId, channelNameId);
         List<ChannelDTO> response = service.findAll(examinationId, channelNameId).stream()
                 .map(mapper::toDTO)
@@ -80,7 +80,11 @@ public class ChannelController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping("/{examinationId}/{number}")
-    public ResponseEntity<ChannelDTO> get(@PathVariable int examinationId, @PathVariable int number) {
+    public ResponseEntity<ChannelDTO> get(
+            @Parameter(description = "Examination's ID", required = true)
+            @PathVariable(value = "examinationId") UUID examinationId,
+            @Parameter(description = "Channel number", required = true)
+            @PathVariable(value = "number") Byte number) {
         log.debug("REST GET /channels/{}/{}", examinationId, number);
         ChannelDTO response = mapper.toDTO(service.getById(examinationId, number));
         log.debug("End REST GET /channels/{}/{}", examinationId, number);
@@ -95,7 +99,11 @@ public class ChannelController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{examinationId}/{number}")
-    public ResponseEntity<Void> delete(@PathVariable int examinationId, @PathVariable int number) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Examination's ID", required = true)
+            @PathVariable(value = "examinationId") UUID examinationId,
+            @Parameter(description = "Channel number", required = true)
+            @PathVariable(value = "number") Byte number) {
         log.info("REST DELETE /channels/{}/{}", examinationId, number);
         service.delete(examinationId, number);
         log.debug("End REST DELETE /channels/{}/{}", examinationId, number);
@@ -113,7 +121,9 @@ public class ChannelController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ChannelDTO> save(@Valid @RequestBody ChannelDTO dto) throws JsonProcessingException {
+    public ResponseEntity<ChannelDTO> save(
+            @Parameter(description = "Controller channel's DTO", required = true)
+            @Valid @RequestBody ChannelDTO dto) {
         log.info("REST PUT /channels wish params: {}", dto);
         Channel entity = service.update(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()

@@ -10,32 +10,33 @@ import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.exception.NotFoundException;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface ExaminationRepository extends JpaRepository<Examination, Integer> {
+public interface ExaminationRepository extends JpaRepository<Examination, UUID> {
 
     String MASK_NOT_FOUND = "Examination(id=%s) is not found";
 
-    default Examination getOrThrow(Integer id) {
+    default Examination getOrThrow(UUID id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
                 MASK_NOT_FOUND, id)));
     }
 
     @Query(nativeQuery = true,
-            value = "select * from examination as e " +
+            value = "select * from main_service.examination as e " +
                     "where (:patientId is null or e.patient_id = :patientId) " +
                     "and (:deviceId is null or e.device_id = :deviceId) ")
-    List<Examination> findAllByPatientIdAndDeviceId(@Param("patientId") Integer patientId,
-                                                    @Param("deviceId") Integer deviceId);
+    List<Examination> findAllByPatientIdAndDeviceId(@Param("patientId") UUID patientId,
+                                                    @Param("deviceId") UUID deviceId);
 
     @Query(nativeQuery = true,
-            value = "select * from examination as e " +
+            value = "select * from main_service.examination as e " +
                     "where (:patientId is null or e.patient_id = :patientId) " +
                     "and (:deviceId is null or e.device_id = :deviceId) ")
-    Page<Examination> findAllByPatientIdAndDeviceId(@Param("patientId") Integer patientId,
-                                                    @Param("deviceId") Integer deviceId,
+    Page<Examination> findAllByPatientIdAndDeviceId(@Param("patientId") UUID patientId,
+                                                    @Param("deviceId") UUID deviceId,
                                                     Pageable pageable);
 }

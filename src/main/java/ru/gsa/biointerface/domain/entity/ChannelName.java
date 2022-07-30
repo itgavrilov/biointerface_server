@@ -4,8 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -13,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Сущность наименования канала контроллера биоинтерфейса
@@ -25,15 +33,17 @@ import java.util.Objects;
 @AllArgsConstructor
 @Entity(name = "channel_name")
 @Table(name = "channel_name")
-public class ChannelName implements Serializable, Comparable<ChannelName> {
+public class ChannelName implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
 
     /**
      * Наименование канала
@@ -79,7 +89,7 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelName that = (ChannelName) o;
-        return Objects.equals(id, that.id) && name.equals(that.name);
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -88,17 +98,11 @@ public class ChannelName implements Serializable, Comparable<ChannelName> {
     }
 
     @Override
-    public int compareTo(ChannelName o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        ChannelName that = (ChannelName) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return name.compareTo(that.name);
     }
 
     @Override
