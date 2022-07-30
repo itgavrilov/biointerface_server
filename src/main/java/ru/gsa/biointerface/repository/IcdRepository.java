@@ -5,14 +5,18 @@ import org.springframework.stereotype.Repository;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 
+import java.util.UUID;
+
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface IcdRepository extends JpaRepository<Icd, Integer> {
+public interface IcdRepository extends JpaRepository<Icd, UUID> {
 
-    default Icd getOrThrow(Integer id) {
+    String MASK_NOT_FOUND = "Icd(id=%s) is not found";
+
+    default Icd getOrThrow(UUID id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Icd(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 }

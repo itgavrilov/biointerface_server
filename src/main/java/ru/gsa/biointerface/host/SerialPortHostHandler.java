@@ -6,7 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.gsa.biointerface.domain.entity.*;
+import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.entity.ChannelName;
+import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.entity.Examination;
+import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.host.cash.Cash;
 import ru.gsa.biointerface.host.cash.DataListener;
 import ru.gsa.biointerface.host.cash.SampleCash;
@@ -231,9 +235,9 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             device = deviceService.save(device);
             examination = examinationService.save(examination);
 
-            for (int i = 0; i < device.getAmountChannels(); i++) {
+            for (byte i = 0; i < device.getAmountChannels(); i++) {
                 Channel channel = new Channel(i, examination, channelNames.get(i));
-                channel = channelService.update(channel);
+                channel = channelService.save(channel);
                 examination.getChannels().add(channel);
             }
 
@@ -278,13 +282,13 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
     }
 
     @Override
-    public void setDevice(int serialNumber, int amountChannels) {
-        if (serialNumber <= 0)
-            throw new IllegalArgumentException("SerialNumber <= 0");
-        if (amountChannels <= 0 || amountChannels > 8)
-            throw new IllegalArgumentException("amountChannels <= 0 or > 8");
+    public void setDevice(String serialNumber, byte amountChannels) {
+        if (serialNumber.isBlank())
+            throw new IllegalArgumentException("SerialNumber can't be blank");
+        if (amountChannels <= 0)
+            throw new IllegalArgumentException("amountChannels <= 0");
 
-        if (device == null || device.getId() != serialNumber) {
+        if (device == null || device.getNumber().equals(serialNumber)) {
             device = new Device(serialNumber, amountChannels, "Found automatically");
             examination = null;
             patient = null;

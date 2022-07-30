@@ -19,6 +19,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Cервис для работы с исследованиями
@@ -51,7 +52,7 @@ public class ExaminationService {
      * @param deviceId  Идентификатор контроллера биоинтерфейса(необязательный) {@link Device#getId()}
      * @return Список исследований {@link List<Examination>}
      */
-    public List<Examination> findAll(Integer patientId, Integer deviceId) {
+    public List<Examination> findAll(UUID patientId, UUID deviceId) {
         return repository.findAllByPatientIdAndDeviceId(patientId, deviceId);
     }
 
@@ -63,7 +64,7 @@ public class ExaminationService {
      * @param pageable  Пагинация {@link Pageable}
      * @return Список исследований с пагинацией {@link Page<Examination>}
      */
-    public Page<Examination> findAll(Integer patientId, Integer deviceId, Pageable pageable) {
+    public Page<Examination> findAll(UUID patientId, UUID deviceId, Pageable pageable) {
         return repository.findAllByPatientIdAndDeviceId(patientId, deviceId, pageable);
     }
 
@@ -74,7 +75,7 @@ public class ExaminationService {
      * @return Исследование {@link Examination}
      * @throws NotFoundException если исследования с id не найдено
      */
-    public Examination getById(Integer id) {
+    public Examination getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -99,13 +100,13 @@ public class ExaminationService {
      * @throws NotFoundException если исследования с id не найдено
      */
     @Transactional
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Examination entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("Examination(id={}) is deleted", id);
     }
 
-    public Examination loadWithGraphsById(int id) {
+    public Examination loadWithGraphsById(UUID id) {
         Examination entity = getById(id);
         entity.setChannels(channelService.findAll(entity.getId(), null));
 

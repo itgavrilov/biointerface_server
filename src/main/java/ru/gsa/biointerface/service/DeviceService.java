@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с контроллерами биоинтерфейсов
@@ -64,7 +64,7 @@ public class DeviceService {
      * @return Контроллер биоинтерфейса {@link Device}
      * @throws NotFoundException если устройстройсвто с id не найдено
      */
-    public Device getById(Integer id) {
+    public Device getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -75,30 +75,23 @@ public class DeviceService {
      * @return Контроллер биоинтерфейса {@link Device}
      */
     @Transactional
-    public Device save(DeviceDTO dto) {
-        Optional<Device> optional = repository.findById(dto.getId());
-        Device entity;
+    public Device update(DeviceDTO dto) {
+        Device entity = repository.getOrThrow(dto.getId());
 
-        if (optional.isEmpty()) {
-            entity = new Device(dto.getId(), dto.getAmountChannels(), dto.getComment());
-        } else {
-            entity = optional.get();
-            entity.setAmountChannels(dto.getAmountChannels());
-            entity.setComment(dto.getComment());
-        }
+        entity.setAmountChannels(dto.getAmountChannels());
+        entity.setComment(dto.getComment());
 
-        entity = save(entity);
+        log.debug("Device(id={}) is update", entity.getId());
 
         return entity;
     }
 
     /**
-     * Создание/обновление контроллера биоинтерфейса
+     * Сохранение контроллера биоинтерфейса
      *
      * @param entity DTO контроллера биоинтерфейса {@link DeviceDTO}
      * @return Контроллер биоинтерфейса {@link Device}
      */
-    @Transactional
     public Device save(Device entity) {
         entity = repository.save(entity);
         log.debug("Device(id={}) is save", entity.getId());
@@ -112,8 +105,7 @@ public class DeviceService {
      * @param id Идентификатор {@link Device#getId()}
      * @throws NotFoundException если устройстройсвто с id не найдено
      */
-    @Transactional
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Device entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("Device(id={}) is deleted", id);

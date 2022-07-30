@@ -12,9 +12,9 @@ import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с заболеваниями по международной классификации болезней (ICD)
@@ -63,7 +63,7 @@ public class IcdService {
      * @return Заболивание {@link Icd}
      * @throws NotFoundException если заболивание с id не найдено
      */
-    public Icd getById(Integer id) {
+    public Icd getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -73,8 +73,7 @@ public class IcdService {
      * @param dto DTO заболивания {@link IcdDTO}
      * @return Заболивание {@link Icd}
      */
-    @Transactional
-    public Icd save(IcdDTO dto) {
+    public Icd saveOrUpdate(IcdDTO dto) {
         Optional<Icd> optional = repository.findById(dto.getId());
         Icd entity;
 
@@ -99,8 +98,7 @@ public class IcdService {
      * @param id Идентификатор {@link Icd#getId()}
      * @throws NotFoundException если заболивание с id не найдено
      */
-    @Transactional
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Icd entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("Icd(id={}) is deleted", id);

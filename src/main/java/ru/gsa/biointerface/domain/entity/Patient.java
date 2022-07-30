@@ -1,15 +1,16 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -22,9 +23,10 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * Сущность карточки пациента
@@ -34,24 +36,20 @@ import java.util.TreeSet;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "patient")
 @Table(name = "patient")
-public class Patient implements Serializable, Comparable<Patient> {
+public class Patient implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    /**
-     * Фамилия
-     */
-    @NotBlank(message = "Second name can't be blank")
-    @Column(name = "second_name", nullable = false)
-    private String secondName;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
 
     /**
      * Имя
@@ -59,6 +57,13 @@ public class Patient implements Serializable, Comparable<Patient> {
     @NotBlank(message = "First name can't be blank")
     @Column(name = "first_name", nullable = false)
     private String firstName;
+
+    /**
+     * Фамилия
+     */
+    @NotBlank(message = "Second name can't be blank")
+    @Column(name = "second_name", nullable = false)
+    private String secondName;
 
     /**
      * Отчество
@@ -88,20 +93,20 @@ public class Patient implements Serializable, Comparable<Patient> {
     private String comment;
 
     /**
-     * Список исследований {@link Set<Examination>}
+     * Список исследований {@link List<Examination>}
      */
     @NotNull(message = "Examinations can't be null")
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    private Set<Examination> examinations;
+    private List<Examination> examinations;
 
     public Patient(String secondName, String firstName, String patronymic, LocalDateTime birthday, Icd icd, String comment) {
-        this.secondName = secondName;
         this.firstName = firstName;
+        this.secondName = secondName;
         this.patronymic = patronymic;
         this.birthday = birthday;
         this.comment = comment;
         this.icd = icd;
-        examinations = new TreeSet<>();
+        examinations = new ArrayList<>();
     }
 
     public void addExamination(Examination examination) {
@@ -119,7 +124,8 @@ public class Patient implements Serializable, Comparable<Patient> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Patient that = (Patient) o;
-        return id == that.id;
+
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -128,15 +134,14 @@ public class Patient implements Serializable, Comparable<Patient> {
     }
 
     @Override
-    public int compareTo(Patient o) {
-        if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+    public int compareTo(Object o) {
+        if (o == null) return -1;
+        Patient that = (Patient) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
+        int result = secondName.compareTo(that.secondName);
+        if (result == 0) result = firstName.compareTo(that.firstName);
+        if (result == 0) result = patronymic.compareTo(that.patronymic);
+        if (result == 0) result = birthday.compareTo(that.birthday);
 
         return result;
     }

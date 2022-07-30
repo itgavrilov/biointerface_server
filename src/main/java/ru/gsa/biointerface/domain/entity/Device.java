@@ -1,22 +1,28 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * Сущность контроллера биоинтерфейса
@@ -26,17 +32,29 @@ import java.util.TreeSet;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "device")
-@Table(name = "device")
-public class Device implements Serializable, Comparable<Device> {
+@Table(name = "device", indexes = {
+        @Index(name = "ix_device_number", columnList = "number")
+})
+public class Device implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
-    @Min(value = 1, message = "Id can't be lass then 1")
     @Id
-    private int id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
+
+    /**
+     * Серийный номер
+     */
+    @NotBlank(message = "Number can't be blank")
+    @Column(name = "number", nullable = false, unique = true)
+    private String number;
 
     /**
      * Количество каналов
@@ -54,16 +72,16 @@ public class Device implements Serializable, Comparable<Device> {
     private String comment;
 
     /**
-     * Список исследований {@link Set<Examination>}
+     * Список исследований {@link List<Examination>}
      */
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
-    private Set<Examination> examinations;
+    private List<Examination> examinations;
 
-    public Device(int id, int amountChannels, String comment) {
-        this.id = id;
+    public Device(String number, int amountChannels, String comment) {
+        this.number = number;
         this.amountChannels = amountChannels;
         this.comment = comment;
-        examinations = new TreeSet<>();
+        examinations = new ArrayList<>();
     }
 
     public void addExamination(Examination examination) {
@@ -80,8 +98,8 @@ public class Device implements Serializable, Comparable<Device> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Device device = (Device) o;
-        return id == device.id;
+        Device that = (Device) o;
+        return id == that.id;
     }
 
     @Override
@@ -90,17 +108,11 @@ public class Device implements Serializable, Comparable<Device> {
     }
 
     @Override
-    public int compareTo(Device o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        Device that = (Device) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return number.compareTo(that.number);
     }
 
     @Override

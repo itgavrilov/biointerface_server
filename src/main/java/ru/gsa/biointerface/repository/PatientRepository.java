@@ -10,27 +10,30 @@ import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.NotFoundException;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface PatientRepository extends JpaRepository<Patient, Integer> {
+public interface PatientRepository extends JpaRepository<Patient, UUID> {
 
-    default Patient getOrThrow(Integer id) {
+    String MASK_NOT_FOUND = "Patient(id=%s) is not found";
+
+    default Patient getOrThrow(UUID id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Patient(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 
     @Query(nativeQuery = true,
             value = "select * from patient as p " +
                     "where (:icdId is null or p.icd_id = :icdId) ")
-    List<Patient> findAllByIcd(@Param("icdId") Integer icdId);
+    List<Patient> findAllByIcd(@Param("icdId") UUID icdId);
 
     @Query(nativeQuery = true,
             value = "select * from patient as p " +
                     "where (:icdId is null or p.icd_id = :icdId) ")
-    Page<Patient> findAllByIcd(@Param("icdId") Integer icdId,
+    Page<Patient> findAllByIcd(@Param("icdId") UUID icdId,
                                Pageable pageable);
 }

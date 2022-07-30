@@ -26,18 +26,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public class ExceptionRestControllerAdvice {
 
     /**
-     * Перехватчик исключений бизнес-логики
-     *
-     * @param exception Исключение-наследник бизнес-логики {@link ResponseStatusException}
-     * @return Возврощаемый ответ клиенту {@link ResponseEntity<ErrorResponse>}
-     */
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException exception) {
-
-        return buildResponse(exception.getStatus(), exception.getMessage());
-    }
-
-    /**
      * Перехватчик исключений
      *
      * @param exception Любой наследний не перехваченный другим ExceptionHandler {@link Exception}
@@ -49,6 +37,18 @@ public class ExceptionRestControllerAdvice {
         var message = "Неопределенная ошибка сервера: " + getRootCauseMessage(exception);
 
         return buildResponse(INTERNAL_SERVER_ERROR, message);
+    }
+
+    /**
+     * Перехватчик исключений бизнес-логики
+     *
+     * @param exception Исключение-наследник бизнес-логики {@link ResponseStatusException}
+     * @return Возврощаемый ответ клиенту {@link ResponseEntity<ErrorResponse>}
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException exception) {
+
+        return buildResponse(exception.getStatus(), exception.getMessage());
     }
 
     /**

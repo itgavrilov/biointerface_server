@@ -1,5 +1,6 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,9 +28,10 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "channel")
 @Table(name = "channel")
-public class Channel implements Serializable, Comparable<Channel> {
+public class Channel implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
@@ -61,8 +63,8 @@ public class Channel implements Serializable, Comparable<Channel> {
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
 
-    public Channel(Integer number, Examination examination, ChannelName channelName) {
-        this.id = new ChannelID(number, examination.getId());
+    public Channel(Byte number, Examination examination, ChannelName channelName) {
+        this.id = new ChannelID(examination.getId(), number);
         this.examination = examination;
         this.channelName = channelName;
         this.samples = new LinkedList<>();
@@ -83,8 +85,9 @@ public class Channel implements Serializable, Comparable<Channel> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Channel channel = (Channel) o;
-        return Objects.equals(id, channel.id);
+        Channel that = (Channel) o;
+
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -93,8 +96,11 @@ public class Channel implements Serializable, Comparable<Channel> {
     }
 
     @Override
-    public int compareTo(Channel o) {
-        return id.compareTo(o.id);
+    public int compareTo(Object o) {
+        if (o == null || getClass() != o.getClass()) return -1;
+        Channel that = (Channel) o;
+
+        return id.compareTo(that.id);
     }
 
     @Override

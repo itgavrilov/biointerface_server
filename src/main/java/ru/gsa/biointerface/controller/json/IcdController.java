@@ -1,7 +1,7 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.dto.ErrorResponse;
@@ -26,6 +33,7 @@ import ru.gsa.biointerface.service.IcdService;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -83,7 +91,9 @@ public class IcdController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/{id}")
-    public ResponseEntity<IcdDTO> get(@PathVariable int id) {
+    public ResponseEntity<IcdDTO> get(
+            @Parameter(description = "ICD's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /icds/{}", id);
         IcdDTO response = mapper.toDTO(service.getById(id));
         log.debug("End REST GET /icds/{}", id);
@@ -97,7 +107,9 @@ public class IcdController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ICD's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /icds/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /icds/{}", id);
@@ -114,9 +126,11 @@ public class IcdController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<IcdDTO> save(@Valid @RequestBody IcdDTO dto) throws JsonProcessingException {
+    public ResponseEntity<IcdDTO> save(
+            @Parameter(description = "ICD's DTO", required = true)
+            @Valid @RequestBody IcdDTO dto) {
         log.info("REST PUT /icds wish params: {}", dto);
-        Icd entity = service.save(dto);
+        Icd entity = service.saveOrUpdate(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/icds/{id}")
                 .buildAndExpand(entity.getId()).toUri();

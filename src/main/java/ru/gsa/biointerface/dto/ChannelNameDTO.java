@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) наименования канала контроллера биоинтерфейса
@@ -19,19 +20,19 @@ import java.util.Objects;
 @Builder
 @Schema(name = "ChannelName", description = "name for controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> {
+public class ChannelNameDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Schema(description = "Channel`s name ID")
-    private Integer id;
+    private UUID id;
 
     /**
      * Наименование канала
      */
-    @Schema(description = "Name")
+    @Schema(description = "Name", required = true)
     @NotBlank(message = "Name can't be blank")
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
@@ -48,7 +49,7 @@ public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChannelNameDTO that = (ChannelNameDTO) o;
-        return Objects.equals(id, that.id) && name.equals(that.name);
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -57,17 +58,11 @@ public class ChannelNameDTO implements Serializable, Comparable<ChannelNameDTO> 
     }
 
     @Override
-    public int compareTo(ChannelNameDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        ChannelNameDTO that = (ChannelNameDTO) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return name.compareTo(that.name);
     }
 
     @Override

@@ -1,67 +1,82 @@
-CREATE TABLE IF NOT EXISTS icd
+CREATE SCHEMA IF NOT EXISTS main_service;
+
+CREATE TABLE IF NOT EXISTS main_service.icd
 (
-    id      SERIAL PRIMARY KEY NOT NULL,
-    name    VARCHAR(35)        NOT NULL,
-    version INTEGER            NOT NULL,
-    comment TEXT               NULL
+    id      uuid    NOT NULL,
+    name    VARCHAR NOT NULL,
+    version INTEGER NOT NULL,
+    comment TEXT    NULL,
+    CONSTRAINT pk_icd PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS device
+CREATE TABLE IF NOT EXISTS main_service.device
 (
-    id              INTEGER PRIMARY KEY NOT NULL,
-    amount_channels INTEGER             NOT NULL,
-    comment         TEXT                NULL
+    id              uuid    NOT NULL,
+    number          VARCHAR NOT NULL,
+    amount_channels INTEGER NOT NULL,
+    comment         TEXT    NULL,
+    CONSTRAINT pk_device PRIMARY KEY (id),
+    CONSTRAINT ix_device_number UNIQUE (number)
 );
 
-CREATE TABLE IF NOT EXISTS channel_name
+CREATE TABLE IF NOT EXISTS main_service.channel_name
 (
-    id      SERIAL PRIMARY KEY NOT NULL,
-    name    VARCHAR(35) UNIQUE NOT NULL,
-    comment TEXT               NULL
+    id      uuid           NOT NULL,
+    name    VARCHAR UNIQUE NOT NULL,
+    comment TEXT           NULL,
+    CONSTRAINT pk_channel_name PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS patient
+CREATE TABLE IF NOT EXISTS main_service.patient
 (
-    id          INTEGER PRIMARY KEY NOT NULL,
-    second_name VARCHAR(20)         NOT NULL,
-    first_name  VARCHAR(20)         NOT NULL,
-    patronymic  VARCHAR(20)         NOT NULL,
-    birthday    DATE                NOT NULL,
-    icd_id      INTEGER             NULL,
-    comment     TEXT                NULL,
-    FOREIGN KEY (icd_id) REFERENCES icd (id) ON DELETE RESTRICT
+    id          uuid    NOT NULL,
+    second_name VARCHAR NOT NULL,
+    first_name  VARCHAR NOT NULL,
+    patronymic  VARCHAR NOT NULL,
+    birthday    DATE    NOT NULL,
+    icd_id      uuid    NULL,
+    comment     TEXT    NULL,
+    CONSTRAINT pk_patient PRIMARY KEY (id),
+    CONSTRAINT fk_patient__icd FOREIGN KEY (icd_id)
+        REFERENCES main_service.icd (id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS examination
+CREATE TABLE IF NOT EXISTS main_service.examination
 (
-    id         SERIAL PRIMARY KEY NOT NULL,
-    startTime  TIMESTAMP          NOT NULL,
-    patient_id INTEGER            NOT NULL,
-    device_id  INTEGER            NOT NULL,
-    comment    TEXT               NULL,
-    FOREIGN KEY (patient_id) REFERENCES patient (id) ON DELETE RESTRICT,
-    FOREIGN KEY (device_id) REFERENCES device (id) ON DELETE RESTRICT
+    id         uuid      NOT NULL,
+    startTime  TIMESTAMP NOT NULL,
+    patient_id uuid      NOT NULL,
+    device_id  uuid      NOT NULL,
+    comment    TEXT      NULL,
+    CONSTRAINT pk_examination PRIMARY KEY (id),
+    CONSTRAINT fk_examination__patient FOREIGN KEY (patient_id)
+        REFERENCES main_service.patient (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_examination__device FOREIGN KEY (device_id)
+        REFERENCES main_service.device (id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS channel
+CREATE TABLE IF NOT EXISTS main_service.channel
 (
-    number          INTEGER NOT NULL,
-    examination_id  INTEGER NOT NULL,
-    channel_name_id INTEGER NULL,
-    PRIMARY KEY (number, examination_id),
-    FOREIGN KEY (examination_id) REFERENCES examination (id) ON DELETE CASCADE,
-    FOREIGN KEY (channel_name_id) REFERENCES channel_name (id) ON DELETE RESTRICT
+    number          bytea NOT NULL,
+    examination_id  uuid  NOT NULL,
+    channel_name_id uuid  NULL,
+    CONSTRAINT pk_channel PRIMARY KEY (number, examination_id),
+    CONSTRAINT fk_channel__examination FOREIGN KEY (examination_id)
+        REFERENCES main_service.examination (id) ON DELETE CASCADE,
+    CONSTRAINT fk_channel__channel_name FOREIGN KEY (channel_name_id)
+        REFERENCES main_service.channel_name (id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS sample
+CREATE TABLE IF NOT EXISTS main_service.sample
 (
-    number         INTEGER NOT NULL,
-    channel_number INTEGER NOT NULL,
-    examination_id INTEGER NOT NULL,
+    number         BIGINT  NOT NULL,
+    channel_number bytea   NOT NULL,
+    examination_id uuid    NOT NULL,
     value          INTEGER NOT NULL,
-    PRIMARY KEY (number, channel_number, examination_id),
-    FOREIGN KEY (channel_number, examination_id) REFERENCES channel (number, examination_id) ON DELETE CASCADE
+    CONSTRAINT pk_sample PRIMARY KEY (number, channel_number, examination_id),
+    CONSTRAINT fk_sample__channel FOREIGN KEY (channel_number, examination_id)
+        REFERENCES main_service.channel (number, examination_id) ON DELETE CASCADE
 );
 
-INSERT INTO patient(id, second_name, first_name, patronymic, birthday, icd_id, comment)
-VALUES ('3', 'Иванов', 'Иван', 'Иванович', '1980-03-03', null, null);
+INSERT INTO main_service.patient(id, second_name, first_name, patronymic, birthday, icd_id, comment)
+VALUES (gen_random_uuid(), 'Иванов', 'Иван', 'Иванович', '1980-03-03', null, null);

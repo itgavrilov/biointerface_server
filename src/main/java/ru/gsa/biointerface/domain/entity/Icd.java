@@ -1,14 +1,15 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -17,9 +18,11 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * Сущность заболевания по международной классификации болезней (ICD)
@@ -29,17 +32,20 @@ import java.util.TreeSet;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "icd")
 @Table(name = "icd")
-public class Icd implements Serializable, Comparable<Icd> {
+public class Icd implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор ICD
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
 
     /**
      * Наименование заболевания по ICD
@@ -68,13 +74,13 @@ public class Icd implements Serializable, Comparable<Icd> {
      * Список карточек пациентов с этим заболеванием {@link Set<Patient>}
      */
     @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Patient> patients;
+    private List<Patient> patients;
 
     public Icd(String name, int version, String comment) {
         this.name = name;
         this.version = version;
         this.comment = comment;
-        patients = new TreeSet<>();
+        patients = new ArrayList<>();
     }
 
     public void addPatient(Patient patient) {
@@ -91,8 +97,9 @@ public class Icd implements Serializable, Comparable<Icd> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Icd icd = (Icd) o;
-        return id == icd.id;
+        Icd that = (Icd) o;
+
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -101,17 +108,11 @@ public class Icd implements Serializable, Comparable<Icd> {
     }
 
     @Override
-    public int compareTo(Icd o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        Icd that = (Icd) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return name.compareTo(that.name);
     }
 
     @Override

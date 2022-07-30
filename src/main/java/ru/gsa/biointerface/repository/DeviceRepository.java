@@ -5,15 +5,19 @@ import org.springframework.stereotype.Repository;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.NotFoundException;
 
+import java.util.UUID;
+
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
  */
 @Repository
-public interface DeviceRepository extends JpaRepository<Device, Integer> {
+public interface DeviceRepository extends JpaRepository<Device, UUID> {
 
-    default Device getOrThrow(Integer id) {
+    String MASK_NOT_FOUND = "Device(id=%s) is not found";
+
+    default Device getOrThrow(UUID id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Device(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id)));
     }
 }

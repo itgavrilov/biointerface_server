@@ -15,7 +15,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.dto.ErrorResponse;
@@ -26,6 +34,7 @@ import ru.gsa.biointerface.service.PatientService;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -50,10 +59,10 @@ public class PatientsController {
                             array = @ArraySchema(schema = @Schema(implementation = PatientDTO.class))))})
     @GetMapping
     public ResponseEntity<List<PatientDTO>> getAll(
-            @Parameter(description = "ICD ID")
-            @RequestParam(value = "icdId", required = false) Integer icdId) {
+            @Parameter(description = "ICD's ID")
+            @RequestParam(value = "icdId", required = false) UUID icdId) {
         log.debug("REST POST /patients wish icdId = {}", icdId);
-        List<PatientDTO> responses = service.getAll(icdId).stream()
+        List<PatientDTO> responses = service.findAll(icdId).stream()
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
         log.debug("End REST POST /patients wish icdId = {}", icdId);
@@ -68,11 +77,11 @@ public class PatientsController {
                             array = @ArraySchema(schema = @Schema(implementation = PatientDTO.class))))})
     @GetMapping("/pageable")
     public ResponseEntity<Page<PatientDTO>> getAll(
-            @Parameter(description = "ICD ID")
-            @RequestParam(value = "icdId", required = false) Integer icdId,
+            @Parameter(description = "ICD's ID")
+            @RequestParam(value = "icdId", required = false) UUID icdId,
             Pageable pageable) {
         log.debug("REST POST /patients/pageable wish icdId = {}", icdId);
-        Page<PatientDTO> responses = service.getAll(icdId, pageable)
+        Page<PatientDTO> responses = service.findAll(icdId, pageable)
                 .map(mapper::toDTO);
         log.debug("End REST POST /patients/pageable wish icdId = {}", icdId);
 
@@ -86,7 +95,9 @@ public class PatientsController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/{id}")
-    public ResponseEntity<PatientDTO> getById(@PathVariable int id) {
+    public ResponseEntity<PatientDTO> getById(
+            @Parameter(description = "Patient's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /patients/{}", id);
         PatientDTO response = mapper.toDTO(service.getById(id));
         log.debug("End REST GET /patients/{}", id);
@@ -96,7 +107,9 @@ public class PatientsController {
 
     @Operation(summary = "delete patient record by ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Patient's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /patients/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /patients/{}", id);
@@ -113,9 +126,11 @@ public class PatientsController {
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<PatientDTO> save(@Valid @RequestBody PatientDTO dto) {
+    public ResponseEntity<PatientDTO> save(
+            @Parameter(description = "Patient's DTO", required = true)
+            @Valid @RequestBody PatientDTO dto) {
         log.info("REST PUT /patients wish params: {}", dto);
-        Patient entity = service.save(dto);
+        Patient entity = service.saveOrUpdate(dto);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/patients/{id}")
                 .buildAndExpand(entity.getId()).toUri();

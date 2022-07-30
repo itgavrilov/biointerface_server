@@ -10,6 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) заболеване по международной классификации болезней (ICD)
@@ -20,26 +21,26 @@ import java.util.Objects;
 @Builder
 @Schema(name = "Icd", description = "ICD disease code")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class IcdDTO implements Serializable, Comparable<IcdDTO> {
+public class IcdDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Schema(description = "ICD ID")
-    private Integer id;
+    private UUID id;
 
     /**
      * Наименование заболевания по ICD
      */
-    @Schema(description = "Name")
+    @Schema(description = "Name", required = true)
     @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
     private String name;
 
     /**
      * Версия ICD
      */
-    @Schema(description = "Version")
+    @Schema(description = "Version", required = true)
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     private Integer version;
@@ -55,8 +56,9 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IcdDTO icdDTO = (IcdDTO) o;
-        return id == icdDTO.id;
+        IcdDTO that = (IcdDTO) o;
+
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -65,17 +67,11 @@ public class IcdDTO implements Serializable, Comparable<IcdDTO> {
     }
 
     @Override
-    public int compareTo(IcdDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        IcdDTO that = (IcdDTO) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return id.compareTo(that.id);
     }
 
     @Override

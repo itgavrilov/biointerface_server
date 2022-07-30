@@ -12,6 +12,7 @@ import ru.gsa.biointerface.exception.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 01/11/2021
@@ -19,35 +20,37 @@ import java.util.Optional;
 @Repository
 public interface ChannelRepository extends JpaRepository<Channel, ChannelID> {
 
-    default Optional<Channel> getByNumberAndExaminationId(Integer examinationId, Integer number) {
-        ChannelID id = new ChannelID(number, examinationId);
+    String MASK_NOT_FOUND = "Channel(examinationId=%s, number=%s) is not found";
+
+    default Optional<Channel> getByNumberAndExaminationId(UUID examinationId, Byte number) {
+        ChannelID id = new ChannelID(examinationId, number);
 
         return findById(id);
     }
 
-    default Channel getOrThrow(Integer examinationId, Integer number) {
-        ChannelID id = new ChannelID(number, examinationId);
+    default Channel getOrThrow(UUID examinationId, Byte number) {
+        ChannelID id = new ChannelID(examinationId, number);
         return getOrThrow(id);
     }
 
     default Channel getOrThrow(ChannelID id) {
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                "Channel(id=%s) is not found", id)));
+                MASK_NOT_FOUND, id.getExaminationId(), id.getNumber())));
     }
 
     @Query(nativeQuery = true,
-            value = "select * from channel as c " +
+            value = "select * from main_service.channel as c " +
                     "where (:examinationId is null or c.examination_id = :examinationId) " +
                     "and (:channelNameId is null or c.channel_name_id = :channelNameId) ")
-    List<Channel> findAllByExaminationIdAndChannelNameId(@Param("examinationId") Integer examinationId,
-                                                         @Param("channelNameId") Integer channelNameId);
+    List<Channel> findAllByExaminationIdAndChannelNameId(@Param("examinationId") UUID examinationId,
+                                                         @Param("channelNameId") UUID channelNameId);
 
 
     @Query(nativeQuery = true,
-            value = "select * from channel as c " +
+            value = "select * from main_service.channel as c " +
                     "where (:examinationId is null or c.examination_id = :examinationId) " +
                     "and (:channelNameId is null or c.channel_name_id = :channelNameId) ")
-    Page<Channel> findAllByExaminationIdAndChannelNameId(@Param("examinationId") Integer examinationId,
-                                                         @Param("channelNameId") Integer channelNameId,
+    Page<Channel> findAllByExaminationIdAndChannelNameId(@Param("examinationId") UUID examinationId,
+                                                         @Param("channelNameId") UUID channelNameId,
                                                          Pageable pageable);
 }

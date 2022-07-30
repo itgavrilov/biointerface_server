@@ -13,9 +13,9 @@ import ru.gsa.biointerface.repository.PatientRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * CRUD-сервис для работы с карточками пациентов
@@ -45,7 +45,7 @@ public class PatientService {
      * @param icdId Идентификатор заболивания(необязательный) {@link Icd#getId()}
      * @return Список карточек пациентов {@link List<Patient>}
      */
-    public List<Patient> getAll(Integer icdId) {
+    public List<Patient> findAll(UUID icdId) {
         return repository.findAllByIcd(icdId);
     }
 
@@ -56,7 +56,7 @@ public class PatientService {
      * @param pageable Пагинация {@link Pageable}
      * @return Список карточек пациентов с пагинацией {@link Page<Patient>}
      */
-    public Page<Patient> getAll(Integer icdId, Pageable pageable) {
+    public Page<Patient> findAll(UUID icdId, Pageable pageable) {
         return repository.findAllByIcd(icdId, pageable);
     }
 
@@ -67,7 +67,7 @@ public class PatientService {
      * @return Карточка пациента {@link Patient}
      * @throws NotFoundException если карточки пациента с id не найдено
      */
-    public Patient getById(Integer id) {
+    public Patient getById(UUID id) {
         return repository.getOrThrow(id);
     }
 
@@ -77,8 +77,7 @@ public class PatientService {
      * @param dto DTO карточки пациента {@link PatientDTO}
      * @return Карточка пациента {@link Patient}
      */
-    @Transactional
-    public Patient save(PatientDTO dto) {
+    public Patient saveOrUpdate(PatientDTO dto) {
         Optional<Patient> optional = repository.findById(dto.getId());
         Icd icd = icdService.getById(dto.getIcdId());
         Patient entity;
@@ -113,8 +112,7 @@ public class PatientService {
      * @param id Идентификатор {@link Patient#getId()}
      * @throws NotFoundException если карточки пациента с id не найдено
      */
-    @Transactional
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Patient entity = repository.getOrThrow(id);
         repository.delete(entity);
         log.debug("Patient(id={}) is deleted", id);

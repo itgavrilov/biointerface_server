@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) исследования
@@ -22,35 +23,35 @@ import java.util.Objects;
 @Builder
 @Schema(name = "Examination", description = "result of biopotential measurements")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> {
+public class ExaminationDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Schema(description = "examination ID")
-    private Integer id;
+    private UUID id;
 
     /**
      * Время начала исследования {@link LocalDateTime}
      */
-    @Schema(description = "examination start time")
+    @Schema(description = "examination start time", required = true)
     @Past(message = "Start time should be in past")
-    private LocalDateTime starttime;
+    private LocalDateTime datetime;
 
     /**
      * Идентификатор карточки пациента {@link PatientDTO#getId()}
      */
-    @Schema(description = "patient ID")
+    @Schema(description = "patient ID", required = true)
     @NotNull(message = "PatientId can't be null")
-    private Integer patientId;
+    private UUID patientId;
 
     /**
      * Идентификатор контроллера биоинтерфейса {@link DeviceDTO#getId()}
      */
-    @Schema(description = "device ID")
+    @Schema(description = "device ID", required = true)
     @NotNull(message = "DeviceId can't be null")
-    private Integer deviceId;
+    private UUID deviceId;
 
     /**
      * Комментарий
@@ -63,8 +64,9 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ExaminationDTO entity = (ExaminationDTO) o;
-        return Objects.equals(id, entity.id);
+        ExaminationDTO that = (ExaminationDTO) o;
+
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -73,17 +75,11 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
     }
 
     @Override
-    public int compareTo(ExaminationDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        ExaminationDTO that = (ExaminationDTO) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
-
-        return result;
+        return id.compareTo(that.id);
     }
 
     @Override
@@ -92,7 +88,7 @@ public class ExaminationDTO implements Serializable, Comparable<ExaminationDTO> 
 
         return "Examination{" +
                 "id=" + id +
-                ", datetime=" + formatter.format(starttime) +
+                ", datetime=" + formatter.format(datetime) +
                 ", patientRecord_id=" + patientId +
                 ", device_id=" + deviceId +
                 '}';

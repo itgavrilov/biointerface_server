@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) карточки пациента
@@ -22,14 +23,14 @@ import java.util.Objects;
 @Builder
 @Schema(name = "Patient", description = "patient record")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class PatientDTO implements Serializable, Comparable<PatientDTO> {
+public class PatientDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
     @Schema(description = "Patient ID")
-    private Integer id;
+    private UUID id;
 
     /**
      * Фамилия
@@ -62,7 +63,7 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
      * Идентификатор заболевания по ICD {@link IcdDTO#getId()}
      */
     @Schema(description = "ICD ID")
-    private Integer icdId;
+    private UUID icdId;
 
     /**
      * Комментарий
@@ -85,15 +86,14 @@ public class PatientDTO implements Serializable, Comparable<PatientDTO> {
     }
 
     @Override
-    public int compareTo(PatientDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = 0;
+        PatientDTO that = (PatientDTO) o;
 
-        if (id > o.id) {
-            result = 1;
-        } else if (id < o.id) {
-            result = -1;
-        }
+        int result = secondName.compareTo(that.secondName);
+        if (result == 0) result = firstName.compareTo(that.firstName);
+        if (result == 0) result = patronymic.compareTo(that.patronymic);
+        if (result == 0) result = birthday.compareTo(that.birthday);
 
         return result;
     }

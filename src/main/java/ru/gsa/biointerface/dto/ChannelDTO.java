@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) канала контроллера биоинтерфейса
@@ -18,28 +20,28 @@ import java.util.Objects;
 @Builder
 @Schema(name = "Channel", description = "controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
+public class ChannelDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор исследования {@link ExaminationDTO#getId()}
      */
-    @Schema(description = "examination`s ID")
-    @Min(value = 0, message = "Examination id can't be lass then 0")
-    private Integer examinationId;
+    @Schema(description = "examination`s ID", required = true)
+    @NotNull(message = "Examination id can't be null")
+    private UUID examinationId;
 
     /**
      * Номер
      */
-    @Schema(description = "serial number in controller")
+    @Schema(description = "serial number in controller", required = true)
     @Min(value = 0, message = "Number can't be lass then 0")
-    private Integer number;
+    private Byte number;
 
     /**
      * Идентификатор наименования канала контроллера биоинтерфейса {@link ChannelNameDTO#getId()}
      */
     @Schema(description = "channel`s name ID")
-    private Integer channelNameId;
+    private UUID channelNameId;
 
     @Override
     public boolean equals(Object o) {
@@ -55,12 +57,12 @@ public class ChannelDTO implements Serializable, Comparable<ChannelDTO> {
     }
 
     @Override
-    public int compareTo(ChannelDTO o) {
+    public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        int result = examinationId - o.examinationId;
+        ChannelDTO that = (ChannelDTO) o;
 
-        if (result == 0)
-            result = number - o.number;
+        int result = examinationId.compareTo(that.examinationId);
+        if (result == 0) result = number - that.number;
 
         return result;
     }
