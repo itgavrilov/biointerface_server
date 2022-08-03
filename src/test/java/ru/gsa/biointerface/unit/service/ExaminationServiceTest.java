@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.unit.service;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ExaminationRepository;
+import ru.gsa.biointerface.service.ExaminationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ExaminationServiceUnitTest {
+class ExaminationServiceTest {
 
     private final EasyRandom generator = new EasyRandom();
 

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;NON_KEYWORDS=VALUE
+    #    url: jdbc:h2:mem:test
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      platform: h2
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      h2:
+        default_schema: main_service
+        ddl-auto: validate
+        charset: UTF-8
+        character_encoding: UTF-8
+        use_unicode: true
+        autocommit: false
+        format_sql: true

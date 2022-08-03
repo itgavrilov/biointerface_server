@@ -1,40 +1,17 @@
 spring:
-  profiles:
-    active: dev
   application:
     name: biointerface_server
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/biointerface
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: ${MAX_POOL_SIZE:20}
-      minimum-idle: ${MIN_POOL_IDLE:5}
+  profiles:
+    active: dev
   jpa:
+    generate-ddl: true
     open-in-view: true
     show-sql: false
-    properties:
-      hibernate:
-        default_schema: main_service
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        ddl-auto: validate
-        charset: UTF-8
-        character_encoding: UTF-8
-        use_unicode: true
-        autocommit: false
-        format_sql: true
-        cache:
-          use_second_level_cache: false
-          provider_class: org.hibernate.cache.NoCacheProvider
   sql:
     init:
-      platform: h2
       encoding: UTF-8
-
   flyway:
-    schemas: public
+    schemas: default
 #    baselineOnMigrate: true
     ignore-missing-migrations: true
     table: flyway_schema_history

@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.mapper;
+package ru.gsa.biointerface.unit.mapper;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import ru.gsa.biointerface.dto.PatientDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class PatientMapperUnitTest {
+class PatientMapperTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final PatientMapper mapper = new PatientMapperImpl();

@@ -29,12 +29,12 @@ public class IcdService {
 
     @PostConstruct
     private void init() {
-        log.info("IcdService is init");
+        log.debug("IcdService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        log.info("IcdService is destruction");
+        log.debug("IcdService is destruction");
     }
 
     /**

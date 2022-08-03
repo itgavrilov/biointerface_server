@@ -27,8 +27,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.dto.IcdDTO;
-import ru.gsa.biointerface.mapper.IcdMapper;
 import ru.gsa.biointerface.service.IcdService;
+import ru.gsa.biointerface.unit.mapper.IcdMapper;
 
 import javax.validation.Valid;
 import java.net.URI;

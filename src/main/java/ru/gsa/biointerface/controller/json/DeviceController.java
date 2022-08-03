@@ -28,8 +28,8 @@ import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.dto.DeviceDTO;
 import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.dto.IcdDTO;
-import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
+import ru.gsa.biointerface.unit.mapper.DeviceMapper;
 
 import javax.validation.Valid;
 import java.net.URI;

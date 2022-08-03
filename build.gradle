@@ -67,15 +67,15 @@ dependencies {
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
     implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-//-----------Tests--------------------------
+//-----------Swagger --------------------------
     implementation('org.springdoc:springdoc-openapi-ui:1.6.9')
 //-----------Tests--------------------------
-    testImplementation('com.h2database:h2:2.1.212')
+    implementation('com.h2database:h2:2.1.210')
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
-    implementation("org.jeasy:easy-random-core:5.0.0")
+    testImplementation("org.jeasy:easy-random-core:5.0.0")
 }
 
 configurations.all {

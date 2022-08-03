@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.mapper;
+package ru.gsa.biointerface.unit.mapper;
 
 import org.mapstruct.Mapper;
 import ru.gsa.biointerface.domain.entity.Icd;

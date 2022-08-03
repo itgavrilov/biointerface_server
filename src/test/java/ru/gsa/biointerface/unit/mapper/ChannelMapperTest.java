@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.mapper;
+package ru.gsa.biointerface.unit.mapper;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import ru.gsa.biointerface.dto.ChannelDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class ChannelMapperUnitTest {
+class ChannelMapperTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final ChannelMapper mapper = new ChannelMapperImpl();

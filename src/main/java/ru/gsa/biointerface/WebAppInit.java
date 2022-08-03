@@ -18,7 +18,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "ru.gsa.biointerface.host",
         "ru.gsa.biointerface.service",
         "ru.gsa.biointerface.controller",
-        "ru.gsa.biointerface.mapper",
+        "ru.gsa.biointerface.unit.mapper",
         "ru.gsa.biointerface.repository"
 })
 @EntityScan("ru.gsa.biointerface.domain.entity")

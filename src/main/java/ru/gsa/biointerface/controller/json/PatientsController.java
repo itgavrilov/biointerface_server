@@ -28,8 +28,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.dto.PatientDTO;
-import ru.gsa.biointerface.mapper.PatientMapper;
 import ru.gsa.biointerface.service.PatientService;
+import ru.gsa.biointerface.unit.mapper.PatientMapper;
 
 import javax.validation.Valid;
 import java.net.URI;

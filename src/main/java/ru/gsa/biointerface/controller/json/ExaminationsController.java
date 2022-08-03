@@ -32,10 +32,10 @@ import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.dto.ChannelNameDTO;
 import ru.gsa.biointerface.dto.ErrorResponse;
 import ru.gsa.biointerface.dto.ExaminationDTO;
-import ru.gsa.biointerface.mapper.ExaminationMapper;
 import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
 import ru.gsa.biointerface.service.PatientService;
+import ru.gsa.biointerface.unit.mapper.ExaminationMapper;
 
 import javax.validation.Valid;
 import java.net.URI;

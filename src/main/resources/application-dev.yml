@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/biointerface
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  sql:
+    init:
+      platform: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    properties:
+      hibernate:
+        types:
+          print:
+            banner: false
+        default_schema: main_service
+        #        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        ddl-auto: validate
+        charset: UTF-8
+        character_encoding: UTF-8
+        use_unicode: true
+        autocommit: false
+        format_sql: true
+        cache:
+          use_second_level_cache: false
+          provider_class: org.hibernate.cache.NoCacheProvider
