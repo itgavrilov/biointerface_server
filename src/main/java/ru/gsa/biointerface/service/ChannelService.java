@@ -107,6 +107,6 @@ public class ChannelService {
     public void delete(UUID examinationId, Byte number) {
         Channel entity = repository.getOrThrow(examinationId, number);
         repository.delete(entity);
-        log.debug("Channel(examinationId={}, number={}) is deleted", examinationId, number);
+        log.info("Channel(examinationId={}, number={}) is deleted", examinationId, number);
     }
 }

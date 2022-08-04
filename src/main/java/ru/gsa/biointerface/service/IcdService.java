@@ -87,7 +87,7 @@ public class IcdService {
         }
 
         entity = repository.save(entity);
-        log.debug("Icd(id={}) is save", entity.getId());
+        log.info("Icd(id={}) is save", entity.getId());
 
         return entity;
     }
@@ -101,6 +101,6 @@ public class IcdService {
     public void delete(UUID id) {
         Icd entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("Icd(id={}) is deleted", id);
+        log.info("Icd(id={}) is deleted", id);
     }
 }

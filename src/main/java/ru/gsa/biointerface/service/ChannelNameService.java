@@ -86,7 +86,7 @@ public class ChannelNameService {
         }
 
         entity = repository.save(entity);
-        log.debug("ChannelName(id={}) is save", entity.getId());
+        log.info("ChannelName(id={}) is save", entity.getId());
 
         return entity;
     }
@@ -100,6 +100,6 @@ public class ChannelNameService {
     public void delete(UUID id) {
         ChannelName entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("ChannelName(id={}) is deleted", id);
+        log.info("ChannelName(id={}) is deleted", id);
     }
 }

@@ -81,7 +81,7 @@ public class DeviceService {
         entity.setAmountChannels(dto.getAmountChannels());
         entity.setComment(dto.getComment());
 
-        log.debug("Device(id={}) is update", entity.getId());
+        log.info("Device(id={}) is update", entity.getId());
 
         return entity;
     }
@@ -94,7 +94,7 @@ public class DeviceService {
      */
     public Device save(Device entity) {
         entity = repository.save(entity);
-        log.debug("Device(id={}) is save", entity.getId());
+        log.info("Device(id={}) is save", entity.getId());
 
         return entity;
     }
@@ -108,6 +108,6 @@ public class DeviceService {
     public void delete(UUID id) {
         Device entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("Device(id={}) is deleted", id);
+        log.info("Device(id={}) is deleted", id);
     }
 }

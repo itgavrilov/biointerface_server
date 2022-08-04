@@ -88,7 +88,7 @@ public class ExaminationService {
     @Transactional
     public Examination save(@Valid Examination entity) {
         entity = repository.save(entity);
-        log.debug("Examination(id={}) is save", entity.getId());
+        log.info("Examination(id={}) is save", entity.getId());
 
         return entity;
     }
@@ -103,7 +103,7 @@ public class ExaminationService {
     public void delete(UUID id) {
         Examination entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("Examination(id={}) is deleted", id);
+        log.info("Examination(id={}) is deleted", id);
     }
 
     public Examination loadWithGraphsById(UUID id) {

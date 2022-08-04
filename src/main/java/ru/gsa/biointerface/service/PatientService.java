@@ -101,7 +101,7 @@ public class PatientService {
         }
 
         entity = repository.save(entity);
-        log.debug("Patient(id={}) is save", entity.getId());
+        log.info("Patient(id={}) is save", entity.getId());
 
         return entity;
     }
@@ -115,6 +115,6 @@ public class PatientService {
     public void delete(UUID id) {
         Patient entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("Patient(id={}) is deleted", id);
+        log.info("Patient(id={}) is deleted", id);
     }
 }
