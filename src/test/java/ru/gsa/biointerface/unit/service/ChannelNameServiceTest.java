@@ -48,6 +48,14 @@ class ChannelNameServiceTest {
         List<ChannelName> entityTests = service.findAll();
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getName(), entityTests.get(i).getName());
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertIterableEquals(entities.get(i).getChannels(), entityTests.get(i).getChannels());
+        }
+
         verify(repository).findAll();
     }
 
@@ -58,6 +66,7 @@ class ChannelNameServiceTest {
         List<ChannelName> entityTests = service.findAll();
         assertNotNull(entityTests);
         assertIterableEquals(new ArrayList<>(), entityTests);
+
         verify(repository).findAll();
     }
 
@@ -73,9 +82,16 @@ class ChannelNameServiceTest {
             Page<ChannelName> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
             when(repository.findAll(pageable)).thenReturn(entityPage);
 
-            Page<ChannelName> entityPageTests2 = service.findAll(pageable);
-            assertNotNull(entityPageTests2);
-            assertIterableEquals(entityPage, entityPageTests2);
+            Page<ChannelName> entityPageTests = service.findAll(pageable);
+            assertNotNull(entityPageTests);
+            assertIterableEquals(entityPage, entityPageTests);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPageTests.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getName(), entityPageTests.getContent().get(i).getName());
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+                assertIterableEquals(entityPage.getContent().get(i).getChannels(), entityPageTests.getContent().get(i).getChannels());
+            }
             verify(repository).findAll(pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -89,7 +105,7 @@ class ChannelNameServiceTest {
 
         Page<ChannelName> entityPageTests = service.findAll(pageable);
         assertNotNull(entityPageTests);
-        assertEquals(entityPage, entityPageTests);
+        assertIterableEquals(entityPage, entityPageTests);
         verify(repository).findAll(pageable);
     }
 
@@ -100,7 +116,10 @@ class ChannelNameServiceTest {
 
         ChannelName entityTest = service.getById(entity.getId());
         assertNotNull(entityTest);
-        assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getName(), entityTest.getName());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getChannels(), entityTest.getChannels());
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -127,7 +146,11 @@ class ChannelNameServiceTest {
 
         ChannelName entityTest = service.saveOrUpdate(dto);
         assertNotNull(entityTest);
-        assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getName(), entityTest.getName());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getChannels(), entityTest.getChannels());
+
         verify(repository).findById(entity.getId());
         verify(repository).save(entity);
     }

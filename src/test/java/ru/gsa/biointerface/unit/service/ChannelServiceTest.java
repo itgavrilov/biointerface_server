@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -48,6 +49,14 @@ class ChannelServiceTest {
         List<Channel> entityTests = service.findAll(null, null);
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getChannelName(), entityTests.get(i).getChannelName());
+            assertEquals(entities.get(i).getExamination(), entityTests.get(i).getExamination());
+            assertIterableEquals(entities.get(i).getSamples(), entityTests.get(i).getSamples());
+        }
+
         verify(repository).findAllByExaminationIdAndChannelNameId(null, null);
     }
 
@@ -64,34 +73,49 @@ class ChannelServiceTest {
     @Test
     void findAll_byExamination() {
         List<Channel> entities = generator.objects(Channel.class, 5).toList();
-        Examination examination = generator.nextObject(Examination.class);
+        Examination examination = entities.get(0).getExamination();
         entities.forEach(e -> e.setExamination(examination));
         when(repository.findAllByExaminationIdAndChannelNameId(examination.getId(), null)).thenReturn(entities);
 
         List<Channel> entityTests = service.findAll(examination.getId(), null);
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getChannelName(), entityTests.get(i).getChannelName());
+            assertEquals(entities.get(i).getExamination(), examination);
+            assertIterableEquals(entities.get(i).getSamples(), entityTests.get(i).getSamples());
+        }
         verify(repository).findAllByExaminationIdAndChannelNameId(examination.getId(), null);
     }
 
     @Test
     void findAll_byChannelName() {
         List<Channel> entities = generator.objects(Channel.class, 5).toList();
-        ChannelName channelName = generator.nextObject(ChannelName.class);
+        ChannelName channelName = entities.get(0).getChannelName();
         entities.forEach(e -> e.setChannelName(channelName));
         when(repository.findAllByExaminationIdAndChannelNameId(null, channelName.getId())).thenReturn(entities);
 
         List<Channel> entityTests = service.findAll(null, channelName.getId());
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getChannelName(), channelName);
+            assertEquals(entities.get(i).getExamination(), entityTests.get(i).getExamination());
+            assertIterableEquals(entities.get(i).getSamples(), entityTests.get(i).getSamples());
+        }
+
         verify(repository).findAllByExaminationIdAndChannelNameId(null, channelName.getId());
     }
 
     @Test
     void findAll_byExaminationAndChannelName() {
         List<Channel> entities = generator.objects(Channel.class, 5).toList();
-        Examination examination = generator.nextObject(Examination.class);
-        ChannelName channelName = generator.nextObject(ChannelName.class);
+        Examination examination = entities.get(0).getExamination();
+        ChannelName channelName = entities.get(0).getChannelName();
         entities.forEach(e -> {
             e.setExamination(examination);
             e.setChannelName(channelName);
@@ -101,6 +125,14 @@ class ChannelServiceTest {
         List<Channel> entityTests = service.findAll(examination.getId(), channelName.getId());
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getChannelName(), channelName);
+            assertEquals(entities.get(i).getExamination(), examination);
+            assertIterableEquals(entities.get(i).getSamples(), entityTests.get(i).getSamples());
+        }
+
         verify(repository).findAllByExaminationIdAndChannelNameId(examination.getId(), channelName.getId());
     }
 
@@ -130,7 +162,13 @@ class ChannelServiceTest {
         when(channelNameRepository.getOrThrow(dto.getChannelNameId())).thenReturn(entityNew.getChannelName());
 
         Channel entityTest = service.update(dto);
+        assertNotNull(entityTest);
         assertEquals(entityNew, entityTest);
+        assertEquals(entityNew.getId(), entityTest.getId());
+        assertEquals(entityNew.getChannelName(), entityTest.getChannelName());
+        assertEquals(entity.getExamination(), entityTest.getExamination());
+        assertNotEquals(entityNew.getExamination(), entityTest.getExamination());
+
         verify(repository).getOrThrow(dto.getExaminationId(), dto.getNumber());
         verify(channelNameRepository).getOrThrow(dto.getChannelNameId());
     }
@@ -155,6 +193,11 @@ class ChannelServiceTest {
         Channel entityTest = service.save(entity);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getChannelName(), entityTest.getChannelName());
+        assertEquals(entity.getExamination(), entityTest.getExamination());
+        assertIterableEquals(entity.getSamples(), entityTest.getSamples());
+
         verify(repository).save(entity);
     }
 

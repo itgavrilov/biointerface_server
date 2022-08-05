@@ -48,6 +48,15 @@ class IcdServiceTest {
         List<Icd> entityTests = service.findAll();
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getName(), entityTests.get(i).getName());
+            assertEquals(entities.get(i).getVersion(), entityTests.get(i).getVersion());
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertIterableEquals(entities.get(i).getPatients(), entityTests.get(i).getPatients());
+        }
+
         verify(repository).findAll();
     }
 
@@ -76,6 +85,14 @@ class IcdServiceTest {
             Page<Icd> entityPageTests = service.findAll(pageable);
             assertNotNull(entityPageTests);
             assertIterableEquals(entityPage, entityPageTests);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPage.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getName(), entityPageTests.getContent().get(i).getName());
+                assertEquals(entityPage.getContent().get(i).getVersion(), entityPageTests.getContent().get(i).getVersion());
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+            }
+
             verify(repository).findAll(pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -87,9 +104,10 @@ class IcdServiceTest {
         Page<Icd> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
         when(repository.findAll(pageable)).thenReturn(entityPage);
 
-        Page<Icd> entityPageTests1 = service.findAll(pageable);
-        assertNotNull(entityPageTests1);
-        assertEquals(entityPage, entityPageTests1);
+        Page<Icd> entityPageTests = service.findAll(pageable);
+        assertNotNull(entityPageTests);
+        assertEquals(entityPage, entityPageTests);
+
         verify(repository).findAll(pageable);
     }
 
@@ -101,6 +119,12 @@ class IcdServiceTest {
         Icd entityTest = service.getById(entity.getId());
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getName(), entityTest.getName());
+        assertEquals(entity.getVersion(), entityTest.getVersion());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getPatients(), entityTest.getPatients());
+
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -129,6 +153,12 @@ class IcdServiceTest {
         Icd entityTest = service.saveOrUpdate(dto);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getName(), entityTest.getName());
+        assertEquals(entity.getVersion(), entityTest.getVersion());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getPatients(), entityTest.getPatients());
+
         verify(repository).findById(entity.getId());
         verify(repository).save(entity);
     }

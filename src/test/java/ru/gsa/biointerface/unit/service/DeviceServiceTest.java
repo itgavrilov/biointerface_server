@@ -47,6 +47,15 @@ class DeviceServiceTest {
         List<Device> entityTests = service.findAll();
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getNumber(), entityTests.get(i).getNumber());
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertEquals(entities.get(i).getAmountChannels(), entityTests.get(i).getAmountChannels());
+            assertIterableEquals(entities.get(i).getExaminations(), entityTests.get(i).getExaminations());
+        }
+
         verify(repository).findAll();
     }
 
@@ -75,8 +84,16 @@ class DeviceServiceTest {
             Page<Device> entityPageTests = service.findAll(pageable);
             assertNotNull(entityPageTests);
             assertIterableEquals(entityPage, entityPageTests);
-            verify(repository).findAll(pageable);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPage.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getNumber(), entityPageTests.getContent().get(i).getNumber());
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+                assertEquals(entityPage.getContent().get(i).getAmountChannels(), entityPageTests.getContent().get(i).getAmountChannels());
+                assertIterableEquals(entityPage.getContent().get(i).getExaminations(), entityPageTests.getContent().get(i).getExaminations());
+            }
 
+            verify(repository).findAll(pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
     }
@@ -87,9 +104,10 @@ class DeviceServiceTest {
         Page<Device> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
         when(repository.findAll(pageable)).thenReturn(entityPage);
 
-        Page<Device> entityPageTests1 = service.findAll(pageable);
-        assertNotNull(entityPageTests1);
-        assertEquals(entityPage, entityPageTests1);
+        Page<Device> entityPageTests = service.findAll(pageable);
+        assertNotNull(entityPageTests);
+        assertEquals(entityPage, entityPageTests);
+
         verify(repository).findAll(pageable);
     }
 
@@ -101,6 +119,12 @@ class DeviceServiceTest {
         Device entityTest = service.getById(entity.getId());
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getNumber(), entityTest.getNumber());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertEquals(entity.getAmountChannels(), entityTest.getAmountChannels());
+        assertIterableEquals(entity.getExaminations(), entityTest.getExaminations());
+
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -127,6 +151,11 @@ class DeviceServiceTest {
         Device entityTest = service.update(dto);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getNumber(), entityTest.getNumber());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertEquals(entity.getAmountChannels(), entityTest.getAmountChannels());
+        assertIterableEquals(entity.getExaminations(), entityTest.getExaminations());
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -149,6 +178,11 @@ class DeviceServiceTest {
         Device entityTest = service.save(entity);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getNumber(), entityTest.getNumber());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertEquals(entity.getAmountChannels(), entityTest.getAmountChannels());
+        assertIterableEquals(entity.getExaminations(), entityTest.getExaminations());
         verify(repository).save(entity);
     }
 

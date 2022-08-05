@@ -48,6 +48,16 @@ class ExaminationServiceTest {
         List<Examination> entityTests = service.findAll(null, null);
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getPatient(), entityTests.get(i).getPatient());
+            assertEquals(entities.get(i).getDatetime(), entityTests.get(i).getDatetime());
+            assertEquals(entities.get(i).getDevice(), entityTests.get(i).getDevice());
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertIterableEquals(entities.get(i).getChannels(), entityTests.get(i).getChannels());
+        }
+
         verify(repository).findAllByPatientIdAndDeviceId(null, null);
     }
 
@@ -64,34 +74,54 @@ class ExaminationServiceTest {
     @Test
     void findAll_byPatient() {
         List<Examination> entities = generator.objects(Examination.class, 5).toList();
-        Patient patient = generator.nextObject(Patient.class);
+        Patient patient = entities.get(0).getPatient();
         entities.forEach(e -> e.setPatient(patient));
         when(repository.findAllByPatientIdAndDeviceId(patient.getId(), null)).thenReturn(entities);
 
         List<Examination> entityTests = service.findAll(patient.getId(), null);
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getPatient(), patient);
+            assertEquals(entities.get(i).getDatetime(), entityTests.get(i).getDatetime());
+            assertEquals(entities.get(i).getDevice(), entityTests.get(i).getDevice());
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertIterableEquals(entities.get(i).getChannels(), entityTests.get(i).getChannels());
+        }
+
         verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), null);
     }
 
     @Test
     void findAll_byDevice() {
         List<Examination> entities = generator.objects(Examination.class, 5).toList();
-        Device device = generator.nextObject(Device.class);
+        Device device = entities.get(0).getDevice();
         entities.forEach(e -> e.setDevice(device));
         when(repository.findAllByPatientIdAndDeviceId(null, device.getId())).thenReturn(entities);
 
         List<Examination> entityTests = service.findAll(null, device.getId());
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getPatient(), entityTests.get(i).getPatient());
+            assertEquals(entities.get(i).getDatetime(), entityTests.get(i).getDatetime());
+            assertEquals(entities.get(i).getDevice(), device);
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertIterableEquals(entities.get(i).getChannels(), entityTests.get(i).getChannels());
+        }
+
         verify(repository).findAllByPatientIdAndDeviceId(null, device.getId());
     }
 
     @Test
     void findAll_byPatientAndDevice() {
         List<Examination> entities = generator.objects(Examination.class, 5).toList();
-        Patient patient = generator.nextObject(Patient.class);
-        Device device = generator.nextObject(Device.class);
+        Patient patient = entities.get(0).getPatient();
+        Device device = entities.get(0).getDevice();
         entities.forEach(e -> {
             e.setPatient(patient);
             e.setDevice(device);
@@ -101,6 +131,16 @@ class ExaminationServiceTest {
         List<Examination> entityTests = service.findAll(patient.getId(), device.getId());
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getPatient(), patient);
+            assertEquals(entities.get(i).getDatetime(), entityTests.get(i).getDatetime());
+            assertEquals(entities.get(i).getDevice(), device);
+            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
+            assertIterableEquals(entities.get(i).getChannels(), entityTests.get(i).getChannels());
+        }
+
         verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), device.getId());
     }
 
@@ -119,6 +159,16 @@ class ExaminationServiceTest {
             Page<Examination> entityPageTests = service.findAll(null, null, pageable);
             assertNotNull(entityPageTests);
             assertIterableEquals(entityPage, entityPageTests);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPage.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getPatient(), entityPageTests.getContent().get(i).getPatient());
+                assertEquals(entityPage.getContent().get(i).getDatetime(), entityPageTests.getContent().get(i).getDatetime());
+                assertEquals(entityPage.getContent().get(i).getDevice(), entityPageTests.getContent().get(i).getDevice());
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+                assertIterableEquals(entityPage.getContent().get(i).getChannels(), entityPageTests.getContent().get(i).getChannels());
+            }
+
             verify(repository).findAllByPatientIdAndDeviceId(null, null, pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -139,7 +189,7 @@ class ExaminationServiceTest {
     @Test
     void findAllPageable_byPatient() {
         List<Examination> entities = generator.objects(Examination.class, 15).toList();
-        Patient patient = generator.nextObject(Patient.class);
+        Patient patient = entities.get(0).getPatient();
         entities.forEach(e -> e.setPatient(patient));
         Pageable pageable = PageRequest.of(0, 5);
 
@@ -153,6 +203,16 @@ class ExaminationServiceTest {
             Page<Examination> entityPageTests = service.findAll(patient.getId(), null, pageable);
             assertNotNull(entityPageTests);
             assertIterableEquals(entityPage, entityPageTests);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPage.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getPatient(), patient);
+                assertEquals(entityPage.getContent().get(i).getDatetime(), entityPageTests.getContent().get(i).getDatetime());
+                assertEquals(entityPage.getContent().get(i).getDevice(), entityPageTests.getContent().get(i).getDevice());
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+                assertIterableEquals(entityPage.getContent().get(i).getChannels(), entityPageTests.getContent().get(i).getChannels());
+            }
+
             verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), null, pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -161,7 +221,7 @@ class ExaminationServiceTest {
     @Test
     void findAllPageable_byDevice() {
         List<Examination> entities = generator.objects(Examination.class, 15).toList();
-        Device device = generator.nextObject(Device.class);
+        Device device = entities.get(0).getDevice();
         entities.forEach(e -> e.setDevice(device));
         Pageable pageable = PageRequest.of(0, 5);
 
@@ -175,6 +235,16 @@ class ExaminationServiceTest {
             Page<Examination> entityPageTests = service.findAll(null, device.getId(), pageable);
             assertNotNull(entityPageTests);
             assertIterableEquals(entityPage, entityPageTests);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPage.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getPatient(), entityPageTests.getContent().get(i).getPatient());
+                assertEquals(entityPage.getContent().get(i).getDatetime(), entityPageTests.getContent().get(i).getDatetime());
+                assertEquals(entityPage.getContent().get(i).getDevice(), device);
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+                assertIterableEquals(entityPage.getContent().get(i).getChannels(), entityPageTests.getContent().get(i).getChannels());
+            }
+
             verify(repository).findAllByPatientIdAndDeviceId(null, device.getId(), pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -183,8 +253,8 @@ class ExaminationServiceTest {
     @Test
     void findAllPageable_byPatientAndDevice() {
         List<Examination> entities = generator.objects(Examination.class, 15).toList();
-        Patient patient = generator.nextObject(Patient.class);
-        Device device = generator.nextObject(Device.class);
+        Patient patient = entities.get(0).getPatient();
+        Device device = entities.get(0).getDevice();
         entities.forEach(e -> {
             e.setPatient(patient);
             e.setDevice(device);
@@ -201,6 +271,16 @@ class ExaminationServiceTest {
             Page<Examination> entityPageTests = service.findAll(patient.getId(), device.getId(), pageable);
             assertNotNull(entityPageTests);
             assertIterableEquals(entityPage, entityPageTests);
+            for (int i = 0; i < entityPage.getContent().size(); i++) {
+                assertNotNull(entityPage.getContent().get(i));
+                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
+                assertEquals(entityPage.getContent().get(i).getPatient(), patient);
+                assertEquals(entityPage.getContent().get(i).getDatetime(), entityPageTests.getContent().get(i).getDatetime());
+                assertEquals(entityPage.getContent().get(i).getDevice(), device);
+                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
+                assertIterableEquals(entityPage.getContent().get(i).getChannels(), entityPageTests.getContent().get(i).getChannels());
+            }
+
             verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), device.getId(), pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -214,6 +294,13 @@ class ExaminationServiceTest {
         Examination entityTest = service.getById(entity.getId());
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getPatient(), entityTest.getPatient());
+        assertEquals(entity.getDatetime(), entityTest.getDatetime());
+        assertEquals(entity.getDevice(), entityTest.getDevice());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getChannels(), entityTest.getChannels());
+
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -235,6 +322,13 @@ class ExaminationServiceTest {
         Examination entityTest = service.save(entity);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getPatient(), entityTest.getPatient());
+        assertEquals(entity.getDatetime(), entityTest.getDatetime());
+        assertEquals(entity.getDevice(), entityTest.getDevice());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getChannels(), entityTest.getChannels());
+
         verify(repository).save(entity);
     }
 
