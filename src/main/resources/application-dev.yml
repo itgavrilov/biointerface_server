@@ -18,7 +18,6 @@ spring:
           print:
             banner: false
         default_schema: main_service
-        #        dialect: org.hibernate.dialect.PostgreSQL10Dialect
         ddl-auto: validate
         charset: UTF-8
         character_encoding: UTF-8
