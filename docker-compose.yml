@@ -10,7 +10,7 @@ services:
 #    command: "-c logging_collector=on"
     volumes:
       - db_data:/var/lib/postgresql/data/biointerface
-    restart: always
+#    restart: always
     ports:
       - "5432:5432"
   biointerface_server:
