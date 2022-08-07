@@ -8,7 +8,8 @@ plugins {
 
 group = 'ru.gsa'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_16
 
 def defaultEncoding = 'UTF-8'
 [compileJava, compileTestJava]*.options*.encoding = defaultEncoding
@@ -81,4 +82,3 @@ configurations.all {
 test {
     useJUnitPlatform()
 }
-targetCompatibility = JavaVersion.VERSION_17

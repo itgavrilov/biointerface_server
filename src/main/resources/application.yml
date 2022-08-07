@@ -34,6 +34,5 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /swagger
-    version: "2.0"
 
 

@@ -10,9 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 import ru.gsa.biointerface.repository.PatientRepository;
@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -83,7 +82,7 @@ class PatientServiceTest {
     void findAll_byIcd() {
         Icd icd = generator.nextObject(Icd.class);
         icd.setId(null);
-        icd.setVersion(generator.nextInt(10, 99));
+        icd.setVersion(10);
         icd.setPatients(new ArrayList<>());
         icd = icdRepository.save(icd);
 
@@ -166,7 +165,7 @@ class PatientServiceTest {
     void findAllPageable_byIcd() {
         Icd icd = generator.nextObject(Icd.class);
         icd.setId(null);
-        icd.setVersion(generator.nextInt(10, 99));
+        icd.setVersion(10);
         icd.setPatients(new ArrayList<>());
         icd = icdRepository.save(icd);
 
@@ -242,7 +241,7 @@ class PatientServiceTest {
     void save() {
         Icd icd = generator.nextObject(Icd.class);
         icd.setId(null);
-        icd.setVersion(generator.nextInt(10, 99));
+        icd.setVersion(10);
         icd.setPatients(new ArrayList<>());
         icd = icdRepository.save(icd);
 
@@ -277,7 +276,7 @@ class PatientServiceTest {
     void delete() {
         Icd icd = generator.nextObject(Icd.class);
         icd.setId(null);
-        icd.setVersion(generator.nextInt(10, 99));
+        icd.setVersion(10);
         icd.setPatients(new ArrayList<>());
         icd = icdRepository.save(icd);
 

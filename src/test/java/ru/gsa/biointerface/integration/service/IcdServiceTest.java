@@ -10,8 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 import ru.gsa.biointerface.service.IcdService;
@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -44,7 +43,7 @@ class IcdServiceTest {
         List<Icd> entities = generator.objects(Icd.class, 5).toList();
         entities.forEach(entity -> {
             entity.setId(null);
-            entity.setVersion(generator.nextInt(10, 99));
+            entity.setVersion(10);
             entity.setPatients(new ArrayList<>());
         });
         entities = repository.saveAll(entities);
@@ -74,7 +73,7 @@ class IcdServiceTest {
         List<Icd> entities = generator.objects(Icd.class, 15).toList();
         entities.forEach(entity -> {
             entity.setId(null);
-            entity.setVersion(generator.nextInt(10, 99));
+            entity.setVersion(10);
             entity.setPatients(new ArrayList<>());
         });
         entities = repository.saveAll(entities);
@@ -117,7 +116,7 @@ class IcdServiceTest {
     void getById() {
         Icd entity = generator.nextObject(Icd.class);
         entity.setId(null);
-        entity.setVersion(generator.nextInt(10, 99));
+        entity.setVersion(10);
         entity.setPatients(new ArrayList<>());
         entity = repository.save(entity);
 
@@ -143,7 +142,7 @@ class IcdServiceTest {
     void saveOrUpdate() {
         IcdDTO dto = generator.nextObject(IcdDTO.class);
         dto.setId(null);
-        dto.setVersion(generator.nextInt(10, 99));
+        dto.setVersion(10);
 
         Icd entityTest = service.saveOrUpdate(dto);
         assertNotNull(entityTest);
@@ -164,7 +163,7 @@ class IcdServiceTest {
     void delete() {
         Icd entity = generator.nextObject(Icd.class);
         entity.setId(null);
-        entity.setVersion(generator.nextInt(10, 99));
+        entity.setVersion(10);
         entity.setPatients(new ArrayList<>());
         entity = repository.save(entity);
 
