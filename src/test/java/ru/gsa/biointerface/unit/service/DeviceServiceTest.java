@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.dto.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 import ru.gsa.biointerface.service.DeviceService;

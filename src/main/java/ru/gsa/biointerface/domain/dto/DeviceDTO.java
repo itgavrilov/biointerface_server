@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,48 +7,48 @@ import lombok.Data;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * DTO (Data Transfer Object) заболеване по международной классификации болезней (ICD)
+ * DTO (Data Transfer Object) контроллера биоинтерфейса
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
 @Data
 @Builder
-@Schema(name = "Icd", description = "ICD disease code")
+@Schema(name = "Device", description = "biointerface controller")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class IcdDTO implements Serializable, Comparable<Object> {
+public class DeviceDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
-    @Schema(description = "ICD ID")
+    @Schema(description = "Device ID")
     private UUID id;
 
     /**
-     * Наименование заболевания по ICD
+     * Серийный номер
      */
-    @Schema(description = "Name", required = true)
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    private String name;
+    @NotBlank(message = "Number can't be blank")
+    private String number;
 
     /**
-     * Версия ICD
+     * Количество каналов
      */
-    @Schema(description = "Version", required = true)
-    @Min(value = 10, message = "Version can't be lass then 10")
-    @Max(value = 99, message = "Version can't be more than 99")
-    private Integer version;
+    @Schema(description = "device Amount channels", required = true)
+    @Min(value = 1, message = "Amount channels can't be lass then 1")
+    @Max(value = 8, message = "Amount channels can't be more than 8")
+    private Integer amountChannels;
 
     /**
      * Комментарий
      */
-    @Schema(description = "Comment")
+    @Schema(description = "device comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 
@@ -56,7 +56,7 @@ public class IcdDTO implements Serializable, Comparable<Object> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IcdDTO that = (IcdDTO) o;
+        DeviceDTO that = (DeviceDTO) o;
 
         return Objects.equals(id, that.id);
     }
@@ -69,17 +69,16 @@ public class IcdDTO implements Serializable, Comparable<Object> {
     @Override
     public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        IcdDTO that = (IcdDTO) o;
+        DeviceDTO that = (DeviceDTO) o;
 
-        return id.compareTo(that.id);
+        return number.compareTo(that.comment);
     }
 
     @Override
     public String toString() {
-        return "Icd{" +
+        return "Device{" +
                 "id=" + id +
-                ", ICD='" + name + '\'' +
-                ", version=" + version +
+                ", amountChannels=" + amountChannels +
                 '}';
     }
 }

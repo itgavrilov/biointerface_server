@@ -7,7 +7,7 @@ import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.dto.ChannelDTO;
+import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.ChannelRepository;

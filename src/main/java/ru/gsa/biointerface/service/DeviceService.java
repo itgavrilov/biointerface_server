@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.dto.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 

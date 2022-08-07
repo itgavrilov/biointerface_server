@@ -12,7 +12,6 @@ spring:
       encoding: UTF-8
   flyway:
     schemas: default
-#    baselineOnMigrate: true
     ignore-missing-migrations: true
     table: flyway_schema_history
 
@@ -30,7 +29,11 @@ server:
     include-stacktrace: always
 
 springdoc:
+  packagesToScan: ru.gsa.biointerface.controller.json
   api-docs:
     enabled: true
   swagger-ui:
     path: /swagger
+    version: "2.0"
+
+

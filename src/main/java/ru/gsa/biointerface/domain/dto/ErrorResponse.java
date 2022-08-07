@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

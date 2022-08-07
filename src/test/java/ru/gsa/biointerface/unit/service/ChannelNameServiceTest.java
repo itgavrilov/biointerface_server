@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.dto.ChannelNameDTO;
+import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.service.ChannelNameService;

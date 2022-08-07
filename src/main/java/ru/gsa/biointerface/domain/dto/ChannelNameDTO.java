@@ -1,12 +1,10 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -14,41 +12,35 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * DTO (Data Transfer Object) контроллера биоинтерфейса
+ * DTO (Data Transfer Object) наименования канала контроллера биоинтерфейса
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
 @Data
 @Builder
-@Schema(name = "Device", description = "biointerface controller")
+@Schema(name = "ChannelName", description = "name for controller`s channel")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class DeviceDTO implements Serializable, Comparable<Object> {
+public class ChannelNameDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
-    @Schema(description = "Device ID")
+    @Schema(description = "Channel`s name ID")
     private UUID id;
 
     /**
-     * Серийный номер
+     * Наименование канала
      */
-    @NotBlank(message = "Number can't be blank")
-    private String number;
-
-    /**
-     * Количество каналов
-     */
-    @Schema(description = "device Amount channels", required = true)
-    @Min(value = 1, message = "Amount channels can't be lass then 1")
-    @Max(value = 8, message = "Amount channels can't be more than 8")
-    private Integer amountChannels;
+    @Schema(description = "Name", required = true)
+    @NotBlank(message = "Name can't be blank")
+    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
+    private String name;
 
     /**
      * Комментарий
      */
-    @Schema(description = "device comment")
+    @Schema(description = "Comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
 
@@ -56,8 +48,7 @@ public class DeviceDTO implements Serializable, Comparable<Object> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DeviceDTO that = (DeviceDTO) o;
-
+        ChannelNameDTO that = (ChannelNameDTO) o;
         return Objects.equals(id, that.id);
     }
 
@@ -69,16 +60,17 @@ public class DeviceDTO implements Serializable, Comparable<Object> {
     @Override
     public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        DeviceDTO that = (DeviceDTO) o;
+        ChannelNameDTO that = (ChannelNameDTO) o;
 
-        return number.compareTo(that.comment);
+        return name.compareTo(that.name);
     }
 
     @Override
     public String toString() {
-        return "Device{" +
-                "id=" + id +
-                ", amountChannels=" + amountChannels +
+        return "ChannelName{" +
+                "id='" + id + '\'' +
+                "name='" + name + '\'' +
+                "comment='" + comment + '\'' +
                 '}';
     }
 }

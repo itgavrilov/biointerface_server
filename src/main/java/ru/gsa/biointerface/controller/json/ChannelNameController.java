@@ -25,10 +25,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.dto.ChannelNameDTO;
-import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
+import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.service.ChannelNameService;
-import ru.gsa.biointerface.unit.mapper.ChannelNameMapper;
+import ru.gsa.biointerface.mapper.ChannelNameMapper;
 
 import javax.validation.Valid;
 import java.net.URI;

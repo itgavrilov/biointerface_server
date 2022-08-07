@@ -5,9 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.dto.PatientDTO;
+import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
 
@@ -77,10 +78,20 @@ public class PatientService {
      * @param dto DTO карточки пациента {@link PatientDTO}
      * @return Карточка пациента {@link Patient}
      */
-    public Patient saveOrUpdate(PatientDTO dto) {
-        Optional<Patient> optional = repository.findById(dto.getId());
-        Icd icd = icdService.getById(dto.getIcdId());
+    public Patient saveOrUpdate(@Validated PatientDTO dto) {
+        Optional<Patient> optional;
         Patient entity;
+        Icd icd = null;
+
+        if(dto.getIcdId() != null) {
+            icd = icdService.getById(dto.getIcdId());
+        }
+
+        if(dto.getId() != null){
+            optional = repository.findById(dto.getId());
+        } else {
+            optional = Optional.empty();
+        }
 
         if (optional.isEmpty()) {
             entity = new Patient(dto.getSecondName(),

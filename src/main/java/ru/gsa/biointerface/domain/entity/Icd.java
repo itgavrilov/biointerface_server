@@ -51,8 +51,7 @@ public class Icd implements Serializable, Comparable<Object> {
      * Наименование заболевания по ICD
      */
     @NotBlank(message = "Name can't be blank")
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    @Column(name = "name", nullable = false, length = 35)
+    @Column(name = "name", nullable = false)
     private String name;
 
     /**

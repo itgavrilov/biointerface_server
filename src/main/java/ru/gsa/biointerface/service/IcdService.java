@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.dto.IcdDTO;
+import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
@@ -73,9 +74,15 @@ public class IcdService {
      * @param dto DTO заболивания {@link IcdDTO}
      * @return Заболивание {@link Icd}
      */
-    public Icd saveOrUpdate(IcdDTO dto) {
-        Optional<Icd> optional = repository.findById(dto.getId());
+    public Icd saveOrUpdate(@Validated IcdDTO dto) {
+        Optional<Icd> optional;
         Icd entity;
+
+        if(dto.getId() != null){
+            optional = repository.findById(dto.getId());
+        } else {
+            optional = Optional.empty();
+        }
 
         if (optional.isEmpty()) {
             entity = new Icd(dto.getName(), dto.getVersion(), dto.getComment());

@@ -1,9 +1,9 @@
-package ru.gsa.biointerface.unit.mapper;
+package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.dto.ChannelNameDTO;
+import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

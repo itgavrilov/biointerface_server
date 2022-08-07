@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.unit.mapper;
+package ru.gsa.biointerface.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -6,7 +6,7 @@ import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.dto.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.ExaminationDTO;
 
 import java.util.List;
 
