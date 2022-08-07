@@ -1,9 +1,10 @@
 package ru.gsa.biointerface.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -16,10 +17,11 @@ import java.util.UUID;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Schema(name = "Sample", description = "reading of examination")
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SampleDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 

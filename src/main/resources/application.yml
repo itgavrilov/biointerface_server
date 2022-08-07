@@ -21,6 +21,16 @@ spring:
     encoding: utf-8
     cache: false
 
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+
+  jackson:
+    date-format: "yyyy-MM-dd'T'HH:mm:ss"
+    time-zone: "Europe/Moscow"
+    serialization:
+      write_dates_as_timestamps: false
+
 server:
   port: 8080
   servlet:
@@ -29,10 +39,15 @@ server:
     include-stacktrace: always
 
 springdoc:
-  packagesToScan: ru.gsa.biointerface.controller.json
   api-docs:
     enabled: true
   swagger-ui:
     path: /swagger
+
+logging:
+  level:
+    ROOT: INFO
+    org.springframework: INFO
+    ru.gsa.biointerface: DEBUG
 
 

@@ -2,8 +2,8 @@ package ru.gsa.biointerface.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -13,6 +13,7 @@ import static org.springdoc.core.SpringDocUtils.getConfig;
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 10/01/2022
  */
+@Slf4j
 @Configuration
 public class OpenApiConfig {
 

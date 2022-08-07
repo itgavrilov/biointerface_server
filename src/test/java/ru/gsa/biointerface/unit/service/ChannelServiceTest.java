@@ -6,10 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.ChannelRepository;
@@ -152,11 +152,10 @@ class ChannelServiceTest {
         Channel entity = generator.nextObject(Channel.class);
         Channel entityNew = generator.nextObject(Channel.class);
         entityNew.setId(entity.getId());
-        ChannelDTO dto = ChannelDTO.builder()
-                .examinationId(entityNew.getId().getExaminationId())
-                .number(entityNew.getId().getNumber())
-                .channelNameId(entityNew.getChannelName().getId())
-                .build();
+        ChannelDTO dto = new ChannelDTO();
+        dto.setExaminationId(entityNew.getId().getExaminationId());
+        dto.setNumber(entityNew.getId().getNumber());
+        dto.setChannelNameId(entityNew.getChannelName().getId());
 
         when(repository.getOrThrow(dto.getExaminationId(), dto.getNumber())).thenReturn(entity);
         when(channelNameRepository.getOrThrow(dto.getChannelNameId())).thenReturn(entityNew.getChannelName());

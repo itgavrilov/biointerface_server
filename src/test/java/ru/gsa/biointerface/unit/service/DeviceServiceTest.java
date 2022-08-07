@@ -10,8 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 import ru.gsa.biointerface.service.DeviceService;
@@ -141,11 +141,10 @@ class DeviceServiceTest {
     @Test
     void update() {
         Device entity = generator.nextObject(Device.class);
-        DeviceDTO dto = DeviceDTO.builder()
-                .id(entity.getId())
-                .amountChannels(generator.nextInt())
-                .comment(generator.nextObject(String.class))
-                .build();
+        DeviceDTO dto = new DeviceDTO();
+        dto.setId(entity.getId());
+        dto.setAmountChannels(generator.nextInt());
+        dto.setComment(generator.nextObject(String.class));
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Device entityTest = service.update(dto);

@@ -48,7 +48,7 @@ public class ExceptionRestControllerAdvice {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException exception) {
 
-        return buildResponse(exception.getStatus(), exception.getMessage());
+        return buildResponse(exception.getStatus(), exception.getReason());
     }
 
     /**

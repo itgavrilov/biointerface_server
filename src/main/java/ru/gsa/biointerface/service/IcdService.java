@@ -6,14 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,7 +78,7 @@ public class IcdService {
         Optional<Icd> optional;
         Icd entity;
 
-        if(dto.getId() != null){
+        if (dto.getId() != null) {
             optional = repository.findById(dto.getId());
         } else {
             optional = Optional.empty();

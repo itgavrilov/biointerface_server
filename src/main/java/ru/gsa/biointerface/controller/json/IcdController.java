@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
-import ru.gsa.biointerface.service.IcdService;
+import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.mapper.IcdMapper;
+import ru.gsa.biointerface.service.IcdService;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -117,7 +117,7 @@ public class IcdController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "save new ICD disease code")
+    @Operation(summary = "Save new or update ICD disease code")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
                     content = @Content(schema = @Schema(implementation = IcdDTO.class))),
@@ -126,7 +126,7 @@ public class IcdController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<IcdDTO> save(
+    public ResponseEntity<IcdDTO> saveOrUpdate(
             @Parameter(description = "ICD's DTO", required = true)
             @Valid @RequestBody IcdDTO dto) {
         log.info("REST PUT /icds wish params: {}", dto);

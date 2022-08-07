@@ -1,12 +1,14 @@
 package ru.gsa.biointerface.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
@@ -18,9 +20,10 @@ import java.util.UUID;
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Schema(name = "Icd", description = "ICD disease code")
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class IcdDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
@@ -34,7 +37,7 @@ public class IcdDTO implements Serializable, Comparable<Object> {
      * Наименование заболевания по ICD
      */
     @Schema(description = "Name", required = true)
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
+    @NotBlank(message = "Name can't be blank")
     private String name;
 
     /**

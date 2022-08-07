@@ -2,8 +2,8 @@ package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
-import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.entity.Icd;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

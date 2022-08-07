@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
-import ru.gsa.biointerface.service.DeviceService;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.mapper.DeviceMapper;
+import ru.gsa.biointerface.service.DeviceService;
 
 import javax.validation.Valid;
 import java.net.URI;
