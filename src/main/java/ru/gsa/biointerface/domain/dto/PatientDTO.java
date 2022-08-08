@@ -10,7 +10,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
@@ -55,11 +55,11 @@ public class PatientDTO implements Serializable, Comparable<Object> {
     private String patronymic;
 
     /**
-     * Дата рождения {@link LocalDateTime}
+     * Дата рождения {@link LocalDate}
      */
     @Schema(description = "Birthday", required = true)
     @Past(message = "Birthday should be in past")
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     /**
      * Идентификатор заболевания по ICD {@link IcdDTO#getId()}

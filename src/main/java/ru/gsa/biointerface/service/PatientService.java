@@ -97,7 +97,7 @@ public class PatientService {
             entity = new Patient(dto.getSecondName(),
                     dto.getFirstName(),
                     dto.getPatronymic(),
-                    dto.getBirthday(),
+                    dto.getBirthday().atStartOfDay(),
                     icd,
                     dto.getComment()
             );
@@ -106,7 +106,7 @@ public class PatientService {
             entity.setSecondName(dto.getSecondName());
             entity.setFirstName(dto.getFirstName());
             entity.setPatronymic(dto.getPatronymic());
-            entity.setBirthday(dto.getBirthday());
+            entity.setBirthday(dto.getBirthday().atStartOfDay());
             entity.setIcd(icd);
             entity.setComment(dto.getComment());
         }

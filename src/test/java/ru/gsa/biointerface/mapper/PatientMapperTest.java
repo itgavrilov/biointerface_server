@@ -29,7 +29,7 @@ class PatientMapperTest {
         assertNotNull(dto.getPatronymic());
         assertEquals(entity.getPatronymic(), dto.getPatronymic());
         assertNotNull(dto.getBirthday());
-        assertEquals(entity.getBirthday(), dto.getBirthday());
+        assertEquals(entity.getBirthday().toLocalDate(), dto.getBirthday());
         assertNotNull(dto.getIcdId());
         assertEquals(entity.getIcd().getId(), dto.getIcdId());
         assertNotNull(dto.getComment());

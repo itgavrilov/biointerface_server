@@ -221,7 +221,7 @@ class PatientServiceTest {
                 dto.getFirstName(),
                 dto.getSecondName(),
                 dto.getPatronymic(),
-                dto.getBirthday(),
+                dto.getBirthday().atStartOfDay(),
                 icd,
                 dto.getComment(),
                 new ArrayList<>());

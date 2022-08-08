@@ -18,6 +18,7 @@ import ru.gsa.biointerface.repository.IcdRepository;
 import ru.gsa.biointerface.repository.PatientRepository;
 import ru.gsa.biointerface.service.PatientService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -247,7 +248,7 @@ class PatientServiceTest {
 
         PatientDTO dto = generator.nextObject(PatientDTO.class);
         dto.setId(null);
-        dto.setBirthday(LocalDateTime.now().minusMinutes(1));
+        dto.setBirthday(LocalDate.now().minusDays(1));
         dto.setIcdId(icd.getId());
 
         Patient entityTest = service.saveOrUpdate(dto);
@@ -266,7 +267,7 @@ class PatientServiceTest {
         assertEquals(dto.getFirstName(), entityTest.getFirstName());
         assertEquals(dto.getSecondName(), entityTest.getSecondName());
         assertEquals(dto.getPatronymic(), entityTest.getPatronymic());
-        assertEquals(dto.getBirthday(), entityTest.getBirthday());
+        assertEquals(dto.getBirthday(), entityTest.getBirthday().toLocalDate());
         assertEquals(dto.getIcdId(), entityTest.getIcd().getId());
         assertEquals(dto.getComment(), entityTest.getComment());
     }

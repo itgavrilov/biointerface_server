@@ -15,7 +15,7 @@ import static org.springdoc.core.SpringDocUtils.getConfig;
  */
 @Slf4j
 @Configuration
-public class OpenApiConfig {
+public class SwaggerConfiguration {
 
     @PostConstruct
     public void init() {
