@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.unit.service;
+package ru.gsa.biointerface.service;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.ChannelRepository;
-import ru.gsa.biointerface.service.ChannelService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ChannelServiceTest {
+class ChannelServiceUnitTest {
 
     private final EasyRandom generator = new EasyRandom();
 

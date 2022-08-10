@@ -66,6 +66,19 @@ public class ChannelService {
     }
 
     /**
+     * Сохранение нового канала
+     *
+     * @param entity Новый канал {@link Channel}
+     * @return Канал {@link Channel}
+     */
+    public Channel save(Channel entity) {
+        entity = repository.save(entity);
+        log.info("Channel(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
      * Обновление канала
      *
      * @param dto DTO канала {@link ChannelDTO}
@@ -80,19 +93,6 @@ public class ChannelService {
         }
 
         log.info("Channel(id={}) is update", entity.getId());
-
-        return entity;
-    }
-
-    /**
-     * Сохранение нового канала
-     *
-     * @param entity Новый канал {@link Channel}
-     * @return Канал {@link Channel}
-     */
-    public Channel save(Channel entity) {
-        entity = repository.save(entity);
-        log.info("Channel(id={}) is save", entity.getId());
 
         return entity;
     }

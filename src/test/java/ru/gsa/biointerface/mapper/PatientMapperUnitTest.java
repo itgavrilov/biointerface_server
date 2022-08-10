@@ -8,7 +8,7 @@ import ru.gsa.biointerface.domain.entity.Patient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class PatientMapperTest {
+class PatientMapperUnitTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final PatientMapper mapper = new PatientMapperImpl();

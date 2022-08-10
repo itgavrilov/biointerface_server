@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 
@@ -11,4 +12,8 @@ import ru.gsa.biointerface.domain.entity.ChannelName;
 public interface ChannelNameMapper {
 
     ChannelNameDTO toDTO(ChannelName channelName);
+
+    @Mapping(target = "channels", expression = "java(new java.util.ArrayList<>())")
+    ChannelName toEntity(ChannelNameDTO dto);
 }
+

@@ -1,4 +1,4 @@
-package ru.gsa.biointerface.integration.service;
+package ru.gsa.biointerface.service;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,6 @@ import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
-import ru.gsa.biointerface.service.IcdService;
 
 import java.util.ArrayList;
 import java.util.List;

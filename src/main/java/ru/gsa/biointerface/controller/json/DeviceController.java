@@ -17,13 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
@@ -32,7 +31,6 @@ import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -101,6 +99,29 @@ public class DeviceController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "save new biointerface controller")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "created",
+                    content = @Content(schema = @Schema(implementation = IcdDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "406", description = "validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @PatchMapping("/{id}")
+    public ResponseEntity<DeviceDTO> update(
+            @Parameter(description = "Device's ID", required = true)
+            @PathVariable(value = "id") UUID id,
+            @Parameter(description = "Device's DTO", required = true)
+            @Valid @RequestBody DeviceDTO dto) {
+        log.info("REST PATCH /devices wish params: id={}, dto={}", id, dto);
+        Device request = mapper.toEntity(dto);
+        request.setId(id);
+        Device response = service.update(request);
+        log.debug("End REST PATCH /devices");
+
+        return ResponseEntity.ok().body(mapper.toDTO(response));
+    }
+
     @Operation(summary = "delete biointerface controller by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successfully"),
@@ -115,29 +136,6 @@ public class DeviceController {
         log.debug("End REST DELETE /devices/{}", id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "save new biointerface controller")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "created",
-                    content = @Content(schema = @Schema(implementation = IcdDTO.class))),
-            @ApiResponse(responseCode = "400", description = "bad request",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "406", description = "validation error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PutMapping
-    public ResponseEntity<DeviceDTO> save(
-            @Parameter(description = "Device's DTO", required = true)
-            @Valid @RequestBody DeviceDTO dto) {
-        log.info("REST PUT /devices wish params: {}", dto);
-        Device entity = service.update(dto);
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/devices/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-        DeviceDTO response = mapper.toDTO(entity);
-        log.debug("End REST PUT /devices");
-
-        return ResponseEntity.created(newResource).body(response);
     }
 
     @GetMapping("/health")

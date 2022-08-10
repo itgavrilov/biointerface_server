@@ -50,8 +50,7 @@ public class ChannelName implements Serializable, Comparable<Object> {
      */
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be blank")
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    @Column(length = 35, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
     /**

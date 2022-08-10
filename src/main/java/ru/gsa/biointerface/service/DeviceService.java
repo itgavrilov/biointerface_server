@@ -69,24 +69,6 @@ public class DeviceService {
     }
 
     /**
-     * Создание/обновление контроллера биоинтерфейса
-     *
-     * @param dto DTO контроллера биоинтерфейса {@link DeviceDTO}
-     * @return Контроллер биоинтерфейса {@link Device}
-     */
-    @Transactional
-    public Device update(DeviceDTO dto) {
-        Device entity = repository.getOrThrow(dto.getId());
-
-        entity.setAmountChannels(dto.getAmountChannels());
-        entity.setComment(dto.getComment());
-
-        log.info("Device(id={}) is update", entity.getId());
-
-        return entity;
-    }
-
-    /**
      * Сохранение контроллера биоинтерфейса
      *
      * @param entity DTO контроллера биоинтерфейса {@link DeviceDTO}
@@ -95,6 +77,24 @@ public class DeviceService {
     public Device save(Device entity) {
         entity = repository.save(entity);
         log.info("Device(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
+     * Создание/обновление контроллера биоинтерфейса
+     *
+     * @param request Контроллер биоинтерфейса {@link Device}
+     * @return Контроллер биоинтерфейса {@link Device}
+     */
+    @Transactional
+    public Device update(Device request) {
+        Device entity = repository.getOrThrow(request.getId());
+
+        entity.setAmountChannels(request.getAmountChannels());
+        entity.setComment(request.getComment());
+
+        log.info("Device(id={}) is update", entity.getId());
 
         return entity;
     }

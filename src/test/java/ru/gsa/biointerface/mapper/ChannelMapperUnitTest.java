@@ -8,7 +8,7 @@ import ru.gsa.biointerface.domain.entity.Channel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class ChannelMapperTest {
+class ChannelMapperUnitTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final ChannelMapper mapper = new ChannelMapperImpl();

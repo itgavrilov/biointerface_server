@@ -92,6 +92,30 @@ public class ChannelController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update channel")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = ChannelDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ChannelDTO> update(
+            @Parameter(description = "Controller channel's DTO", required = true)
+            @Valid @RequestBody ChannelDTO dto) {
+        log.info("REST PUT /channels wish params: {}", dto);
+        Channel entity = service.update(dto);
+        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("channels/{examinationId}/{number}")
+                .buildAndExpand(entity.getId().getExaminationId(), entity.getId().getNumber()).toUri();
+        ChannelDTO response = mapper.toDTO(entity);
+        log.debug("End REST PUT /channels");
+
+        return ResponseEntity.created(newResource).body(response);
+    }
+
     @Operation(summary = "delete channels by examination ID and  number")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successfully"),
@@ -109,30 +133,6 @@ public class ChannelController {
         log.debug("End REST DELETE /channels/{}/{}", examinationId, number);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Update channel")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created",
-                    content = @Content(schema = @Schema(implementation = ChannelDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Object not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ChannelDTO> save(
-            @Parameter(description = "Controller channel's DTO", required = true)
-            @Valid @RequestBody ChannelDTO dto) {
-        log.info("REST PUT /channels wish params: {}", dto);
-        Channel entity = service.update(dto);
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("channels/{examinationId}/{number}")
-                .buildAndExpand(entity.getId().getExaminationId(), entity.getId().getNumber()).toUri();
-        ChannelDTO response = mapper.toDTO(entity);
-        log.debug("End REST PUT /channels");
-
-        return ResponseEntity.created(newResource).body(response);
     }
 
     @GetMapping(value = "/health")

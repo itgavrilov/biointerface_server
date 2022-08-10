@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +52,7 @@ public class ChannelNameController {
     private final ChannelNameService service;
     private final ChannelNameMapper mapper;
 
-    @Operation(summary = "get all channel`s names")
+    @Operation(summary = "Get all channel`s names")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
@@ -67,7 +68,7 @@ public class ChannelNameController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get all channel`s names wish paging")
+    @Operation(summary = "Get all channel`s names wish paging")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
@@ -82,7 +83,7 @@ public class ChannelNameController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get channel`s name by ID")
+    @Operation(summary = "Get channel`s name by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
@@ -99,7 +100,53 @@ public class ChannelNameController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete channel`s name by ID")
+    @Operation(summary = "Save new channel`s name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "created",
+                    content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "406", description = "validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @PutMapping
+    public ResponseEntity<ChannelNameDTO> save(
+            @Parameter(description = "Channel name's DTO", required = true)
+            @Valid @RequestBody ChannelNameDTO dto) {
+        log.debug("REST PUT /channelNames wish params: {}", dto);
+
+        ChannelName entity = service.save(mapper.toEntity(dto));
+        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/channelNames/{id}")
+                .buildAndExpand(entity.getId()).toUri();
+        log.debug("End REST PUT /channelNames");
+
+        return ResponseEntity.created(newResource).body(mapper.toDTO(entity));
+    }
+
+    @Operation(summary = "Update new channel`s name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "created",
+                    content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "406", description = "validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @PatchMapping("/{id}")
+    public ResponseEntity<ChannelNameDTO> update(
+            @Parameter(description = "Channel name's ID", required = true)
+            @PathVariable(value = "id") UUID id,
+            @Parameter(description = "Channel name's DTO", required = true)
+            @Valid @RequestBody ChannelNameDTO dto) {
+        log.debug("REST PATCH /channelNames wish params: id={}, dto={}", id, dto);
+        ChannelName request = mapper.toEntity(dto);
+        request.setId(id);
+        ChannelName entity = service.update(mapper.toEntity(dto));
+        log.debug("End REST PATCH /channelNames");
+
+        return ResponseEntity.ok().body(mapper.toDTO(entity));
+    }
+
+    @Operation(summary = "Delete channel`s name by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successfully"),
             @ApiResponse(responseCode = "404", description = "object not found",
@@ -113,29 +160,6 @@ public class ChannelNameController {
         log.debug("End REST DELETE /channelNames/{}", id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "save new channel`s name")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "created",
-                    content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
-            @ApiResponse(responseCode = "400", description = "bad request",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "406", description = "validation error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PutMapping
-    public ResponseEntity<ChannelNameDTO> save(
-            @Parameter(description = "Channel name's DTO", required = true)
-            @Valid @RequestBody ChannelNameDTO dto) {
-        log.info("REST PUT /channelNames wish params: {}", dto);
-        ChannelName entity = service.saveOrUpdate(dto);
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/channelNames/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-        ChannelNameDTO response = mapper.toDTO(entity);
-        log.debug("End REST PUT /channelNames");
-
-        return ResponseEntity.created(newResource).body(response);
     }
 
     @GetMapping("/health")

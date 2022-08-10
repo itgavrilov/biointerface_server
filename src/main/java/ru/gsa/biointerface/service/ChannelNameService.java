@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
@@ -13,7 +13,6 @@ import ru.gsa.biointerface.repository.ChannelNameRepository;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -68,25 +67,34 @@ public class ChannelNameService {
     }
 
     /**
-     * Создание/обновление наименования
+     * Создание наименования
      *
-     * @param dto DTO наименования {@link ChannelNameDTO}
+     * @param entity Новое наименование {@link ChannelName}
      * @return Наименование {@link ChannelName}
      */
-    public ChannelName saveOrUpdate(ChannelNameDTO dto) {
-        Optional<ChannelName> optional = repository.findById(dto.getId());
-        ChannelName entity;
-
-        if (optional.isEmpty()) {
-            entity = new ChannelName(dto.getName(), dto.getComment());
-        } else {
-            entity = optional.get();
-            entity.setName(dto.getName());
-            entity.setComment(dto.getComment());
-        }
+    public ChannelName save(ChannelName entity) {
+        entity.setId(null);
 
         entity = repository.save(entity);
         log.info("ChannelName(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
+     * Обновление наименования
+     *
+     * @param request наименование канала {@link ChannelName}
+     * @return Наименование {@link ChannelName}
+     */
+    @Transactional
+    public ChannelName update(ChannelName request) {
+        ChannelName entity = repository.getOrThrow(request.getId());
+
+        entity.setName(request.getName());
+        entity.setComment(request.getComment());
+
+        log.info("ChannelName(id={}) is update", entity.getId());
 
         return entity;
     }

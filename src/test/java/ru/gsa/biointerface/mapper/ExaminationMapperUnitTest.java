@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class ExaminationMapperTest {
+class ExaminationMapperUnitTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final ExaminationMapper mapper = new ExaminationMapperImpl();
