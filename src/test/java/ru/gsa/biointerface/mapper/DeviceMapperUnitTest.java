@@ -37,6 +37,7 @@ class DeviceMapperUnitTest {
         assertNotNull(entity);
         assertNotNull(entity.getId());
         assertEquals(dto.getId(), entity.getId());
+        assertNotNull(entity.getAmountChannels());
         assertEquals(dto.getAmountChannels(), entity.getAmountChannels());
         assertNotNull(entity.getComment());
         assertEquals(dto.getComment(), entity.getComment());

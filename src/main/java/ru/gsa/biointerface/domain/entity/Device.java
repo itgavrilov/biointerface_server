@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -59,10 +60,11 @@ public class Device implements Serializable, Comparable<Object> {
     /**
      * Количество каналов
      */
+    @NotNull(message = "AmountChannels can't be null")
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
     @Column(name = "amount_channels", nullable = false)
-    private int amountChannels;
+    private Integer amountChannels;
 
     /**
      * Комментарий

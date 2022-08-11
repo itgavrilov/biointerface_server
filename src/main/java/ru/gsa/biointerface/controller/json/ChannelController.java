@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ChannelDTO;
@@ -42,10 +40,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Channels", description = "controller`s channels")
 @RestController
-@RequestMapping(value = "/channels", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/channels", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final ChannelService service;
     private final ChannelMapper mapper;
@@ -133,18 +129,5 @@ public class ChannelController {
         log.debug("End REST DELETE /channels/{}/{}", examinationId, number);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping(value = "/health")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping(value = "/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
     }
 }

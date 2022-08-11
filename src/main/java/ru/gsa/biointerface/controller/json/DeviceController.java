@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
@@ -44,10 +42,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Devices", description = "biointerface controllers")
 @RestController
-@RequestMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/devices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final DeviceService service;
     private final DeviceMapper mapper;
@@ -99,7 +95,7 @@ public class DeviceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "save new biointerface controller")
+    @Operation(summary = "Update new biointerface controller")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
                     content = @Content(schema = @Schema(implementation = IcdDTO.class))),
@@ -136,18 +132,5 @@ public class DeviceController {
         log.debug("End REST DELETE /devices/{}", id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/health")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping("/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
     }
 }

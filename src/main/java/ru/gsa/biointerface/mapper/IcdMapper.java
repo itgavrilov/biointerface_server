@@ -1,6 +1,7 @@
 package ru.gsa.biointerface.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 
@@ -11,4 +12,7 @@ import ru.gsa.biointerface.domain.entity.Icd;
 public interface IcdMapper {
 
     IcdDTO toDTO(Icd icd);
+
+    @Mapping(target = "patients", expression = "java(new java.util.ArrayList<>())")
+    Icd toEntity(IcdDTO icdDTO);
 }

@@ -12,16 +12,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
@@ -45,10 +44,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "ICDs", description = "ICD disease codes")
 @RestController
-@RequestMapping(value = "/icds", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/icds", produces = MediaType.APPLICATION_JSON_VALUE)
 public class IcdController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final IcdService service;
     private final IcdMapper mapper;
@@ -101,23 +98,7 @@ public class IcdController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete ICD disease code by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successfully"),
-            @ApiResponse(responseCode = "404", description = "object not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "ICD's ID", required = true)
-            @PathVariable(value = "id") UUID id) {
-        log.info("REST DELETE /icds/{}", id);
-        service.delete(id);
-        log.debug("End REST DELETE /icds/{}", id);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Save new or update ICD disease code")
+    @Operation(summary = "Save new ICD disease code")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
                     content = @Content(schema = @Schema(implementation = IcdDTO.class))),
@@ -126,11 +107,11 @@ public class IcdController {
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping
-    public ResponseEntity<IcdDTO> saveOrUpdate(
+    public ResponseEntity<IcdDTO> save(
             @Parameter(description = "ICD's DTO", required = true)
             @Valid @RequestBody IcdDTO dto) {
-        log.info("REST PUT /icds wish params: {}", dto);
-        Icd entity = service.saveOrUpdate(dto);
+        log.debug("REST PUT /icds wish params: {}", dto);
+        Icd entity = service.save(mapper.toEntity(dto));
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/icds/{id}")
                 .buildAndExpand(entity.getId()).toUri();
@@ -140,16 +121,46 @@ public class IcdController {
         return ResponseEntity.created(newResource).body(response);
     }
 
-    @GetMapping("/health")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
+    @Operation(summary = "Update ICD disease code")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "created",
+                    content = @Content(schema = @Schema(implementation = IcdDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "406", description = "validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @PatchMapping("/{id}")
+    public ResponseEntity<IcdDTO> update(
+            @Parameter(description = "ICD's ID", required = true)
+            @PathVariable(value = "id") UUID id,
+            @Parameter(description = "ICD's DTO", required = true)
+            @Valid @RequestBody IcdDTO dto) {
+        log.debug("REST PATCH /icds wish params: {}", dto);
+        Icd request = mapper.toEntity(dto);
+        request.setId(id);
+        Icd entity = service.update(request);
+        IcdDTO response = mapper.toDTO(entity);
+        log.debug("End PATCH PUT /icds");
+
+        return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
+
+    @Operation(summary = "delete ICD disease code by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successfully"),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ICD's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
+        log.debug("REST DELETE /icds/{}", id);
+        service.delete(id);
+        log.debug("End REST DELETE /icds/{}", id);
+
+        return ResponseEntity.noContent().build();
     }
 }

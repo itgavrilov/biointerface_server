@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
@@ -44,10 +42,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Channel`s names", description = "names for controller`s channel")
 @RestController
-@RequestMapping(value = "/channel-names", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/channel-names", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ChannelNameController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final ChannelNameService service;
     private final ChannelNameMapper mapper;
@@ -160,18 +156,5 @@ public class ChannelNameController {
         log.debug("End REST DELETE /channelNames/{}", id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/health")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping("/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
     }
 }

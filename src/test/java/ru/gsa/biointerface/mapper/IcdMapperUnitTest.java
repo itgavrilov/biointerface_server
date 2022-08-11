@@ -29,4 +29,21 @@ class IcdMapperUnitTest {
         assertNotNull(dto.getComment());
         assertEquals(entity.getComment(), dto.getComment());
     }
+
+    @Test
+    void toEntity() {
+        IcdDTO dto = generator.nextObject(IcdDTO.class);
+
+        Icd entity = mapper.toEntity(dto);
+
+        assertNotNull(entity);
+        assertNotNull(entity.getId());
+        assertEquals(dto.getId(), entity.getId());
+        assertNotNull(entity.getName());
+        assertEquals(dto.getName(), entity.getName());
+        assertNotNull(entity.getVersion());
+        assertEquals(dto.getVersion(), entity.getVersion());
+        assertNotNull(entity.getComment());
+        assertEquals(dto.getComment(), entity.getComment());
+    }
 }
