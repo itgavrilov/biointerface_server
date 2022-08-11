@@ -3,7 +3,6 @@ package ru.gsa.biointerface.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
 import ru.gsa.biointerface.domain.entity.ChannelName;
@@ -81,17 +80,13 @@ public class ChannelService {
     /**
      * Обновление канала
      *
-     * @param dto DTO канала {@link ChannelDTO}
+     * @param request Канал {@link Channel}
      * @return Канал {@link Channel}
      */
     @Transactional
-    public Channel update(ChannelDTO dto) {
-        Channel entity = repository.getOrThrow(dto.getExaminationId(), dto.getNumber());
-
-        if (!entity.getChannelName().getId().equals(dto.getChannelNameId())) {
-            entity.setChannelName(channelNameRepository.getOrThrow(dto.getChannelNameId()));
-        }
-
+    public Channel update(Channel request) {
+        Channel entity = repository.getOrThrow(request.getId());
+        entity.setChannelName(request.getChannelName());
         log.info("Channel(id={}) is update", entity.getId());
 
         return entity;

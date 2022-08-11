@@ -132,7 +132,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             if (Objects.equals(comment, newComment)) {
                 try {
                     examination.setComment(newComment);
-                    examinationService.save(examination);
+                    examinationService.update(examination);
                     log.info("New comment is set in examination(number={})", examination.getId());
                 } catch (Exception e) {
                     examination.setComment(comment);
@@ -233,7 +233,7 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
         if (!isRecording()) {
             examination = new Examination(patient, device, comment);
             device = deviceService.save(device);
-            examination = examinationService.save(examination);
+            examination = examinationService.update(examination);
 
             for (byte i = 0; i < device.getAmountChannels(); i++) {
                 Channel channel = new Channel(i, examination, channelNames.get(i));

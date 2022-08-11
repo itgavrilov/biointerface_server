@@ -34,9 +34,10 @@ public class ChannelID implements Serializable, Comparable<Object> {
     /**
      * Порядковый номер
      */
+    @NotNull(message = "Number can't be null")
     @Min(value = 0, message = "Number can't be lass then 0")
-    @Column(name = "number")
-    private byte number;
+    @Column(name = "number", nullable = false)
+    private Byte number;
 
     public ChannelID(UUID examinationId, byte number) {
         this.examinationId = examinationId;

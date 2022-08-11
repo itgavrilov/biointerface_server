@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,10 +58,11 @@ public class Icd implements Serializable, Comparable<Object> {
     /**
      * Версия ICD
      */
+    @NotNull(message = "Version can't be null")
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     @Column(name = "version", nullable = false)
-    private int version;
+    private Integer version;
 
     /**
      * Комментарий

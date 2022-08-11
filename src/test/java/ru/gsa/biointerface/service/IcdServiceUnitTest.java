@@ -10,14 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -139,18 +137,12 @@ class IcdServiceUnitTest {
     }
 
     @Test
-    void saveOrUpdate() {
-        IcdDTO dto = generator.nextObject(IcdDTO.class);
-        Icd entity = new Icd(
-                dto.getId(),
-                dto.getName(),
-                dto.getVersion(),
-                dto.getComment(),
-                new ArrayList<>());
-        when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
+    void save() {
+        Icd entity = generator.nextObject(Icd.class);
+        entity.setVersion(10);
         when(repository.save(entity)).thenReturn(entity);
 
-        Icd entityTest = service.saveOrUpdate(dto);
+        Icd entityTest = service.save(entity);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
         assertEquals(entity.getId(), entityTest.getId());
@@ -159,8 +151,39 @@ class IcdServiceUnitTest {
         assertEquals(entity.getComment(), entityTest.getComment());
         assertIterableEquals(entity.getPatients(), entityTest.getPatients());
 
-        verify(repository).findById(entity.getId());
         verify(repository).save(entity);
+    }
+
+    @Test
+    void update() {
+        Icd entity = generator.nextObject(Icd.class);
+        Icd entityForTest = new Icd(
+                entity.getId(),
+                generator.nextObject(String.class),
+                11,
+                generator.nextObject(String.class),
+                new ArrayList<>());
+        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
+
+        Icd entityTest = service.update(entityForTest);
+        assertNotNull(entityTest);
+        assertEquals(entity, entityTest);
+        assertEquals(entity.getId(), entityTest.getId());
+        assertEquals(entity.getName(), entityTest.getName());
+        assertEquals(entity.getVersion(), entityTest.getVersion());
+        assertEquals(entity.getComment(), entityTest.getComment());
+        assertIterableEquals(entity.getPatients(), entityTest.getPatients());
+        verify(repository).getOrThrow(entity.getId());
+    }
+
+    @Test
+    void update_rnd() {
+        Icd entity = generator.nextObject(Icd.class);
+        String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
+        when(repository.getOrThrow(entity.getId())).thenThrow(new NotFoundException(message));
+
+        assertThrows(NotFoundException.class, () -> service.update(entity), message);
+        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test

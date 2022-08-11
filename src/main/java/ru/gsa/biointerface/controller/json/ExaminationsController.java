@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +43,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 15/11/2021
  */
@@ -51,10 +52,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Examinations", description = "results of biopotential measurements")
 @RestController
-@RequestMapping(value = "/examinations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/examinations")
 public class ExaminationsController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final ExaminationService service;
     private final PatientService patientService;
@@ -66,7 +65,7 @@ public class ExaminationsController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = ExaminationDTO.class))))})
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ExaminationDTO>> getAll(
             @Parameter(description = "ID patient record")
             @RequestParam(value = "patientId", required = false) UUID patientId,
@@ -86,7 +85,8 @@ public class ExaminationsController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = ExaminationDTO.class))))})
-    @GetMapping("/pageable")
+    @GetMapping(path = "/pageable",
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ExaminationDTO>> getAll(
             @Parameter(description = "ID patient record")
             @RequestParam(value = "patientId", required = false) UUID patientId,
@@ -107,7 +107,8 @@ public class ExaminationsController {
                     content = @Content(schema = @Schema(implementation = ExaminationDTO.class))),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ExaminationDTO> get(
             @Parameter(description = "Examination's ID", required = true)
             @PathVariable(value = "id") UUID id) {
@@ -118,22 +119,6 @@ public class ExaminationsController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete result of biopotential by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "successfully"),
-            @ApiResponse(responseCode = "404", description = "object not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "Examination's ID", required = true)
-            @PathVariable(value = "id") UUID id) {
-        log.info("REST DELETE /examinations/{}", id);
-        service.delete(id);
-        log.debug("End REST DELETE /examinations/{}", id);
-
-        return ResponseEntity.noContent().build();
-    }
-
     @Operation(summary = "save result of biopotential")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
@@ -142,14 +127,15 @@ public class ExaminationsController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PutMapping
-    public ResponseEntity<ExaminationDTO> save(
+    @PutMapping(produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<ExaminationDTO> update(
             @Parameter(description = "Examination's DTO", required = true)
             @Valid @RequestBody ExaminationDTO dto) throws JsonProcessingException {
         log.info("REST PUT /examinations wish params: {}", dto);
         Patient patient = patientService.getById(dto.getPatientId());
         Device device = deviceService.getById(dto.getDeviceId());
-        Examination entity = service.save(mapper.toEntity(dto, patient, device, new ArrayList<>()));
+        Examination entity = service.update(mapper.toEntity(dto, patient, device, new ArrayList<>()));
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/examinations/{id}")
                 .buildAndExpand(entity.getId()).toUri();
@@ -159,16 +145,18 @@ public class ExaminationsController {
         return ResponseEntity.created(newResource).body(response);
     }
 
-    @GetMapping(value = "/health")
+    @Operation(summary = "delete result of biopotential by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "successfully"),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping(value = "/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
+    public void delete(
+            @Parameter(description = "Examination's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
+        log.info("REST DELETE /examinations/{}", id);
+        service.delete(id);
+        log.debug("End REST DELETE /examinations/{}", id);
     }
 }

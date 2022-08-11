@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
@@ -14,7 +13,6 @@ import ru.gsa.biointerface.repository.IcdRepository;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -69,32 +67,35 @@ public class IcdService {
     }
 
     /**
-     * Создание/обновление заболивания
+     * Создание заболивания
      *
-     * @param dto DTO заболивания {@link IcdDTO}
+     * @param request Заболивание {@link Icd}
      * @return Заболивание {@link Icd}
      */
-    public Icd saveOrUpdate(@Validated IcdDTO dto) {
-        Optional<Icd> optional;
-        Icd entity;
+    public Icd save(Icd request) {
+        request.setId(null);
 
-        if (dto.getId() != null) {
-            optional = repository.findById(dto.getId());
-        } else {
-            optional = Optional.empty();
-        }
+        request = repository.save(request);
+        log.info("Icd(id={}) is save", request.getId());
 
-        if (optional.isEmpty()) {
-            entity = new Icd(dto.getName(), dto.getVersion(), dto.getComment());
-        } else {
-            entity = optional.get();
-            entity.setName(dto.getName());
-            entity.setVersion(dto.getVersion());
-            entity.setComment(dto.getComment());
-        }
+        return request;
+    }
 
-        entity = repository.save(entity);
-        log.info("Icd(id={}) is save", entity.getId());
+    /**
+     * Обновление заболивания
+     *
+     * @param request Заболивание {@link Icd}
+     * @return Заболивание {@link Icd}
+     */
+    @Transactional
+    public Icd update(Icd request) {
+        Icd entity = repository.getOrThrow(request.getId());
+
+        entity.setName(request.getName());
+        entity.setVersion(request.getVersion());
+        entity.setComment(request.getComment());
+
+        log.info("Icd(id={}) is update", entity.getId());
 
         return entity;
     }

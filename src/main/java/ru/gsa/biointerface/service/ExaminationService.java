@@ -86,7 +86,7 @@ public class ExaminationService {
      * @return Карточка пациента {@link Patient}
      */
     @Transactional
-    public Examination save(@Valid Examination entity) {
+    public Examination update(@Valid Examination entity) {
         entity = repository.save(entity);
         log.info("Examination(id={}) is save", entity.getId());
 

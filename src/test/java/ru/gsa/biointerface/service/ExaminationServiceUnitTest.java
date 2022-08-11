@@ -318,7 +318,7 @@ class ExaminationServiceUnitTest {
         Examination entity = generator.nextObject(Examination.class);
         when(repository.save(entity)).thenReturn(entity);
 
-        Examination entityTest = service.save(entity);
+        Examination entityTest = service.update(entity);
         assertNotNull(entityTest);
         assertEquals(entity, entityTest);
         assertEquals(entity.getId(), entityTest.getId());

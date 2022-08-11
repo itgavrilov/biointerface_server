@@ -16,6 +16,9 @@ public interface IcdRepository extends JpaRepository<Icd, UUID> {
     String MASK_NOT_FOUND = "Icd(id=%s) is not found";
 
     default Icd getOrThrow(UUID id) {
+        if (id == null) {
+            throw new NotFoundException(String.format(MASK_NOT_FOUND, id));
+        }
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
                 MASK_NOT_FOUND, id)));
     }

@@ -13,12 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -35,6 +34,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 /**
  * JSON CRUD-контроллер для работы с контроллерами биоинтерфейсов
  * <p>
@@ -44,20 +45,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Devices", description = "biointerface controllers")
 @RestController
-@RequestMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/devices")
 public class DeviceController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final DeviceService service;
     private final DeviceMapper mapper;
 
-    @Operation(summary = "get all biointerface controllers")
+    @Operation(summary = "Get all biointerface controllers")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
-                    content = @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DeviceDTO>> getAll() {
         log.debug("REST GET /devices");
         List<DeviceDTO> responses = service.findAll().stream()
@@ -68,11 +66,13 @@ public class DeviceController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get all biointerface controllers wish paging")
+    @Operation(summary = "Get all biointerface controllers wish paging")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping(value = "/pageable")
+    @GetMapping(path = "/pageable",
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<DeviceDTO>> getAll(Pageable pageable) {
         log.debug("REST GET /devices/pageable");
         Page<DeviceDTO> responses = service.findAll(pageable)
@@ -82,13 +82,14 @@ public class DeviceController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get biointerface controller by ID")
+    @Operation(summary = "Get biointerface controller by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(schema = @Schema(implementation = DeviceDTO.class))),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<DeviceDTO> get(
             @Parameter(description = "Device's ID", required = true)
             @PathVariable(value = "id") UUID id) {
@@ -99,7 +100,7 @@ public class DeviceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "save new biointerface controller")
+    @Operation(summary = "Update new biointerface controller")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
                     content = @Content(schema = @Schema(implementation = IcdDTO.class))),
@@ -107,47 +108,35 @@ public class DeviceController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PatchMapping("/{id}")
+    @PutMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<DeviceDTO> update(
             @Parameter(description = "Device's ID", required = true)
             @PathVariable(value = "id") UUID id,
             @Parameter(description = "Device's DTO", required = true)
             @Valid @RequestBody DeviceDTO dto) {
-        log.info("REST PATCH /devices wish params: id={}, dto={}", id, dto);
+        log.info("REST PUT /devices wish params: id={}, dto={}", id, dto);
         Device request = mapper.toEntity(dto);
         request.setId(id);
-        Device response = service.update(request);
-        log.debug("End REST PATCH /devices");
+        DeviceDTO response = mapper.toDTO(service.update(request));
+        log.debug("End REST PUT /devices");
 
-        return ResponseEntity.ok().body(mapper.toDTO(response));
+        return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete biointerface controller by ID")
+    @Operation(summary = "Delete biointerface controller by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successfully"),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
             @Parameter(description = "Device's ID", required = true)
             @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /devices/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /devices/{}", id);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/health")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping("/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
     }
 }
