@@ -5,17 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-import ru.gsa.biointerface.domain.dto.PatientDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -27,8 +26,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PatientService {
+
     private final PatientRepository repository;
-    private final IcdService icdService;
 
     @PostConstruct
     private void init() {
@@ -73,48 +72,46 @@ public class PatientService {
     }
 
     /**
-     * Создание/обновление карточки пациента
+     * Создание карточки пациента
      *
-     * @param dto DTO карточки пациента {@link PatientDTO}
+     * @param request Карточка пациента {@link Patient}
      * @return Карточка пациента {@link Patient}
      */
-    public Patient saveOrUpdate(@Validated PatientDTO dto) {
-        Optional<Patient> optional;
-        Patient entity;
-        Icd icd = null;
-
-        if (dto.getIcdId() != null) {
-            icd = icdService.getById(dto.getIcdId());
+    public Patient save(Patient request) {
+        if(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(request.getSecondName(),
+                request.getFirstName(), request.getPatronymic(), request.getBirthday())){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            throw new BadRequestException(String.format(
+                    "ChannelName(second name=%s, first name=%s, patronymic=%s, birthday=%s) already exists",
+                    request.getSecondName(), request.getFirstName(), request.getPatronymic(),
+                    formatter.format(request.getBirthday())));
         }
 
-        if (dto.getId() != null) {
-            optional = repository.findById(dto.getId());
-        } else {
-            optional = Optional.empty();
-        }
-
-        if (optional.isEmpty()) {
-            entity = new Patient(dto.getSecondName(),
-                    dto.getFirstName(),
-                    dto.getPatronymic(),
-                    dto.getBirthday().atStartOfDay(),
-                    icd,
-                    dto.getComment()
-            );
-        } else {
-            entity = optional.get();
-            entity.setSecondName(dto.getSecondName());
-            entity.setFirstName(dto.getFirstName());
-            entity.setPatronymic(dto.getPatronymic());
-            entity.setBirthday(dto.getBirthday().atStartOfDay());
-            entity.setIcd(icd);
-            entity.setComment(dto.getComment());
-        }
-
-        entity = repository.save(entity);
+        request.setId(null);
+        Patient entity = repository.save(request);
         log.info("Patient(id={}) is save", entity.getId());
 
-        return entity;
+        return repository.getOrThrow(entity.getId());
+    }
+
+    /**
+     * Обновление карточки пациента
+     *
+     * @param request Карточка пациента {@link Patient}
+     * @return Карточка пациента {@link Patient}
+     */
+    public Patient update(Patient request) {
+        Patient entity = repository.getOrThrow(request.getId());
+        entity.setSecondName(request.getSecondName());
+        entity.setFirstName(request.getFirstName());
+        entity.setPatronymic(request.getPatronymic());
+        entity.setBirthday(request.getBirthday());
+        entity.setIcd(request.getIcd());
+        entity.setComment(request.getComment());
+        repository.save(entity);
+        log.info("Patient(id={}) is save", entity.getId());
+
+        return repository.getOrThrow(entity.getId());
     }
 
     /**

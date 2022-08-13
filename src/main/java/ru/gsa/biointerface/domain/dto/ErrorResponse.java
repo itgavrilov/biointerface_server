@@ -1,10 +1,8 @@
 package ru.gsa.biointerface.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -14,9 +12,7 @@ import java.time.LocalDateTime;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 29/01/2022
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
 @Schema(name = "ErrorResponse", description = "error")
 public class ErrorResponse {

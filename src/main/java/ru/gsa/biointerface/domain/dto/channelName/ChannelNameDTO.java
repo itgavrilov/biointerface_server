@@ -1,14 +1,13 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.domain.dto.channelName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,12 +16,13 @@ import java.util.UUID;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Data
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-@Builder
-@Schema(name = "ChannelName", description = "name for controller`s channel")
-public class ChannelNameDTO implements Serializable, Comparable<Object> {
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
+@Schema(name = "ChannelNameDTO", description = "Name for controller`s channel")
+public class ChannelNameDTO extends ChannelNameSaveOrUpdateDTO implements Serializable, Comparable<Object> {
+
     static final long SerialVersionUID = 1L;
 
     /**
@@ -32,44 +32,41 @@ public class ChannelNameDTO implements Serializable, Comparable<Object> {
     private UUID id;
 
     /**
-     * Наименование канала
+     * Дата создания
      */
-    @Schema(description = "Name", required = true)
-    @NotBlank(message = "Name can't be blank")
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    private String name;
+    @Schema(description = "Creation date")
+    private LocalDateTime creationDate;
 
     /**
-     * Комментарий
+     * Дата последнего изменений
      */
-    @Schema(description = "Comment")
-    @Size(max = 400, message = "Comment can't be more than 400 chars")
-    private String comment;
+    @Schema(description = "Modify date")
+    private LocalDateTime modifyDate;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChannelNameDTO that = (ChannelNameDTO) o;
-        return Objects.equals(id, that.id);
+        ChannelNameSaveOrUpdateDTO that = (ChannelNameSaveOrUpdateDTO) o;
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(name);
     }
 
     @Override
     public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        ChannelNameDTO that = (ChannelNameDTO) o;
+        ChannelNameSaveOrUpdateDTO that = (ChannelNameSaveOrUpdateDTO) o;
 
         return name.compareTo(that.name);
     }
 
     @Override
     public String toString() {
-        return "ChannelName{" +
+        return "ChannelNameDTO{" +
                 "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 "comment='" + comment + '\'' +

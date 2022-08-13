@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 
@@ -82,15 +80,17 @@ public class ExaminationService {
     /**
      * Создание/обновление исследования
      *
-     * @param entity Сущность исследования {@link Examination}
+     * @param request Сущность исследования {@link Examination}
      * @return Карточка пациента {@link Patient}
      */
-    @Transactional
-    public Examination update(@Valid Examination entity) {
-        entity = repository.save(entity);
+    public Examination update(Examination request) {
+        Examination entity = repository.getOrThrow(request.getId());
+        entity.setPatient(request.getPatient());
+        entity.setComment(request.getComment());
+        repository.save(entity);
         log.info("Examination(id={}) is save", entity.getId());
 
-        return entity;
+        return repository.getOrThrow(entity.getId());
     }
 
     /**
@@ -108,11 +108,6 @@ public class ExaminationService {
 
     public Examination loadWithGraphsById(UUID id) {
         Examination entity = getById(id);
-        entity.setChannels(channelService.findAll(entity.getId(), null));
-
-        for (Channel channel : entity.getChannels()) {
-            channel.setSamples(sampleService.findAllByChannel(channel));
-        }
 
         log.info("Examination(id={}) load with channels from database", entity.getId());
 
@@ -120,8 +115,6 @@ public class ExaminationService {
     }
 
     public void recordingStart(@Valid Examination entity) throws Exception {
-        if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
-            throw new BadRequestException("Amount channels differs from amount in device");
 
         Optional<Examination> optional = repository.findById(entity.getId());
 

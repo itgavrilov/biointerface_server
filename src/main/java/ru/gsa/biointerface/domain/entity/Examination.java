@@ -1,10 +1,13 @@
 package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,8 +23,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +39,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity(name = "examination")
 @Table(name = "examination")
 public class Examination implements Serializable, Comparable<Object> {
@@ -81,6 +85,20 @@ public class Examination implements Serializable, Comparable<Object> {
     private String comment;
 
     /**
+     * Дата создания
+     */
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false, updatable = false)
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @UpdateTimestamp
+    @Column(name = "modify_date", nullable = false)
+    private LocalDateTime modifyDate;
+
+    /**
      * Список каналов контроллера биоинтерфейса {@link List<Channel>}
      */
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -92,16 +110,6 @@ public class Examination implements Serializable, Comparable<Object> {
         this.device = device;
         this.patient = patient;
         channels = new ArrayList<>();
-    }
-
-    public void addChannel(Channel channel) {
-        channels.add(channel);
-        channel.setExamination(this);
-    }
-
-    public void removeChannel(Channel channel) {
-        channels.remove(channel);
-        channel.setExamination(null);
     }
 
     @Override
@@ -127,7 +135,7 @@ public class Examination implements Serializable, Comparable<Object> {
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyy-MM-dd hh:mm:ss");
 
         return "Examination{" +
                 "id=" + id +

@@ -19,7 +19,10 @@ public interface IcdRepository extends JpaRepository<Icd, UUID> {
         if (id == null) {
             throw new NotFoundException(String.format(MASK_NOT_FOUND, id));
         }
+
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
                 MASK_NOT_FOUND, id)));
     }
+
+    boolean existsByNameAndVersion(String name, Integer version);
 }

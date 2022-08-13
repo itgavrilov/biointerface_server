@@ -1,44 +1,38 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.domain.dto.icd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) заболеване по международной классификации болезней (ICD)
+ * для создания или обновления
  * <p>
- * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
+ * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 12/08/2022
  */
-@Data
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-@Builder
-@Schema(name = "Icd", description = "ICD disease code")
-public class IcdDTO implements Serializable, Comparable<Object> {
-    static final long SerialVersionUID = 1L;
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
+@Schema(name = "IcdSaveOrUpdateDTO", description = "ICD disease code for save or update")
+public class IcdSaveOrUpdateDTO implements Serializable {
 
-    /**
-     * Идентификатор
-     */
-    @Schema(description = "ICD ID")
-    private UUID id;
+    static final long SerialVersionUID = 1L;
 
     /**
      * Наименование заболевания по ICD
      */
     @Schema(description = "Name", required = true)
     @NotBlank(message = "Name can't be blank")
-    private String name;
+    protected String name;
 
     /**
      * Версия ICD
@@ -46,43 +40,21 @@ public class IcdDTO implements Serializable, Comparable<Object> {
     @Schema(description = "Version", required = true)
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
-    private Integer version;
+    protected Integer version;
 
     /**
      * Комментарий
      */
     @Schema(description = "Comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
-    private String comment;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        IcdDTO that = (IcdDTO) o;
-
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (o == null || getClass() != o.getClass()) return -1;
-        IcdDTO that = (IcdDTO) o;
-
-        return id.compareTo(that.id);
-    }
+    protected String comment;
 
     @Override
     public String toString() {
-        return "Icd{" +
-                "id=" + id +
+        return "IcdSaveOrUpdateDTO{" +
                 ", ICD='" + name + '\'' +
                 ", version=" + version +
+                ", comment=" + comment +
                 '}';
     }
 }

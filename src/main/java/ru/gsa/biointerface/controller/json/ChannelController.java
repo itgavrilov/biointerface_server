@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.сhannel.ChannelDTO;
+import ru.gsa.biointerface.domain.dto.сhannel.ChannelUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
@@ -53,7 +54,7 @@ public class ChannelController {
     private final ChannelNameService channelNameService;
     private final ChannelMapper mapper;
 
-    @Operation(summary = "get channels")
+    @Operation(summary = "Get channels")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully",
                     content = @Content(array = @ArraySchema(
@@ -75,7 +76,7 @@ public class ChannelController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "get channels by examination ID and number")
+    @Operation(summary = "Get channels by examination ID and number")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully",
                     content = @Content(schema = @Schema(implementation = ChannelDTO.class))),
@@ -105,28 +106,27 @@ public class ChannelController {
             @ApiResponse(responseCode = "404", description = "Object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping(path = "/{id}",
+    @PutMapping(path = "/{examinationId}/{number}",
             produces = APPLICATION_JSON_VALUE,
             consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<ChannelDTO> update(
-            @Parameter(description = "Channel name's ID", required = true)
-            @PathVariable(value = "id") UUID id,
+            @Parameter(description = "Examination's ID", required = true)
+            @PathVariable(value = "examinationId") UUID examinationId,
+            @Parameter(description = "Channel number", required = true)
+            @PathVariable(value = "number") Byte number,
             @Parameter(description = "Controller channel's DTO", required = true)
-            @Valid @RequestBody ChannelDTO dto) {
+            @Valid @RequestBody ChannelUpdateDTO dto) {
         log.info("REST PUT /channels wish params: {}", dto);
-        Examination examination = examinationService.getById(dto.getExaminationId());
-        ChannelName channelName = null;
-        if (dto.getChannelNameId() != null) {
-            channelName = channelNameService.getById(dto.getChannelNameId());
-        }
-        Channel request = mapper.toEntity(dto, examination, channelName);
+        Examination examination = examinationService.getById(examinationId);
+        ChannelName channelName = channelNameService.getByIdOrNull(dto.getChannelNameId());
+        Channel request = mapper.toEntity(dto, number, examination, channelName);
         ChannelDTO response = mapper.toDTO(service.update(request));
         log.debug("End REST PUT /channels");
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete channels by examination ID and  number")
+    @Operation(summary = "Delete channels by examination ID and  number")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successfully"),
             @ApiResponse(responseCode = "404", description = "Object not found",

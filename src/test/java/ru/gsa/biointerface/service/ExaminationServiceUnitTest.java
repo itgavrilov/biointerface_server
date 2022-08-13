@@ -315,20 +315,26 @@ class ExaminationServiceUnitTest {
 
     @Test
     void save() {
-        Examination entity = generator.nextObject(Examination.class);
-        when(repository.save(entity)).thenReturn(entity);
-
-        Examination entityTest = service.update(entity);
-        assertNotNull(entityTest);
-        assertEquals(entity, entityTest);
-        assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getPatient(), entityTest.getPatient());
-        assertEquals(entity.getDatetime(), entityTest.getDatetime());
-        assertEquals(entity.getDevice(), entityTest.getDevice());
-        assertEquals(entity.getComment(), entityTest.getComment());
-        assertIterableEquals(entity.getChannels(), entityTest.getChannels());
-
-        verify(repository).save(entity);
+//        Icd entity = getNewEntity();
+//        Icd entityForTest = entity.toBuilder()
+//                .name(generator.nextObject(String.class))
+//                .version(11)
+//                .comment(generator.nextObject(String.class))
+//                .build();
+//        when(repository.getOrThrow(entityForTest.getId())).thenReturn(entity.toBuilder().build());
+//        when(repository.save(entityForTest)).thenReturn(entityForTest);
+//
+//        Icd entityTest = service.update(entityForTest);
+//        assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
+//
+//        assertEquals(entity.getId(), entityTest.getId());
+//        assertEquals(entity.getCreationDate(), entityTest.getCreationDate());
+//        assertNotEquals(entity.getName(), entityTest.getName());
+//        assertNotEquals(entity.getVersion(), entityTest.getVersion());
+//        assertNotEquals(entity.getComment(), entityTest.getComment());
+//
+//        verify(repository, times(2)).getOrThrow(entity.getId());
+//        verify(repository).save(entityForTest);
     }
 
     @Test
@@ -365,5 +371,35 @@ class ExaminationServiceUnitTest {
 
     @Test
     void isRecording() {
+    }
+
+
+    private Examination getNewEntity(){
+        return generator.nextObject(Examination.class);
+    }
+
+    private List<Examination> getNewEntityList(int count){
+        List<Examination> entities = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            entities.add(getNewEntity());
+        }
+
+        return entities;
+    }
+
+    private void assertEqualsEntity(Examination entity, Examination test){
+        assertEqualsEntityWithoutIdAndTimestamps(entity, test);
+        assertEquals(entity.getId(), test.getId());
+        assertEquals(entity.getCreationDate(), test.getCreationDate());
+        assertEquals(entity.getModifyDate(), test.getModifyDate());
+    }
+
+    private void assertEqualsEntityWithoutIdAndTimestamps(Examination entity, Examination test){
+//        assertNotNull(entity);
+//        assertNotNull(test);
+//        assertEquals(entity.getName(), test.getName());
+//        assertEquals(entity.getVersion(), test.getVersion());
+//        assertEquals(entity.getComment(), test.getComment());
     }
 }

@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.channelName.ChannelNameDTO;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
@@ -38,7 +38,6 @@ import ru.gsa.biointerface.service.PatientService;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,7 +59,7 @@ public class ExaminationsController {
     private final DeviceService deviceService;
     private final ExaminationMapper mapper;
 
-    @Operation(summary = "get all results of biopotential measurements")
+    @Operation(summary = "Get all results of biopotential measurements")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
@@ -80,7 +79,7 @@ public class ExaminationsController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get all results of biopotential measurements wish paging")
+    @Operation(summary = "Get all results of biopotential measurements wish paging")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
@@ -101,7 +100,7 @@ public class ExaminationsController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get result of biopotential measurements by ID")
+    @Operation(summary = "Get result of biopotential measurements by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(schema = @Schema(implementation = ExaminationDTO.class))),
@@ -119,7 +118,7 @@ public class ExaminationsController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "save result of biopotential")
+    @Operation(summary = "Save result of biopotential")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
                     content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
@@ -135,7 +134,7 @@ public class ExaminationsController {
         log.info("REST PUT /examinations wish params: {}", dto);
         Patient patient = patientService.getById(dto.getPatientId());
         Device device = deviceService.getById(dto.getDeviceId());
-        Examination entity = service.update(mapper.toEntity(dto, patient, device, new ArrayList<>()));
+        Examination entity = service.update(mapper.toEntity(dto, patient, device));
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/examinations/{id}")
                 .buildAndExpand(entity.getId()).toUri();
@@ -145,7 +144,7 @@ public class ExaminationsController {
         return ResponseEntity.created(newResource).body(response);
     }
 
-    @Operation(summary = "delete result of biopotential by ID")
+    @Operation(summary = "Delete result of biopotential by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successfully"),
             @ApiResponse(responseCode = "404", description = "object not found",

@@ -24,8 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.dto.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.channelName.ChannelNameDTO;
+import ru.gsa.biointerface.domain.dto.channelName.ChannelNameSaveOrUpdateDTO;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.mapper.ChannelNameMapper;
 import ru.gsa.biointerface.service.ChannelNameService;
@@ -114,9 +115,9 @@ public class ChannelNameController {
             consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<ChannelNameDTO> save(
             @Parameter(description = "Channel name's DTO", required = true)
-            @Valid @RequestBody ChannelNameDTO dto) {
+            @Valid @RequestBody ChannelNameSaveOrUpdateDTO dto) {
         log.debug("REST POST /channelNames wish params: {}", dto);
-        ChannelName entity = service.save(mapper.toEntity(dto));
+        ChannelName entity = service.save(mapper.toEntity(dto, null));
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/channelNames/{id}")
                 .buildAndExpand(entity.getId()).toUri();
@@ -140,10 +141,9 @@ public class ChannelNameController {
             @Parameter(description = "Channel name's ID", required = true)
             @PathVariable(value = "id") UUID id,
             @Parameter(description = "Channel name's DTO", required = true)
-            @Valid @RequestBody ChannelNameDTO dto) {
+            @Valid @RequestBody ChannelNameSaveOrUpdateDTO dto) {
         log.debug("REST PUT /channelNames wish params: id={}, dto={}", id, dto);
-        ChannelName request = mapper.toEntity(dto);
-        request.setId(id);
+        ChannelName request = mapper.toEntity(dto, id);
         ChannelNameDTO response = mapper.toDTO(service.update(request));
         log.debug("End REST PUT /channelNames");
 

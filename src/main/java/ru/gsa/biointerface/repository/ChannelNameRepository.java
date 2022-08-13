@@ -23,4 +23,6 @@ public interface ChannelNameRepository extends JpaRepository<ChannelName, UUID> 
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
                 MASK_NOT_FOUND, id)));
     }
+
+    boolean existsByName(String name);
 }

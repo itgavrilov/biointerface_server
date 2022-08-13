@@ -1,17 +1,19 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.domain.dto.examination;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.gsa.biointerface.domain.dto.device.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.patient.PatientDTO;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,47 +22,59 @@ import java.util.UUID;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Data
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-@Builder
-@Schema(name = "Examination", description = "result of biopotential measurements")
+@AllArgsConstructor
+@Builder(toBuilder = true)
+@Schema(name = "Examination", description = "Result of biopotential measurements")
 public class ExaminationDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
      * Идентификатор
      */
-    @Schema(description = "examination ID")
+    @Schema(description = "Examination ID")
     private UUID id;
 
     /**
      * Время начала исследования {@link LocalDateTime}
      */
-    @Schema(description = "examination start time", required = true)
+    @Schema(description = "Examination start time", required = true)
     @Past(message = "Start time should be in past")
     private LocalDateTime datetime;
 
     /**
      * Идентификатор карточки пациента {@link PatientDTO#getId()}
      */
-    @Schema(description = "patient ID", required = true)
+    @Schema(description = "Patient ID", required = true)
     @NotNull(message = "PatientId can't be null")
     private UUID patientId;
 
     /**
      * Идентификатор контроллера биоинтерфейса {@link DeviceDTO#getId()}
      */
-    @Schema(description = "device ID", required = true)
+    @Schema(description = "Device ID", required = true)
     @NotNull(message = "DeviceId can't be null")
     private UUID deviceId;
 
     /**
      * Комментарий
      */
-    @Schema(description = "examination comment")
+    @Schema(description = "Comment")
     @Size(max = 400, message = "Comment can't be more than 400 chars")
     private String comment;
+
+    /**
+     * Дата создания
+     */
+    @Schema(description = "Creation date")
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @Schema(description = "Modify date")
+    private LocalDateTime modifyDate;
 
     @Override
     public boolean equals(Object o) {
@@ -86,7 +100,7 @@ public class ExaminationDTO implements Serializable, Comparable<Object> {
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
         return "Examination{" +
                 "id=" + id +

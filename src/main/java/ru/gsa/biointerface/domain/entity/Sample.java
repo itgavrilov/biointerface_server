@@ -1,5 +1,7 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +29,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity(name = "sample")
 @Table(name = "sample")
 public class Sample implements Serializable, Comparable<Object> {
@@ -62,7 +66,6 @@ public class Sample implements Serializable, Comparable<Object> {
     public Sample(int id, Channel channel, int value) {
         this.id = new SampleID(id, channel.getId());
         this.channel = channel;
-        channel.getSamples().add(this);
         this.value = value;
     }
 

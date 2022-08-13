@@ -5,14 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.dto.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.device.DeviceDTO;
 import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,32 +71,34 @@ public class DeviceService {
     /**
      * Сохранение контроллера биоинтерфейса
      *
-     * @param entity DTO контроллера биоинтерфейса {@link DeviceDTO}
+     * @param request Контроллер биоинтерфейса {@link DeviceDTO}
      * @return Контроллер биоинтерфейса {@link Device}
      */
-    public Device save(Device entity) {
-        entity = repository.save(entity);
+    public Device save(Device request) {
+        if(repository.existsByNumber(request.getNumber())){
+            throw new BadRequestException(String.format("Device(number=%s) already exists", request.getNumber()));
+        }
+
+        request.setId(null);
+        Device entity = repository.save(request);
         log.info("Device(id={}) is save", entity.getId());
 
-        return entity;
+        return repository.getOrThrow(entity.getId());
     }
 
     /**
-     * Создание/обновление контроллера биоинтерфейса
+     * Обновление контроллера биоинтерфейса
      *
      * @param request Контроллер биоинтерфейса {@link Device}
      * @return Контроллер биоинтерфейса {@link Device}
      */
-    @Transactional
     public Device update(Device request) {
         Device entity = repository.getOrThrow(request.getId());
-
-        entity.setAmountChannels(request.getAmountChannels());
         entity.setComment(request.getComment());
-
+        repository.save(entity);
         log.info("Device(id={}) is update", entity.getId());
 
-        return entity;
+        return repository.getOrThrow(entity.getId());
     }
 
     /**

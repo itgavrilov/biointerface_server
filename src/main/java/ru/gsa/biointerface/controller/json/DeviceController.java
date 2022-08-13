@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.gsa.biointerface.domain.dto.DeviceDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.dto.device.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.device.DeviceUpdateDTO;
+import ru.gsa.biointerface.domain.dto.icd.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
@@ -115,10 +116,9 @@ public class DeviceController {
             @Parameter(description = "Device's ID", required = true)
             @PathVariable(value = "id") UUID id,
             @Parameter(description = "Device's DTO", required = true)
-            @Valid @RequestBody DeviceDTO dto) {
+            @Valid @RequestBody DeviceUpdateDTO dto) {
         log.info("REST PUT /devices wish params: id={}, dto={}", id, dto);
-        Device request = mapper.toEntity(dto);
-        request.setId(id);
+        Device request = mapper.toEntity(dto, id);
         DeviceDTO response = mapper.toDTO(service.update(request));
         log.debug("End REST PUT /devices");
 

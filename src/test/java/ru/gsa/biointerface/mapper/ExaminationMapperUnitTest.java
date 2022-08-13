@@ -2,17 +2,12 @@ package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
-import ru.gsa.biointerface.domain.dto.ExaminationDTO;
-import ru.gsa.biointerface.domain.entity.Channel;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ExaminationMapperUnitTest {
@@ -43,13 +38,11 @@ class ExaminationMapperUnitTest {
     void toEntity() {
         ExaminationDTO dto = generator.nextObject(ExaminationDTO.class);
         Patient patient = generator.nextObject(Patient.class);
+        patient.setId(dto.getPatientId());
         Device device = generator.nextObject(Device.class);
-        List<Channel> channels = generator.objects(Channel.class, 2).collect(Collectors.toList());
-        device.setAmountChannels(channels.size());
-        dto.setDeviceId(device.getId());
-        dto.setPatientId(patient.getId());
+        patient.setId(dto.getDeviceId());
 
-        Examination entity = mapper.toEntity(dto, patient, device, channels);
+        Examination entity = mapper.toEntity(dto, patient, device);
 
         assertNotNull(entity);
         assertNotNull(entity.getId());
@@ -61,6 +54,5 @@ class ExaminationMapperUnitTest {
         assertNotNull(entity.getPatient());
         assertEquals(patient, entity.getPatient());
         assertNotNull(entity.getChannels());
-        assertIterableEquals(channels, entity.getChannels());
     }
 }

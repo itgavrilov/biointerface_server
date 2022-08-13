@@ -7,23 +7,34 @@ spring:
     generate-ddl: true
     open-in-view: true
     show-sql: false
+    properties:
+      hibernate:
+        types:
+          print:
+            banner: false
+        default_schema: main_service
+        ddl-auto: validate
+        charset: UTF-8
+        character_encoding: UTF-8
+        use_unicode: true
+        autocommit: false
+        format_sql: true
+        cache:
+          use_second_level_cache: false
+          provider_class: org.hibernate.cache.NoCacheProvider
   sql:
     init:
       encoding: UTF-8
   flyway:
-    schemas: default
+    schemas: main_service
     ignore-missing-migrations: true
-    table: flyway_schema_history
+    table: flyway_history
 
   thymeleaf:
     prefix: "/WEB-INF/templates/"
     suffix: ".html"
     encoding: utf-8
     cache: false
-
-  jackson:
-    serialization:
-      write_dates_as_timestamps: false
 
 server:
   port: 8080

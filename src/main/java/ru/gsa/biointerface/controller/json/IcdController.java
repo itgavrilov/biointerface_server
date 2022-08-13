@@ -25,7 +25,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
-import ru.gsa.biointerface.domain.dto.IcdDTO;
+import ru.gsa.biointerface.domain.dto.icd.IcdDTO;
+import ru.gsa.biointerface.domain.dto.icd.IcdSaveOrUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.mapper.IcdMapper;
 import ru.gsa.biointerface.service.IcdService;
@@ -116,9 +117,10 @@ public class IcdController {
             consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<IcdDTO> save(
             @Parameter(description = "ICD's DTO", required = true)
-            @Valid @RequestBody IcdDTO dto) {
+            @Valid @RequestBody IcdSaveOrUpdateDTO dto) {
         log.debug("REST POST /icds wish params: {}", dto);
-        Icd entity = service.save(mapper.toEntity(dto));
+        Icd request = mapper.toEntity(dto, null);
+        Icd entity = service.save(request);
         URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/v1/icds/{id}")
                 .buildAndExpand(entity.getId()).toUri();
@@ -145,10 +147,9 @@ public class IcdController {
             @Parameter(description = "ICD's ID", required = true)
             @PathVariable(value = "id") UUID id,
             @Parameter(description = "ICD's DTO", required = true)
-            @Valid @RequestBody IcdDTO dto) {
+            @Valid @RequestBody IcdSaveOrUpdateDTO dto) {
         log.debug("REST PUT /icds wish params: {}", dto);
-        Icd request = mapper.toEntity(dto);
-        request.setId(id);
+        Icd request = mapper.toEntity(dto, id);
         Icd entity = service.update(request);
         IcdDTO response = mapper.toDTO(entity);
         log.debug("End PUT PUT /icds");

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
@@ -67,18 +67,33 @@ public class IcdService {
     }
 
     /**
+     * Получение заболиваний по id
+     * Если не найдено то вернет null
+     *
+     * @param id Идентификатор {@link Icd#getId()}
+     * @return Заболивание {@link Icd}
+     */
+    public Icd getByIdOrNull(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    /**
      * Создание заболивания
      *
      * @param request Заболивание {@link Icd}
      * @return Заболивание {@link Icd}
      */
     public Icd save(Icd request) {
+        if(repository.existsByNameAndVersion(request.getName(), request.getVersion())){
+            throw new BadRequestException(String.format("ChannelName(name=%s, version=%s) already exists",
+                    request.getName(), request.getVersion()));
+        }
+
         request.setId(null);
+        Icd entity = repository.save(request);
+        log.info("Icd(id={}) is save", entity.getId());
 
-        request = repository.save(request);
-        log.info("Icd(id={}) is save", request.getId());
-
-        return request;
+        return repository.getOrThrow(entity.getId());
     }
 
     /**
@@ -87,17 +102,16 @@ public class IcdService {
      * @param request Заболивание {@link Icd}
      * @return Заболивание {@link Icd}
      */
-    @Transactional
     public Icd update(Icd request) {
         Icd entity = repository.getOrThrow(request.getId());
 
         entity.setName(request.getName());
         entity.setVersion(request.getVersion());
         entity.setComment(request.getComment());
-
+        repository.save(entity);
         log.info("Icd(id={}) is update", entity.getId());
 
-        return entity;
+        return repository.getOrThrow(entity.getId());
     }
 
     /**

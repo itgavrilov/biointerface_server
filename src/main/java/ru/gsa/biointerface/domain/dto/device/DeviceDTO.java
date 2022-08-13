@@ -1,16 +1,16 @@
-package ru.gsa.biointerface.domain.dto;
+package ru.gsa.biointerface.domain.dto.device;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -19,12 +19,13 @@ import java.util.UUID;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Data
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-@Builder
-@Schema(name = "Device", description = "biointerface controller")
-public class DeviceDTO implements Serializable, Comparable<Object> {
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
+@Schema(name = "DeviceDTO", description = "Biointerface controller")
+public class DeviceDTO extends DeviceUpdateDTO implements Serializable, Comparable<Object> {
+
     static final long SerialVersionUID = 1L;
 
     /**
@@ -48,11 +49,16 @@ public class DeviceDTO implements Serializable, Comparable<Object> {
     private Integer amountChannels;
 
     /**
-     * Комментарий
+     * Дата создания
      */
-    @Schema(description = "device comment")
-    @Size(max = 400, message = "Comment can't be more than 400 chars")
-    private String comment;
+    @Schema(description = "Creation date")
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @Schema(description = "Modify date")
+    private LocalDateTime modifyDate;
 
     @Override
     public boolean equals(Object o) {
@@ -60,12 +66,12 @@ public class DeviceDTO implements Serializable, Comparable<Object> {
         if (o == null || getClass() != o.getClass()) return false;
         DeviceDTO that = (DeviceDTO) o;
 
-        return Objects.equals(id, that.id);
+        return Objects.equals(number, that.number);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(number);
     }
 
     @Override
@@ -73,13 +79,14 @@ public class DeviceDTO implements Serializable, Comparable<Object> {
         if (o == null || getClass() != o.getClass()) return -1;
         DeviceDTO that = (DeviceDTO) o;
 
-        return number.compareTo(that.comment);
+        return number.compareTo(that.number);
     }
 
     @Override
     public String toString() {
-        return "Device{" +
+        return "DeviceDTO{" +
                 "id=" + id +
+                ", number=" + number +
                 ", amountChannels=" + amountChannels +
                 '}';
     }

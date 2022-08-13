@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.gsa.biointerface.domain.dto.ChannelDTO;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.сhannel.ChannelDTO;
 import ru.gsa.biointerface.domain.entity.Sample;
 import ru.gsa.biointerface.service.SampleService;
 
@@ -38,7 +38,7 @@ public class SampleController {
 
     private final SampleService service;
 
-    @Operation(summary = "get all readings of biopotential measurements by channel")
+    @Operation(summary = "Get all readings of biopotential measurements by channel")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully",
                     content = @Content(array = @ArraySchema(

@@ -12,18 +12,3 @@ spring:
       platform: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
-    properties:
-      hibernate:
-        types:
-          print:
-            banner: false
-        default_schema: main_service
-        ddl-auto: validate
-        charset: UTF-8
-        character_encoding: UTF-8
-        use_unicode: true
-        autocommit: false
-        format_sql: true
-        cache:
-          use_second_level_cache: false
-          provider_class: org.hibernate.cache.NoCacheProvider

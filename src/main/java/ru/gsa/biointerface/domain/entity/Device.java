@@ -1,18 +1,19 @@
 package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -20,8 +21,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,6 +34,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity(name = "device")
 @Table(name = "device", indexes = {
         @Index(name = "ix_device_number", columnList = "number")
@@ -74,26 +75,23 @@ public class Device implements Serializable, Comparable<Object> {
     private String comment;
 
     /**
-     * Список исследований {@link List<Examination>}
+     * Дата создания
      */
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
-    private List<Examination> examinations;
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false, updatable = false)
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @UpdateTimestamp
+    @Column(name = "modify_date", nullable = false)
+    private LocalDateTime modifyDate;
 
     public Device(String number, int amountChannels, String comment) {
         this.number = number;
         this.amountChannels = amountChannels;
         this.comment = comment;
-        examinations = new ArrayList<>();
-    }
-
-    public void addExamination(Examination examination) {
-        examinations.add(examination);
-        examination.setDevice(this);
-    }
-
-    public void removeExamination(Examination examination) {
-        examinations.remove(examination);
-        examination.setDevice(null);
     }
 
     @Override
