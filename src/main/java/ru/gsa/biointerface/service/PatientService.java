@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.BadRequestException;
@@ -91,7 +92,7 @@ public class PatientService {
         Patient entity = repository.save(request);
         log.info("Patient(id={}) is save", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**
@@ -100,6 +101,7 @@ public class PatientService {
      * @param request Карточка пациента {@link Patient}
      * @return Карточка пациента {@link Patient}
      */
+    @Transactional
     public Patient update(Patient request) {
         Patient entity = repository.getOrThrow(request.getId());
         entity.setSecondName(request.getSecondName());
@@ -108,10 +110,9 @@ public class PatientService {
         entity.setBirthday(request.getBirthday());
         entity.setIcd(request.getIcd());
         entity.setComment(request.getComment());
-        repository.save(entity);
         log.info("Patient(id={}) is save", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**

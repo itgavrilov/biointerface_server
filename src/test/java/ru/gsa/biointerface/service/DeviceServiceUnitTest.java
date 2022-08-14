@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -138,14 +138,12 @@ class DeviceServiceUnitTest {
         Device entityClone = entity.toBuilder().build();
         when(repository.existsByNumber(entityClone.getNumber())).thenReturn(false);
         when(repository.save(entityClone)).thenReturn(entity);
-        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Device entityTest = service.save(entityClone);
         assertEqualsEntity(entity, entityTest);
 
         verify(repository).existsByNumber(entityClone.getNumber());
         verify(repository).save(entityClone);
-        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
@@ -156,7 +154,6 @@ class DeviceServiceUnitTest {
                 .build();
 
         when(repository.getOrThrow(entityForTest.getId())).thenReturn(entity.toBuilder().build());
-        when(repository.save(entityForTest)).thenReturn(entityForTest);
 
         Device entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
@@ -166,8 +163,7 @@ class DeviceServiceUnitTest {
         assertEquals(entity.getAmountChannels(), entityTest.getAmountChannels());
         assertNotEquals(entity.getComment(), entityTest.getComment());
 
-        verify(repository, times(2)).getOrThrow(entity.getId());
-        verify(repository).save(entityForTest);
+        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
@@ -201,9 +197,13 @@ class DeviceServiceUnitTest {
         verify(repository).getOrThrow(rndId);
     }
 
-    private Device getNewEntity(int amountChannels){
+    private Device getNewEntity(int amountChannels) {
         Device entity = generator.nextObject(Device.class);
         entity.setAmountChannels(amountChannels);
+        try {
+            sleep(10);
+        } catch (Exception ignored) {
+        }
 
         return entity;
     }
@@ -221,8 +221,6 @@ class DeviceServiceUnitTest {
     private void assertEqualsEntity(Device entity, Device test){
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
-        assertEquals(entity.getCreationDate(), test.getCreationDate());
-        assertEquals(entity.getModifyDate(), test.getModifyDate());
     }
 
     private void assertEqualsEntityWithoutIdAndTimestamps(Device entity, Device test){

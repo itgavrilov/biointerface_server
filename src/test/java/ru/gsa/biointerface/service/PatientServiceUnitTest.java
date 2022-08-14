@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -189,7 +189,6 @@ class PatientServiceUnitTest {
         when(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
                 entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday())).thenReturn(false);
         when(repository.save(entityClone)).thenReturn(entity);
-        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Patient entityTest = service.save(entityClone);
         assertEqualsEntity(entity, entityTest);
@@ -197,7 +196,6 @@ class PatientServiceUnitTest {
         verify(repository).existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
                 entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday());
         verify(repository).save(entityClone);
-        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
@@ -209,7 +207,6 @@ class PatientServiceUnitTest {
         when(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
                 entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday())).thenReturn(false);
         when(repository.save(entityClone)).thenReturn(entity);
-        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Patient entityTest = service.save(entityClone);
         assertEqualsEntity(entity, entityTest);
@@ -217,7 +214,6 @@ class PatientServiceUnitTest {
         verify(repository).existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
                 entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday());
         verify(repository).save(entityClone);
-        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
@@ -233,15 +229,12 @@ class PatientServiceUnitTest {
         entityForTest.setModifyDate(entity.getModifyDate());
 
         when(repository.getOrThrow(entity.getId())).thenReturn(entityClone);
-        when(repository.save(entityClone)).thenReturn(entityClone);
 
         Patient entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
-        assertEquals(entityForTest.getCreationDate(), entityTest.getCreationDate());
 
         assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getCreationDate(), entityTest.getCreationDate());
         assertNotEquals(entity.getFirstName(), entityTest.getFirstName());
         assertNotEquals(entity.getSecondName(), entityTest.getSecondName());
         assertNotEquals(entity.getPatronymic(), entityTest.getPatronymic());
@@ -249,8 +242,7 @@ class PatientServiceUnitTest {
         assertNotEquals(entity.getIcd(), entityTest.getIcd());
         assertNotEquals(entity.getComment(), entityTest.getComment());
 
-        verify(repository).save(entityClone);
-        verify(repository, times(2)).getOrThrow(entity.getId());
+        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
@@ -281,10 +273,14 @@ class PatientServiceUnitTest {
         return icd;
     }
 
-    private Patient getNewEntity(Icd icd, int minusDays){
+    private Patient getNewEntity(Icd icd, int minusDays) {
         Patient entity = generator.nextObject(Patient.class);
         entity.setBirthday(LocalDate.now().minusDays(minusDays));
         entity.setIcd(icd);
+        try {
+            sleep(10);
+        } catch (Exception ignored) {
+        }
 
         return entity;
     }
@@ -303,8 +299,6 @@ class PatientServiceUnitTest {
     private void assertEqualsEntity(Patient entity, Patient test){
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
-        assertEquals(entity.getCreationDate(), test.getCreationDate());
-        assertEquals(entity.getModifyDate(), test.getModifyDate());
     }
 
     private void assertEqualsEntityWithoutIdAndTimestamps(Patient entity, Patient test){

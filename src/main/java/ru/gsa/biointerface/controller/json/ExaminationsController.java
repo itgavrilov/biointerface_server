@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -24,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.channelName.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
@@ -37,7 +36,6 @@ import ru.gsa.biointerface.service.ExaminationService;
 import ru.gsa.biointerface.service.PatientService;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -118,30 +116,33 @@ public class ExaminationsController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Save result of biopotential")
+    @Operation(summary = "Update result of biopotential")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "created",
+            @ApiResponse(responseCode = "201", description = "successfully",
                     content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "406", description = "validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PutMapping(produces = APPLICATION_JSON_VALUE,
+    @PutMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE,
             consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<ExaminationDTO> update(
+            @Parameter(description = "Examination's ID", required = true)
+            @PathVariable(value = "id") UUID id,
             @Parameter(description = "Examination's DTO", required = true)
-            @Valid @RequestBody ExaminationDTO dto) throws JsonProcessingException {
+            @Valid @RequestBody ExaminationUpdateDTO dto) {
         log.info("REST PUT /examinations wish params: {}", dto);
+
         Patient patient = patientService.getById(dto.getPatientId());
         Device device = deviceService.getById(dto.getDeviceId());
-        Examination entity = service.update(mapper.toEntity(dto, patient, device));
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/examinations/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-        ExaminationDTO response = mapper.toDTO(entity);
+        Examination request = mapper.toEntity(dto, id, patient, device);
+        ExaminationDTO response = mapper.toDTO(service.update(request));
         log.debug("End REST PUT /examinations");
 
-        return ResponseEntity.created(newResource).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete result of biopotential by ID")

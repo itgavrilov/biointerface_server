@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.Thread.sleep;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -140,17 +141,17 @@ class ChannelNameServiceTest {
         ChannelName entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
-        assertEquals(entityForTest.getCreationDate(), entityTest.getCreationDate());
+        assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
 
         ChannelName entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityFromBD);
         assertEquals(entityForTest.getId(), entityFromBD.getId());
-        assertEquals(entityForTest.getCreationDate(), entityFromBD.getCreationDate());
+        assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityFromBD.getCreationDate());
 
         assertEqualsEntity(entityFromBD, entityTest);
 
         assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getCreationDate(), entityTest.getCreationDate());
+        assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
         assertNotEquals(entity.getName(), entityTest.getName());
         assertNotEquals(entity.getComment(), entityTest.getComment());
         assertNotEquals(entity.getModifyDate(), entityTest.getModifyDate());
@@ -191,12 +192,12 @@ class ChannelNameServiceTest {
     }
 
     private ChannelName getNewEntityFromDB(){
-        ChannelName entity = repository.saveAndFlush(getNewEntityWithoutIdAndTimestamps());
+        ChannelName entity = repository.save(getNewEntityWithoutIdAndTimestamps());
         try {
             sleep(10);
         } catch (Exception ignored) {}
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     private List<ChannelName> getNewEntityListFromDB(int count){
@@ -205,16 +206,16 @@ class ChannelNameServiceTest {
         for (int i = 0; i < count; i++) {
             entities.add(getNewEntityWithoutIdAndTimestamps());
         }
-        repository.saveAllAndFlush(entities);
+        entities = repository.saveAll(entities);
 
-        return repository.findAll();
+        return entities;
     }
 
-    private void assertEqualsEntity(ChannelName entity, ChannelName test){
+    private void assertEqualsEntity(ChannelName entity, ChannelName test) {
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
-        assertEquals(entity.getCreationDate(), test.getCreationDate());
-        assertEquals(entity.getModifyDate(), test.getModifyDate());
+        assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(test.getCreationDate());
+        assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
     private void assertEqualsEntityWithoutIdAndTimestamps(ChannelName entity, ChannelName test){

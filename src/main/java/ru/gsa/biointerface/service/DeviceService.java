@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.dto.device.DeviceDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.BadRequestException;
@@ -83,7 +84,7 @@ public class DeviceService {
         Device entity = repository.save(request);
         log.info("Device(id={}) is save", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**
@@ -92,13 +93,13 @@ public class DeviceService {
      * @param request Контроллер биоинтерфейса {@link Device}
      * @return Контроллер биоинтерфейса {@link Device}
      */
+    @Transactional
     public Device update(Device request) {
         Device entity = repository.getOrThrow(request.getId());
         entity.setComment(request.getComment());
-        repository.save(entity);
         log.info("Device(id={}) is update", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**

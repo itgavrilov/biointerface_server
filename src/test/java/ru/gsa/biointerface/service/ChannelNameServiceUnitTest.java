@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,18 +41,20 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void findAll() {
-        List<ChannelName> entities = generator.objects(ChannelName.class, 5).toList();
+        List<ChannelName> entities = getNewEntity(5);
         when(repository.findAll()).thenReturn(entities);
 
         List<ChannelName> entityTests = service.findAll();
+
         assertNotNull(entityTests);
-        assertIterableEquals(entities, entityTests);
-        for (int i = 0; i < entityTests.size(); i++) {
-            assertNotNull(entities.get(i));
-            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
-            assertEquals(entities.get(i).getName(), entityTests.get(i).getName());
-            assertEquals(entities.get(i).getComment(), entityTests.get(i).getComment());
-        }
+
+        entityTests.forEach(entityTest -> {
+            ChannelName entity = entities.stream()
+                    .filter(e -> e.getId().equals(entityTest.getId()))
+                    .findAny().orElseThrow();
+            assertEqualsEntity(entity, entityTest);
+        });
+
         verify(repository).findAll();
     }
 
@@ -68,7 +70,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void findAllPageable() {
-        List<ChannelName> entities = generator.objects(ChannelName.class, 15).toList();
+        List<ChannelName> entities = getNewEntity(15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
@@ -80,13 +82,15 @@ class ChannelNameServiceUnitTest {
 
             Page<ChannelName> entityPageTests = service.findAll(pageable);
             assertNotNull(entityPageTests);
-            assertIterableEquals(entityPage, entityPageTests);
-            for (int i = 0; i < entityPage.getContent().size(); i++) {
-                assertNotNull(entityPageTests.getContent().get(i));
-                assertEquals(entityPage.getContent().get(i).getId(), entityPageTests.getContent().get(i).getId());
-                assertEquals(entityPage.getContent().get(i).getName(), entityPageTests.getContent().get(i).getName());
-                assertEquals(entityPage.getContent().get(i).getComment(), entityPageTests.getContent().get(i).getComment());
-            }
+
+            entityPageTests.getContent().forEach(entityTest -> {
+                assertNotNull(entityTest);
+                ChannelName entity = entities.stream()
+                        .filter(e -> e.getId().equals(entityTest.getId()))
+                        .findAny().orElseThrow();
+                assertEqualsEntity(entity, entityTest);
+            });
+
             verify(repository).findAll(pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -106,14 +110,13 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void getById() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
+        ChannelName entity = getNewEntity();
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         ChannelName entityTest = service.getById(entity.getId());
-        assertNotNull(entityTest);
-        assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getName(), entityTest.getName());
-        assertEquals(entity.getComment(), entityTest.getComment());
+
+        assertEqualsEntity(entity, entityTest);
+
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -129,51 +132,42 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void save() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
+        ChannelName entity = getNewEntity();
         ChannelName entityClone = entity.toBuilder().build();
-        ChannelName entityForTest = entity.toBuilder()
-                .id(null)
-                .creationDate(null)
-                .modifyDate(null)
-                .build();
-        when(repository.save(entityForTest)).thenReturn(entityClone);
-        when(repository.getOrThrow(entityClone.getId())).thenReturn(entityClone);
+        when(repository.existsByName(entityClone.getName())).thenReturn(false);
+        when(repository.save(entityClone)).thenReturn(entity);
 
-        ChannelName entityTest = service.save(entityForTest);
-        assertNotNull(entityTest);
+        ChannelName entityTest = service.save(entityClone);
+        assertEqualsEntity(entity, entityTest);
 
-        assertNotEquals(entityForTest.getId(), entityTest.getId());
-        assertNotEquals(entityForTest.getCreationDate(), entityTest.getCreationDate());
-        assertNotEquals(entityForTest.getModifyDate(), entityTest.getModifyDate());
-
-        assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getName(), entityTest.getName());
-        assertEquals(entity.getComment(), entityTest.getComment());
-        assertEquals(entity.getCreationDate(), entityTest.getCreationDate());
-        assertEquals(entity.getModifyDate(), entityTest.getModifyDate());
-
-        verify(repository).save(entityForTest);
-        verify(repository, times(1)).getOrThrow(entity.getId());
+        verify(repository).existsByName(entityClone.getName());
+        verify(repository).save(entityClone);
     }
 
     @Test
     void update() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
-        ChannelName entityForTest = generator.nextObject(ChannelName.class);
-        entityForTest.setId(entity.getId());
-        when(repository.getOrThrow(entity.getId())).thenReturn(entity);
+        ChannelName entity = getNewEntity();
+
+        ChannelName entityForTest = entity.toBuilder()
+                .name(generator.nextObject(String.class))
+                .comment(generator.nextObject(String.class))
+                .build();
+        when(repository.getOrThrow(entity.getId())).thenReturn(entity.toBuilder().build());
 
         ChannelName entityTest = service.update(entityForTest);
-        assertNotNull(entityTest);
+        assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
+        assertEquals(entityForTest.getId(), entityTest.getId());
+
         assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entityForTest.getName(), entityTest.getName());
-        assertEquals(entityForTest.getComment(), entityTest.getComment());
-        verify(repository, times(2)).getOrThrow(entity.getId());
+        assertNotEquals(entity.getName(), entityTest.getName());
+        assertNotEquals(entity.getComment(), entityTest.getComment());
+
+        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
     void update_rnd() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
+        ChannelName entity = getNewEntity();
         String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
         when(repository.getOrThrow(entity.getId())).thenThrow(new NotFoundException(message));
 
@@ -183,7 +177,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void delete() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
+        ChannelName entity = getNewEntity();
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
@@ -199,5 +193,37 @@ class ChannelNameServiceUnitTest {
 
         assertThrows(NotFoundException.class, () -> service.delete(rnd), message);
         verify(repository).getOrThrow(rnd);
+    }
+
+    private ChannelName getNewEntity() {
+        ChannelName entity = generator.nextObject(ChannelName.class);
+        try {
+            sleep(10);
+        } catch (Exception ignored) {
+        }
+
+        return entity;
+    }
+
+    private List<ChannelName> getNewEntity(int count) {
+        List<ChannelName> entities = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            entities.add(getNewEntity());
+        }
+
+        return entities;
+    }
+
+    private void assertEqualsEntity(ChannelName entity, ChannelName test) {
+        assertEqualsEntityWithoutIdAndTimestamps(entity, test);
+        assertEquals(entity.getId(), test.getId());
+    }
+
+    private void assertEqualsEntityWithoutIdAndTimestamps(ChannelName entity, ChannelName test) {
+        assertNotNull(entity);
+        assertNotNull(test);
+        assertEquals(entity.getName(), test.getName());
+        assertEquals(entity.getComment(), test.getComment());
     }
 }

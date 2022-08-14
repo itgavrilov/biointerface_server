@@ -18,7 +18,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-@Schema(name = "DeviceSaveOrUpdateDTO", description = "Biointerface controller for save or update")
+@Schema(name = "DeviceSaveOrUpdateDTO", description = "Biointerface controller for update")
 public class DeviceUpdateDTO implements Serializable {
 
     static final long SerialVersionUID = 1L;

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
@@ -93,7 +94,7 @@ public class IcdService {
         Icd entity = repository.save(request);
         log.info("Icd(id={}) is save", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**
@@ -102,16 +103,16 @@ public class IcdService {
      * @param request Заболивание {@link Icd}
      * @return Заболивание {@link Icd}
      */
+    @Transactional
     public Icd update(Icd request) {
         Icd entity = repository.getOrThrow(request.getId());
 
         entity.setName(request.getName());
         entity.setVersion(request.getVersion());
         entity.setComment(request.getComment());
-        repository.save(entity);
         log.info("Icd(id={}) is update", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**

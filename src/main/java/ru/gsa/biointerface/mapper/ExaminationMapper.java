@@ -4,9 +4,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
+
+import java.util.UUID;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 26/05/2022
@@ -19,6 +22,16 @@ public interface ExaminationMapper {
             @Mapping(target = "deviceId", source = "examination.device.id")
     })
     ExaminationDTO toDTO(Examination examination);
+
+    @Mappings({
+            @Mapping(target = "id", source = "id"),
+            @Mapping(target = "comment", source = "dto.comment"),
+            @Mapping(target = "datetime", ignore = true),
+            @Mapping(target = "creationDate", ignore = true),
+            @Mapping(target = "modifyDate", ignore = true),
+            @Mapping(target = "channels", expression = "java(new java.util.ArrayList<>())")
+    })
+    Examination toEntity(ExaminationUpdateDTO dto, UUID id, Patient patient, Device device);
 
     @Mappings({
             @Mapping(target = "id", source = "dto.id"),

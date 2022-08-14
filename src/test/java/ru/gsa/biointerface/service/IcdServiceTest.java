@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.Thread.sleep;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -210,11 +211,11 @@ class IcdServiceTest {
         return repository.findAll();
     }
 
-    private void assertEqualsEntity(Icd entity, Icd test){
+    private void assertEqualsEntity(Icd entity, Icd test) {
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
-        assertEquals(entity.getCreationDate(), test.getCreationDate());
-        assertEquals(entity.getModifyDate(), test.getModifyDate());
+        assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(test.getCreationDate());
+        assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
     private void assertEqualsEntityWithoutIdAndTimestamps(Icd entity, Icd test){

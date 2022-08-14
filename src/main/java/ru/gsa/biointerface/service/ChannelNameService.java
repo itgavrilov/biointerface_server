@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
@@ -92,7 +93,7 @@ public class ChannelNameService {
         ChannelName entity = repository.save(request);
         log.info("ChannelName(id={}) is save", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**
@@ -101,15 +102,15 @@ public class ChannelNameService {
      * @param request наименование канала {@link ChannelName}
      * @return Наименование {@link ChannelName}
      */
+    @Transactional
     public ChannelName update(ChannelName request) {
         ChannelName entity = repository.getOrThrow(request.getId());
 
         entity.setName(request.getName());
         entity.setComment(request.getComment());
-        repository.save(entity);
         log.info("ChannelName(id={}) is update", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.Thread.sleep;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -195,7 +196,6 @@ class PatientServiceTest {
         Patient entityForTest = getNewEntityWithoutIdAndTimestamps(icd, 50);
         entityForTest.setId(entity.getId());
         entityForTest.setCreationDate(entity.getCreationDate());
-        entityForTest.setModifyDate(entity.getModifyDate());
 
         Patient entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
@@ -274,11 +274,11 @@ class PatientServiceTest {
         return repository.findAll();
     }
 
-    private void assertEqualsEntity(Patient entity, Patient test){
+    private void assertEqualsEntity(Patient entity, Patient test) {
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
-        assertEquals(entity.getCreationDate(), test.getCreationDate());
-        assertEquals(entity.getModifyDate(), test.getModifyDate());
+        assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(test.getCreationDate());
+        assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
     private void assertEqualsEntityWithoutIdAndTimestamps(Patient entity, Patient test){
