@@ -1,18 +1,22 @@
-package ru.gsa.biointerface.mapper;
+package ru.gsa.biointerface.unit.mapper;
 
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.dto.patient.PatientDTO;
 import ru.gsa.biointerface.domain.dto.patient.PatientSaveOrUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.mapper.PatientMapper;
+import ru.gsa.biointerface.mapper.PatientMapperImpl;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class PatientMapperUnitTest {
+@Tag("UnitTest")
+class PatientMapperTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final PatientMapper mapper = new PatientMapperImpl();

@@ -95,7 +95,7 @@ public class IcdController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping(path = "/{id}",
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<IcdDTO> get(
+    public ResponseEntity<IcdDTO> getById(
             @Parameter(description = "ICD's ID", required = true)
             @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /icds/{}", id);

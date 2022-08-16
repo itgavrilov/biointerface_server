@@ -1,18 +1,22 @@
-package ru.gsa.biointerface.mapper;
+package ru.gsa.biointerface.unit.mapper;
 
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.dto.сhannel.ChannelDTO;
 import ru.gsa.biointerface.domain.dto.сhannel.ChannelUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
+import ru.gsa.biointerface.mapper.ChannelMapper;
+import ru.gsa.biointerface.mapper.ChannelMapperImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class ChannelMapperUnitTest {
+@Tag("UnitTest")
+class ChannelMapperTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final ChannelMapper mapper = new ChannelMapperImpl();

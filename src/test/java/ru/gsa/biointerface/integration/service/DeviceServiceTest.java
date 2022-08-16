@@ -1,6 +1,7 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.integration.service;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,10 +10,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import ru.gsa.biointerface.TestUtils;
-import ru.gsa.biointerface.domain.entity.ChannelName;
+import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.NotFoundException;
-import ru.gsa.biointerface.repository.ChannelNameRepository;
+import ru.gsa.biointerface.repository.DeviceRepository;
+import ru.gsa.biointerface.service.DeviceService;
+import ru.gsa.biointerface.utils.DeviceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +28,19 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Tag("IntegrationTest")
 @SpringBootTest
 @ActiveProfiles("test")
-class ChannelNameServiceTest {
+class DeviceServiceTest {
+
+    private final DeviceService service;
+    private final DeviceRepository repository;
 
     @Autowired
-    private ChannelNameService service;
-    @Autowired
-    private ChannelNameRepository repository;
+    public DeviceServiceTest(DeviceService service, DeviceRepository repository) {
+        this.service = service;
+        this.repository = repository;
+    }
 
     @AfterEach
     void tearDown() {
@@ -42,14 +49,14 @@ class ChannelNameServiceTest {
 
     @Test
     void findAll() {
-        List<ChannelName> entities = getNewEntityListFromDB(5);
+        List<Device> entities = getNewEntityListFromDB(8, 5);
 
-        List<ChannelName> entityTests = service.findAll();
+        List<Device> entityTests = service.findAll();
 
         assertNotNull(entityTests);
 
         entityTests.forEach(entityTest -> {
-            ChannelName entity = entities.stream()
+            Device entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
             assertEqualsEntity(entity, entityTest);
@@ -58,23 +65,24 @@ class ChannelNameServiceTest {
 
     @Test
     void findAll_empty() {
-        List<ChannelName> entityTests = service.findAll();
+        List<Device> entityTests = service.findAll();
         assertNotNull(entityTests);
         assertIterableEquals(new ArrayList<>(), entityTests);
     }
 
     @Test
     void findAllPageable() {
-        List<ChannelName> entities = getNewEntityListFromDB(15);
+        List<Device> entities = getNewEntityListFromDB(8, 15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
-            Page<ChannelName> entityPageTests = service.findAll(pageable);
+            Page<Device> entityPageTests = service.findAll(pageable);
+
             assertNotNull(entityPageTests);
 
             entityPageTests.getContent().forEach(entityTest -> {
                 assertNotNull(entityTest);
-                ChannelName entity = entities.stream()
+                Device entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
                 assertEqualsEntity(entity, entityTest);
@@ -87,38 +95,38 @@ class ChannelNameServiceTest {
     @Test
     void findAllPageable_empty() {
         Pageable pageable = PageRequest.of(0, 5);
-        Page<ChannelName> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
+        Page<Device> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
 
-        Page<ChannelName> entityPageTests = service.findAll(pageable);
+        Page<Device> entityPageTests = service.findAll(pageable);
         assertNotNull(entityPageTests);
-        assertIterableEquals(entityPage, entityPageTests);
+        assertEquals(entityPage, entityPageTests);
     }
 
     @Test
     void getById() {
-        ChannelName entity = getNewEntityFromDB();
+        Device entity = getNewEntityFromDB(8);
 
-        ChannelName entityTest = service.getById(entity.getId());
+        Device entityTest = service.getById(entity.getId());
 
         assertEqualsEntity(entity, entityTest);
     }
 
     @Test
     void getById_rnd() {
-        UUID rnd = UUID.randomUUID();
-        String message = String.format(repository.MASK_NOT_FOUND, rnd);
+        UUID rndId = UUID.randomUUID();
+        String message = String.format(repository.MASK_NOT_FOUND, rndId);
 
-        assertThrows(NotFoundException.class, () -> service.getById(rnd), message);
+        assertThrows(NotFoundException.class, () -> service.getById(rndId), message);
     }
 
     @Test
     void save() {
-        ChannelName entity = getNewEntityWithoutIdAndTimestamps();
+        Device entity = getNewEntityWithoutIdAndTimestamps(8);
 
-        ChannelName entityTest = service.save(entity.toBuilder().build());
+        Device entityTest = service.save(entity.toBuilder().build());
         assertEqualsEntityWithoutIdAndTimestamps(entity, entityTest);
 
-        ChannelName entityFromBD = repository.getOrThrow(entityTest.getId());
+        Device entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntity(entityFromBD, entityTest);
 
         assertNotEquals(entity.getId(), entityTest.getId());
@@ -128,18 +136,19 @@ class ChannelNameServiceTest {
 
     @Test
     void update() {
-        ChannelName entity = getNewEntityFromDB();
+        Device entity = getNewEntityFromDB(8);
 
-        ChannelName entityForTest = TestUtils.getNewChannelName();
+        Device entityForTest = DeviceUtil.getDevice(8);
         entityForTest.setId(entity.getId());
+        entityForTest.setNumber(entity.getNumber());
         entityForTest.setCreationDate(entity.getCreationDate());
 
-        ChannelName entityTest = service.update(entityForTest);
+        Device entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
         assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
 
-        ChannelName entityFromBD = repository.getOrThrow(entityTest.getId());
+        Device entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityFromBD);
         assertEquals(entityForTest.getId(), entityFromBD.getId());
         assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityFromBD.getCreationDate());
@@ -148,36 +157,36 @@ class ChannelNameServiceTest {
 
         assertEquals(entity.getId(), entityTest.getId());
         assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
-        assertNotEquals(entity.getName(), entityTest.getName());
         assertNotEquals(entity.getComment(), entityTest.getComment());
         assertNotEquals(entity.getModifyDate(), entityTest.getModifyDate());
     }
 
     @Test
     void update_rnd() {
-        ChannelName entity = TestUtils.getNewChannelName();
+        Device entity = DeviceUtil.getDevice(8);
+        UUID rnd = entity.getId();
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
 
-        String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
         assertThrows(NotFoundException.class, () -> service.update(entity), message);
     }
 
     @Test
     void delete() {
-        ChannelName entity = getNewEntityFromDB();
-
-        ChannelName finalEntity = entity;
-        assertDoesNotThrow(() -> service.delete(finalEntity.getId()));
-    }
-
-    @Test
-    void delete_rnd() {
-        ChannelName entity = getNewEntityFromDB();
+        Device entity = getNewEntityFromDB(8);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
     }
 
-    private ChannelName getNewEntityWithoutIdAndTimestamps() {
-        ChannelName entity = TestUtils.getNewChannelName();
+    @Test
+    void delete_rnd() {
+        UUID rndId = UUID.randomUUID();
+        String message = String.format(repository.MASK_NOT_FOUND, rndId);
+
+        assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
+    }
+
+    private Device getNewEntityWithoutIdAndTimestamps(int amountChannels) {
+        Device entity = DeviceUtil.getDevice(amountChannels);
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);
@@ -185,33 +194,34 @@ class ChannelNameServiceTest {
         return entity;
     }
 
-    private ChannelName getNewEntityFromDB() {
-        ChannelName entity = TestUtils.getNewChannelName();
+    private Device getNewEntityFromDB(int amountChannels) {
+        Device entity = getNewEntityWithoutIdAndTimestamps(amountChannels);
 
         return repository.save(entity);
     }
 
-    private List<ChannelName> getNewEntityListFromDB(int count) {
-        List<ChannelName> entities = new ArrayList<>();
+    private List<Device> getNewEntityListFromDB(int amountChannels, int count) {
+        List<Device> entities = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            entities.add(getNewEntityWithoutIdAndTimestamps());
+            entities.add(getNewEntityWithoutIdAndTimestamps(amountChannels));
         }
 
         return repository.saveAll(entities);
     }
 
-    private void assertEqualsEntity(ChannelName entity, ChannelName test) {
+    private void assertEqualsEntity(Device entity, Device test) {
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
         assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(test.getCreationDate());
         assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
-    private void assertEqualsEntityWithoutIdAndTimestamps(ChannelName entity, ChannelName test) {
+    private void assertEqualsEntityWithoutIdAndTimestamps(Device entity, Device test) {
         assertNotNull(entity);
         assertNotNull(test);
-        assertEquals(entity.getName(), test.getName());
+        assertEquals(entity.getNumber(), test.getNumber());
         assertEquals(entity.getComment(), test.getComment());
+        assertEquals(entity.getAmountChannels(), test.getAmountChannels());
     }
 }

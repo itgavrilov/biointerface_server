@@ -1,6 +1,7 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.integration.service;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
@@ -17,6 +17,8 @@ import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 import ru.gsa.biointerface.repository.PatientRepository;
+import ru.gsa.biointerface.service.ExaminationService;
+import ru.gsa.biointerface.utils.ChannelUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,19 +31,28 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.gsa.biointerface.utils.DeviceUtil.getDevice;
+import static ru.gsa.biointerface.utils.ExaminationUtil.getExamination;
+import static ru.gsa.biointerface.utils.PatientUtil.getPatient;
 
+@Tag("IntegrationTest")
 @SpringBootTest
 @ActiveProfiles("test")
 class ExaminationServiceTest {
 
+    private final ExaminationService service;
+    private final ExaminationRepository repository;
+    private final PatientRepository patientRepository;
+    private final DeviceRepository deviceRepository;
+
     @Autowired
-    private ExaminationService service;
-    @Autowired
-    private ExaminationRepository repository;
-    @Autowired
-    private PatientRepository patientRepository;
-    @Autowired
-    private DeviceRepository deviceRepository;
+    public ExaminationServiceTest(ExaminationService service, ExaminationRepository repository,
+                                  PatientRepository patientRepository, DeviceRepository deviceRepository) {
+        this.service = service;
+        this.repository = repository;
+        this.patientRepository = patientRepository;
+        this.deviceRepository = deviceRepository;
+    }
 
     @AfterEach
     void tearDown() {
@@ -273,7 +284,7 @@ class ExaminationServiceTest {
         Examination entity = getNewEntityFromDB(getPatientFromDB(), getDeviceFromDB());
         Examination entityClone = entity.toBuilder().build();
 
-        Examination entityForTest = TestUtils.getNewExamination(getPatientFromDB(), getDeviceFromDB());
+        Examination entityForTest = getExamination(getPatientFromDB(), getDeviceFromDB());
         entityForTest.setId(entityClone.getId());
 
         Examination entityTest = service.update(entityForTest);
@@ -306,7 +317,7 @@ class ExaminationServiceTest {
     void loadWithGraphsById() {
         Device device = getDeviceFromDB();
         Examination entity = getNewEntityFromDB(getPatientFromDB(), device);
-        entity.setChannels(TestUtils.getListChannels(device.getAmountChannels()));
+        entity.setChannels(ChannelUtil.getChannels(device.getAmountChannels()));
         entity = repository.saveAndFlush(entity);
         Examination entityClone = entity.toBuilder().build();
 
@@ -329,7 +340,7 @@ class ExaminationServiceTest {
     }
 
     private Patient getPatientFromDB() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
+        Patient patient = getPatient(null, 10);
         patient.setId(null);
         patient.setCreationDate(null);
         patient.setModifyDate(null);
@@ -338,7 +349,7 @@ class ExaminationServiceTest {
     }
 
     private Device getDeviceFromDB() {
-        Device device = TestUtils.getNewDevice(8);
+        Device device = getDevice(8);
         device.setId(null);
         device.setCreationDate(null);
         device.setModifyDate(null);
@@ -347,7 +358,7 @@ class ExaminationServiceTest {
     }
 
     private Examination getNewEntityWithoutIdAndTimestamps(Patient patient, Device device) {
-        Examination entity = TestUtils.getNewExamination(patient, device);
+        Examination entity = getExamination(patient, device);
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);

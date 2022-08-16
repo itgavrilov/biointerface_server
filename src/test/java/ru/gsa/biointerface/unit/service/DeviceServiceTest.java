@@ -1,5 +1,6 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.unit.service;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,10 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
+import ru.gsa.biointerface.service.DeviceService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static ru.gsa.biointerface.utils.DeviceUtil.assertEqualsDevice;
+import static ru.gsa.biointerface.utils.DeviceUtil.assertEqualsDeviceLight;
+import static ru.gsa.biointerface.utils.DeviceUtil.getDevice;
+import static ru.gsa.biointerface.utils.DeviceUtil.getDevices;
 
+@Tag("UnitTest")
 @ExtendWith(MockitoExtension.class)
-class DeviceServiceUnitTest {
+class DeviceServiceTest {
 
     @Mock
     private DeviceRepository repository;
@@ -38,7 +44,7 @@ class DeviceServiceUnitTest {
 
     @Test
     void findAll() {
-        List<Device> entities = getNewEntityList(8, 5);
+        List<Device> entities = getDevices(8, 5);
         when(repository.findAll()).thenReturn(entities);
 
         List<Device> entityTests = service.findAll();
@@ -49,7 +55,7 @@ class DeviceServiceUnitTest {
             Device entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsDevice(entity, entityTest);
         });
 
         verify(repository).findAll();
@@ -67,7 +73,7 @@ class DeviceServiceUnitTest {
 
     @Test
     void findAllPageable() {
-        List<Device> entities = getNewEntityList(8, 15);
+        List<Device> entities = getDevices(8, 15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
@@ -86,7 +92,7 @@ class DeviceServiceUnitTest {
                 Device entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsDevice(entity, entityTest);
             });
 
             verify(repository).findAll(pageable);
@@ -109,12 +115,12 @@ class DeviceServiceUnitTest {
 
     @Test
     void getById() {
-        Device entity = TestUtils.getNewDevice(8);
+        Device entity = getDevice(8);
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Device entityTest = service.getById(entity.getId());
 
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsDevice(entity, entityTest);
 
         verify(repository).getOrThrow(entity.getId());
     }
@@ -131,13 +137,13 @@ class DeviceServiceUnitTest {
 
     @Test
     void save_entity() {
-        Device entity = TestUtils.getNewDevice(8);
+        Device entity = getDevice(8);
         Device entityClone = entity.toBuilder().build();
         when(repository.existsByNumber(entityClone.getNumber())).thenReturn(false);
         when(repository.save(entityClone)).thenReturn(entity);
 
         Device entityTest = service.save(entityClone);
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsDevice(entity, entityTest);
 
         verify(repository).existsByNumber(entityClone.getNumber());
         verify(repository).save(entityClone);
@@ -145,15 +151,15 @@ class DeviceServiceUnitTest {
 
     @Test
     void update() {
-        Device entity = TestUtils.getNewDevice(8);
-        Device entityForTest = TestUtils.getNewDevice(8);
+        Device entity = getDevice(8);
+        Device entityForTest = getDevice(8);
         entityForTest.setId(entity.getId());
         entityForTest.setNumber(entity.getNumber());
 
         when(repository.getOrThrow(entityForTest.getId())).thenReturn(entity.toBuilder().build());
 
         Device entityTest = service.update(entityForTest);
-        assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
+        assertEqualsDeviceLight(entityForTest, entityTest);
 
         assertEquals(entity.getId(), entityTest.getId());
         assertEquals(entity.getNumber(), entityTest.getNumber());
@@ -165,7 +171,7 @@ class DeviceServiceUnitTest {
 
     @Test
     void update_rnd() {
-        Device entity = TestUtils.getNewDevice(8);
+        Device entity = getDevice(8);
         UUID rnd = entity.getId();
         String message = String.format(repository.MASK_NOT_FOUND, rnd);
         when(repository.getOrThrow(rnd)).thenThrow(new NotFoundException(message));
@@ -176,7 +182,7 @@ class DeviceServiceUnitTest {
 
     @Test
     void delete() {
-        Device entity = TestUtils.getNewDevice(8);
+        Device entity = getDevice(8);
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
@@ -192,28 +198,5 @@ class DeviceServiceUnitTest {
 
         assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
         verify(repository).getOrThrow(rndId);
-    }
-
-    private List<Device> getNewEntityList(int amountChannels, int count) {
-        List<Device> entities = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            entities.add(TestUtils.getNewDevice(amountChannels));
-        }
-
-        return entities;
-    }
-
-    private void assertEqualsEntity(Device entity, Device test) {
-        assertEqualsEntityWithoutIdAndTimestamps(entity, test);
-        assertEquals(entity.getId(), test.getId());
-    }
-
-    private void assertEqualsEntityWithoutIdAndTimestamps(Device entity, Device test) {
-        assertNotNull(entity);
-        assertNotNull(test);
-        assertEquals(entity.getNumber(), test.getNumber());
-        assertEquals(entity.getComment(), test.getComment());
-        assertEquals(entity.getAmountChannels(), test.getAmountChannels());
     }
 }
