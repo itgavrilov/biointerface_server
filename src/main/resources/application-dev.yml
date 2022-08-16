@@ -10,31 +10,8 @@ spring:
   sql:
     init:
       platform: postgres
-      encoding: UTF-8
-  flyway:
-    schemas: main_service
-    ignore-missing-migrations: true
-    table: flyway_history
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
-    generate-ddl: true
-    open-in-view: true
-    show-sql: false
-    properties:
-      hibernate:
-        types:
-          print:
-            banner: false
-        default_schema: main_service
-        ddl-auto: validate
-        charset: UTF-8
-        character_encoding: UTF-8
-        use_unicode: true
-        autocommit: false
-        format_sql: true
-        cache:
-          use_second_level_cache: false
-          provider_class: org.hibernate.cache.NoCacheProvider
   thymeleaf:
     prefix: "/WEB-INF/templates/"
     suffix: ".html"

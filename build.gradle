@@ -70,7 +70,7 @@ dependencies {
 //    LocalDateTime Enhance JSR-310
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
 //-----------Tests--------------------------
-    implementation('com.h2database:h2:2.1.210')
+    testRuntimeOnly('com.h2database:h2:2.1.210')
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }

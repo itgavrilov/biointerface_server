@@ -1,3 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/biointerface
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  sql:
+    init:
+      platform: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+  thymeleaf:
+    prefix: "/WEB-INF/templates/"
+    suffix: ".html"
+    encoding: utf-8
+    cache: false
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger
+
 logging:
   level:
     ROOT: INFO
