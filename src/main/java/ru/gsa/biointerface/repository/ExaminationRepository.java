@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.exception.NotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public interface ExaminationRepository extends JpaRepository<Examination, UUID> 
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
                 MASK_NOT_FOUND, id)));
     }
+
+    boolean existsByPatientIdAndDeviceIdAndDatetime(UUID patientId, UUID deviceId, LocalDateTime datetime);
 
     @Query(nativeQuery = true,
             value = "select * from main_service.examination as e " +

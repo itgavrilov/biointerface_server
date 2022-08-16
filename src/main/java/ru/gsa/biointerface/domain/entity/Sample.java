@@ -53,7 +53,7 @@ public class Sample implements Serializable, Comparable<Object> {
             @JoinColumn(name = "examination_id", referencedColumnName = "examination_id", nullable = false),
             @JoinColumn(name = "channel_number", referencedColumnName = "number", nullable = false)
     })
-    @MapsId("channel_id")
+    @MapsId("channelId")
     private Channel channel;
 
     /**

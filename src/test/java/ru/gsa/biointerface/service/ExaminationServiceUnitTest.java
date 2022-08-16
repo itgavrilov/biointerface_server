@@ -299,6 +299,33 @@ class ExaminationServiceUnitTest {
     }
 
     @Test
+    void save() {
+        Patient patient = TestUtils.getNewPatient(null, 10);
+        Device device = TestUtils.getNewDevice(8);
+        Examination entity = TestUtils.getNewExamination(patient, device);
+        Examination entityClone = entity.toBuilder().build();
+        when(repository.existsByPatientIdAndDeviceIdAndDatetime(
+                entityClone.getPatientId(),
+                entityClone.getDeviceId(),
+                entityClone.getDatetime())).thenReturn(false);
+        when(repository.save(entityClone)).thenReturn(entityClone);
+        when(patientService.getById(entityClone.getPatientId())).thenReturn(patient);
+        when(deviceService.getById(entityClone.getDeviceId())).thenReturn(device);
+
+        Examination entityTest = service.save(entityClone);
+
+        assertEqualsEntity(entity, entityTest);
+
+        verify(repository).existsByPatientIdAndDeviceIdAndDatetime(
+                entityClone.getPatientId(),
+                entityClone.getDeviceId(),
+                entityClone.getDatetime());
+        verify(repository).save(entityClone);
+        verify(patientService).getById(entityClone.getPatientId());
+        verify(deviceService).getById(entityClone.getDeviceId());
+    }
+
+    @Test
     void update() {
         Patient patient = TestUtils.getNewPatient(null, 10);
         Device device = TestUtils.getNewDevice(8);

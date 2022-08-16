@@ -87,6 +87,7 @@ public class ChannelService {
     public Channel update(Channel request) {
         Channel entity = repository.getOrThrow(request.getId());
         entity.setChannelName(request.getChannelName());
+        entity.setComment(request.getComment());
         log.info("Channel(id={}) is update", entity.getId());
 
         return entity;

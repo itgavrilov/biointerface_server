@@ -38,11 +38,11 @@ public class SampleID implements Serializable, Comparable<Object> {
      * Идентификатор канала контроллера биоинтерфейса {@link ChannelID}
      */
     @Embedded
-    private ChannelID channel_id;
+    private ChannelID channelId;
 
-    public SampleID(Integer number, ChannelID channel_id) {
+    public SampleID(Integer number, ChannelID channelId) {
         this.number = number;
-        this.channel_id = channel_id;
+        this.channelId = channelId;
     }
 
     @Override
@@ -51,12 +51,12 @@ public class SampleID implements Serializable, Comparable<Object> {
         if (o == null || getClass() != o.getClass()) return false;
         SampleID that = (SampleID) o;
 
-        return number == that.number && Objects.equals(channel_id, that.channel_id);
+        return number == that.number && Objects.equals(channelId, that.channelId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(number, channel_id);
+        return Objects.hash(number, channelId);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class SampleID implements Serializable, Comparable<Object> {
         if (o == null || getClass() != o.getClass()) return -1;
         SampleID that = (SampleID) o;
 
-        int result = channel_id.compareTo(that.channel_id);
+        int result = channelId.compareTo(that.channelId);
         if (result == 0) {
             if (number > that.number) {
                 result = 1;
@@ -81,9 +81,9 @@ public class SampleID implements Serializable, Comparable<Object> {
         String channelId = "-";
         String examinationId = "-";
 
-        if (channel_id != null) {
-            channelId = String.valueOf(channel_id.getNumber());
-            examinationId = String.valueOf(channel_id.getExaminationId());
+        if (this.channelId != null) {
+            channelId = String.valueOf(this.channelId.getNumber());
+            examinationId = String.valueOf(this.channelId.getExaminationId());
         }
         return "Sample{" +
                 "number=" + number +

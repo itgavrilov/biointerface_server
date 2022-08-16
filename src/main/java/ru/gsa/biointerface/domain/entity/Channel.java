@@ -106,6 +106,13 @@ public class Channel implements Serializable, Comparable<Object> {
         } else {
             id.setExaminationId(examinationId);
         }
+
+        if (samples != null) {
+            UUID finalExaminationId = examinationId;
+            samples.forEach(s -> {
+                s.getId().getChannelId().setExaminationId(finalExaminationId);
+            });
+        }
     }
 
     public void setNumber(Byte number) {
@@ -114,6 +121,12 @@ public class Channel implements Serializable, Comparable<Object> {
             id = new ChannelID(null, number);
         } else {
             id.setNumber(number);
+        }
+
+        if (samples != null) {
+            samples.forEach(s -> {
+                s.getId().getChannelId().setNumber(number);
+            });
         }
     }
 

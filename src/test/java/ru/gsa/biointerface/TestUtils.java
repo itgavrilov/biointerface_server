@@ -89,4 +89,12 @@ public class TestUtils {
         return channels;
     }
 
+    public static Channel getNewChannel(Examination examination, ChannelName channelName, Byte number) {
+        Channel channel = generator.nextObject(Channel.class);
+        channel.setNumber(number);
+        channel.setExamination(examination);
+        channel.setChannelName(channelName);
+
+        return channel;
+    }
 }
