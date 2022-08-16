@@ -5,10 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.gsa.biointerface.config.TestConfig;
 import ru.gsa.biointerface.controller.json.IcdController;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.mapper.IcdMapper;
 import ru.gsa.biointerface.service.IcdService;
 
 import java.util.List;
@@ -21,6 +22,9 @@ import static ru.gsa.biointerface.utils.IcdUtil.getIcds;
 
 @Tag("UnitTest")
 @WebMvcTest(IcdController.class)
+@Import({
+        TestConfig.class
+})
 class IcdControllerTest {
 
     @Autowired
@@ -29,9 +33,6 @@ class IcdControllerTest {
     @MockBean
     private IcdService service;
 
-    @MockBean
-    private IcdMapper mapper;
-
     @Test
     void getAll() throws Exception {
         List<Icd> entities = getIcds(2);
@@ -39,7 +40,7 @@ class IcdControllerTest {
 
         mvc.perform(get("/api/v1/icds"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.[0].id").value(entities.get(0).getId()))
                 .andExpect(jsonPath("$.[0].name").value(entities.get(0).getName()))
                 .andExpect(jsonPath("$.[0].version").value(entities.get(0).getVersion()))
