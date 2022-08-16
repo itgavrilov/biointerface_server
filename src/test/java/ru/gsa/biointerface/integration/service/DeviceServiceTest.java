@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Tag("IntegrationTest")
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("integration")
 class DeviceServiceTest {
 
     private final DeviceService service;

@@ -37,7 +37,7 @@ import static ru.gsa.biointerface.utils.PatientUtil.getPatient;
 
 @Tag("IntegrationTest")
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("integration")
 class ExaminationServiceTest {
 
     private final ExaminationService service;

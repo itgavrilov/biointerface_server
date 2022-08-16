@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.gsa.biointerface.config.TestConfig;
 import ru.gsa.biointerface.controller.json.IcdController;
@@ -25,6 +26,7 @@ import static ru.gsa.biointerface.utils.IcdUtil.getIcds;
 @Import({
         TestConfig.class
 })
+@ActiveProfiles("test")
 class IcdControllerTest {
 
     @Autowired
@@ -41,18 +43,18 @@ class IcdControllerTest {
         mvc.perform(get("/api/v1/icds"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$.[0].id").value(entities.get(0).getId()))
-                .andExpect(jsonPath("$.[0].name").value(entities.get(0).getName()))
-                .andExpect(jsonPath("$.[0].version").value(entities.get(0).getVersion()))
-                .andExpect(jsonPath("$.[0].comment").value(entities.get(0).getComment()))
-                .andExpect(jsonPath("$.[0].creationDate").value(entities.get(0).getCreationDate()))
-                .andExpect(jsonPath("$.[0].modifyDate").value(entities.get(0).getModifyDate()))
-                .andExpect(jsonPath("$.[1].id").value(entities.get(1).getId()))
-                .andExpect(jsonPath("$.[1].name").value(entities.get(1).getName()))
-                .andExpect(jsonPath("$.[1].version").value(entities.get(1).getVersion()))
-                .andExpect(jsonPath("$.[1].comment").value(entities.get(1).getComment()))
-                .andExpect(jsonPath("$.[1].creationDate").value(entities.get(1).getCreationDate()))
-                .andExpect(jsonPath("$.[1].modifyDate").value(entities.get(1).getModifyDate()));
+                .andExpect(jsonPath("$.[1].id").value(entities.get(0).getId().toString()))
+                .andExpect(jsonPath("$.[1].name").value(entities.get(0).getName()))
+                .andExpect(jsonPath("$.[1].version").value(entities.get(0).getVersion()))
+                .andExpect(jsonPath("$.[1].comment").value(entities.get(0).getComment()))
+                .andExpect(jsonPath("$.[1].creationDate").value(entities.get(0).getCreationDate()))
+                .andExpect(jsonPath("$.[1].modifyDate").value(entities.get(0).getModifyDate()))
+                .andExpect(jsonPath("$.[0].id").value(entities.get(1).getId().toString()))
+                .andExpect(jsonPath("$.[0].name").value(entities.get(1).getName()))
+                .andExpect(jsonPath("$.[0].version").value(entities.get(1).getVersion()))
+                .andExpect(jsonPath("$.[0].comment").value(entities.get(1).getComment()))
+                .andExpect(jsonPath("$.[0].creationDate").value(entities.get(1).getCreationDate()))
+                .andExpect(jsonPath("$.[0].modifyDate").value(entities.get(1).getModifyDate()));
     }
 
 //    @Test
