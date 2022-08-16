@@ -5,7 +5,11 @@ import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import ru.gsa.biointerface.host.serialport.packets.*;
+import ru.gsa.biointerface.host.serialport.packets.ChannelPacket;
+import ru.gsa.biointerface.host.serialport.packets.ConfigPacket;
+import ru.gsa.biointerface.host.serialport.packets.ControlPacket;
+import ru.gsa.biointerface.host.serialport.packets.Packet;
+import ru.gsa.biointerface.host.serialport.packets.PacketType;
 import ru.gsa.biointerface.host.serialport.serverByPuchkov.AbstractServer;
 
 import java.util.Arrays;

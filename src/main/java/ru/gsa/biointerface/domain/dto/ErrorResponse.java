@@ -1,8 +1,8 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 29/01/2022
  */
-@Data
+@Getter
 @Builder
 @Schema(name = "ErrorResponse", description = "error")
 public class ErrorResponse {
@@ -39,5 +39,6 @@ public class ErrorResponse {
      * Дата/время возникновения ошибки
      */
     @Schema(description = "timestamp")
+//    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
 }

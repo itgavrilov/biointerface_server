@@ -2,17 +2,13 @@ package ru.gsa.biointerface.mapper;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
-import ru.gsa.biointerface.domain.entity.Channel;
-import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.dto.ExaminationDTO;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ExaminationMapperUnitTest {
@@ -30,9 +26,9 @@ class ExaminationMapperUnitTest {
         assertNotNull(dto.getId());
         assertEquals(entity.getId(), dto.getId());
         assertNotNull(dto.getDeviceId());
-        assertEquals(entity.getDevice().getId(), dto.getDeviceId());
+        assertEquals(entity.getDeviceId(), dto.getDeviceId());
         assertNotNull(dto.getPatientId());
-        assertEquals(entity.getPatient().getId(), dto.getPatientId());
+        assertEquals(entity.getPatientId(), dto.getPatientId());
         assertNotNull(dto.getDatetime());
         assertEquals(entity.getDatetime(), dto.getDatetime());
         assertNotNull(dto.getComment());
@@ -40,27 +36,39 @@ class ExaminationMapperUnitTest {
     }
 
     @Test
-    void toEntity() {
-        ExaminationDTO dto = generator.nextObject(ExaminationDTO.class);
-        Patient patient = generator.nextObject(Patient.class);
-        Device device = generator.nextObject(Device.class);
-        List<Channel> channels = generator.objects(Channel.class, 2).collect(Collectors.toList());
-        device.setAmountChannels(channels.size());
-        dto.setDeviceId(device.getId());
-        dto.setPatientId(patient.getId());
+    void toEntityFromExaminationUpdateDTO() {
+        ExaminationUpdateDTO dto = generator.nextObject(ExaminationUpdateDTO.class);
+        UUID id = generator.nextObject(UUID.class);
 
-        Examination entity = mapper.toEntity(dto, patient, device, channels);
+        Examination entity = mapper.toEntity(dto, id);
+
+        assertNotNull(entity);
+        assertNotNull(entity.getId());
+        assertEquals(id, entity.getId());
+        assertNotNull(entity.getComment());
+        assertEquals(dto.getComment(), entity.getComment());
+        assertNotNull(entity.getPatientId());
+        assertEquals(dto.getPatientId(), entity.getPatientId());
+        assertNotNull(entity.getDeviceId());
+        assertEquals(dto.getDeviceId(), entity.getDeviceId());
+        assertNotNull(entity.getChannels());
+    }
+
+    @Test
+    void toEntityFromExaminationDTO() {
+        ExaminationDTO dto = generator.nextObject(ExaminationDTO.class);
+
+        Examination entity = mapper.toEntity(dto);
 
         assertNotNull(entity);
         assertNotNull(entity.getId());
         assertEquals(dto.getId(), entity.getId());
         assertNotNull(entity.getComment());
         assertEquals(dto.getComment(), entity.getComment());
-        assertNotNull(entity.getDevice());
-        assertEquals(device, entity.getDevice());
-        assertNotNull(entity.getPatient());
-        assertEquals(patient, entity.getPatient());
+        assertNotNull(entity.getPatientId());
+        assertEquals(dto.getPatientId(), entity.getPatientId());
+        assertNotNull(entity.getDeviceId());
+        assertEquals(dto.getDeviceId(), entity.getDeviceId());
         assertNotNull(entity.getChannels());
-        assertIterableEquals(channels, entity.getChannels());
     }
 }

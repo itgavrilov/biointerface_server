@@ -1,11 +1,15 @@
 package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,10 +19,13 @@ import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Сущность канала контроллера биоинтерфейса
@@ -29,6 +36,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity(name = "channel")
 @Table(name = "channel")
 public class Channel implements Serializable, Comparable<Object> {
@@ -44,7 +52,7 @@ public class Channel implements Serializable, Comparable<Object> {
      * Исследование {@link Examination}
      */
     @NotNull(message = "Examination can't be null")
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
     @MapsId("examinationId")
     private Examination examination;
@@ -57,28 +65,77 @@ public class Channel implements Serializable, Comparable<Object> {
     private ChannelName channelName;
 
     /**
+     * Комментарий
+     */
+    @Size(max = 400, message = "Comment can't be more than 400 chars")
+    @Column(length = 400)
+    private String comment;
+
+    /**
+     * Дата создания
+     */
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false, updatable = false)
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @UpdateTimestamp
+    @Column(name = "modify_date", nullable = false)
+    private LocalDateTime modifyDate;
+
+    /**
      * Массив измерений {@link List<Sample>}
      */
     @NotNull(message = "Samples can't be null")
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
 
+    public void setExamination(Examination examination) {
+        UUID examinationId = null;
+
+        if (examination != null) {
+            examinationId = examination.getId();
+        }
+
+        this.examination = examination;
+
+        if (id == null) {
+            id = new ChannelID(examinationId, null);
+        } else {
+            id.setExaminationId(examinationId);
+        }
+
+        if (samples != null) {
+            UUID finalExaminationId = examinationId;
+            samples.forEach(s -> {
+                s.getId().getChannelId().setExaminationId(finalExaminationId);
+            });
+        }
+    }
+
+    public void setNumber(Byte number) {
+
+        if (id == null) {
+            id = new ChannelID(null, number);
+        } else {
+            id.setNumber(number);
+        }
+
+        if (samples != null) {
+            samples.forEach(s -> {
+                s.getId().getChannelId().setNumber(number);
+            });
+        }
+    }
+
     public Channel(Byte number, Examination examination, ChannelName channelName) {
         this.id = new ChannelID(examination.getId(), number);
         this.examination = examination;
         this.channelName = channelName;
+        this.comment = null;
         this.samples = new LinkedList<>();
-    }
-
-    public void addSample(Sample sample) {
-        sample.setId(new SampleID(samples.size(), id));
-        samples.add(sample);
-        sample.setChannel(this);
-    }
-
-    public void removeSample(Sample sample) {
-        samples.remove(sample);
-        sample.setChannel(null);
     }
 
     @Override
@@ -114,6 +171,7 @@ public class Channel implements Serializable, Comparable<Object> {
                 "number=" + id.getNumber() +
                 ", examination_id=" + id.getExaminationId() +
                 ", channelName_id=" + channelNameId +
+                ", comment='" + comment +
                 '}';
     }
 }

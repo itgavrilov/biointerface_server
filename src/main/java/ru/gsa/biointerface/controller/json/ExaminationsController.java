@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.controller.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,24 +23,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.gsa.biointerface.domain.entity.Device;
+import ru.gsa.biointerface.domain.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.channelName.ChannelNameDTO;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.dto.ChannelNameDTO;
-import ru.gsa.biointerface.dto.ErrorResponse;
-import ru.gsa.biointerface.dto.ExaminationDTO;
 import ru.gsa.biointerface.mapper.ExaminationMapper;
-import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
-import ru.gsa.biointerface.service.PatientService;
 
 import javax.validation.Valid;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 15/11/2021
@@ -51,22 +45,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Examinations", description = "results of biopotential measurements")
 @RestController
-@RequestMapping(value = "/examinations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/examinations")
 public class ExaminationsController {
 
-    private static final String version = "0.0.1-SNAPSHOT";
-
     private final ExaminationService service;
-    private final PatientService patientService;
-    private final DeviceService deviceService;
     private final ExaminationMapper mapper;
 
-    @Operation(summary = "get all results of biopotential measurements")
+    @Operation(summary = "Get all results of biopotential measurements")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = ExaminationDTO.class))))})
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ExaminationDTO>> getAll(
             @Parameter(description = "ID patient record")
             @RequestParam(value = "patientId", required = false) UUID patientId,
@@ -81,12 +71,13 @@ public class ExaminationsController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get all results of biopotential measurements wish paging")
+    @Operation(summary = "Get all results of biopotential measurements wish paging")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = ExaminationDTO.class))))})
-    @GetMapping("/pageable")
+    @GetMapping(path = "/pageable",
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ExaminationDTO>> getAll(
             @Parameter(description = "ID patient record")
             @RequestParam(value = "patientId", required = false) UUID patientId,
@@ -101,13 +92,14 @@ public class ExaminationsController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get result of biopotential measurements by ID")
+    @Operation(summary = "Get result of biopotential measurements by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(schema = @Schema(implementation = ExaminationDTO.class))),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ExaminationDTO> get(
             @Parameter(description = "Examination's ID", required = true)
             @PathVariable(value = "id") UUID id) {
@@ -118,57 +110,44 @@ public class ExaminationsController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete result of biopotential by ID")
+    @Operation(summary = "Update result of biopotential")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "successfully",
+                    content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "406", description = "validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @PutMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<ExaminationDTO> update(
+            @Parameter(description = "Examination's ID", required = true)
+            @PathVariable(value = "id") UUID id,
+            @Parameter(description = "Examination's DTO", required = true)
+            @Valid @RequestBody ExaminationUpdateDTO dto) {
+        log.info("REST PUT /examinations wish params: {}", dto);
+        Examination request = mapper.toEntity(dto, id);
+        ExaminationDTO response = mapper.toDTO(service.update(request));
+        log.debug("End REST PUT /examinations");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Delete result of biopotential by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successfully"),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
             @Parameter(description = "Examination's ID", required = true)
             @PathVariable(value = "id") UUID id) {
         log.info("REST DELETE /examinations/{}", id);
         service.delete(id);
         log.debug("End REST DELETE /examinations/{}", id);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "save result of biopotential")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "created",
-                    content = @Content(schema = @Schema(implementation = ChannelNameDTO.class))),
-            @ApiResponse(responseCode = "400", description = "bad request",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "406", description = "validation error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PutMapping
-    public ResponseEntity<ExaminationDTO> save(
-            @Parameter(description = "Examination's DTO", required = true)
-            @Valid @RequestBody ExaminationDTO dto) throws JsonProcessingException {
-        log.info("REST PUT /examinations wish params: {}", dto);
-        Patient patient = patientService.getById(dto.getPatientId());
-        Device device = deviceService.getById(dto.getDeviceId());
-        Examination entity = service.save(mapper.toEntity(dto, patient, device, new ArrayList<>()));
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/examinations/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-        ExaminationDTO response = mapper.toDTO(entity);
-        log.debug("End REST PUT /examinations");
-
-        return ResponseEntity.created(newResource).body(response);
-    }
-
-    @GetMapping(value = "/health")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping(value = "/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
     }
 }

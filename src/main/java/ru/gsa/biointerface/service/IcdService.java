@@ -5,15 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.Icd;
-import ru.gsa.biointerface.dto.IcdDTO;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -29,12 +29,12 @@ public class IcdService {
 
     @PostConstruct
     private void init() {
-        log.info("IcdService is init");
+        log.debug("IcdService is init");
     }
 
     @PreDestroy
     private void destroy() {
-        log.info("IcdService is destruction");
+        log.debug("IcdService is destruction");
     }
 
     /**
@@ -68,26 +68,49 @@ public class IcdService {
     }
 
     /**
-     * Создание/обновление заболивания
+     * Получение заболиваний по id
+     * Если не найдено то вернет null
      *
-     * @param dto DTO заболивания {@link IcdDTO}
+     * @param id Идентификатор {@link Icd#getId()}
      * @return Заболивание {@link Icd}
      */
-    public Icd saveOrUpdate(IcdDTO dto) {
-        Optional<Icd> optional = repository.findById(dto.getId());
-        Icd entity;
+    public Icd getByIdOrNull(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
 
-        if (optional.isEmpty()) {
-            entity = new Icd(dto.getName(), dto.getVersion(), dto.getComment());
-        } else {
-            entity = optional.get();
-            entity.setName(dto.getName());
-            entity.setVersion(dto.getVersion());
-            entity.setComment(dto.getComment());
+    /**
+     * Создание заболивания
+     *
+     * @param request Заболивание {@link Icd}
+     * @return Заболивание {@link Icd}
+     */
+    public Icd save(Icd request) {
+        if(repository.existsByNameAndVersion(request.getName(), request.getVersion())){
+            throw new BadRequestException(String.format("ChannelName(name=%s, version=%s) already exists",
+                    request.getName(), request.getVersion()));
         }
 
-        entity = repository.save(entity);
-        log.debug("Icd(id={}) is save", entity.getId());
+        request.setId(null);
+        Icd entity = repository.save(request);
+        log.info("Icd(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
+     * Обновление заболивания
+     *
+     * @param request Заболивание {@link Icd}
+     * @return Заболивание {@link Icd}
+     */
+    @Transactional
+    public Icd update(Icd request) {
+        Icd entity = repository.getOrThrow(request.getId());
+
+        entity.setName(request.getName());
+        entity.setVersion(request.getVersion());
+        entity.setComment(request.getComment());
+        log.info("Icd(id={}) is update", entity.getId());
 
         return entity;
     }
@@ -101,6 +124,6 @@ public class IcdService {
     public void delete(UUID id) {
         Icd entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("Icd(id={}) is deleted", id);
+        log.info("Icd(id={}) is deleted", id);
     }
 }

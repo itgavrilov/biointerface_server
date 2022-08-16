@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
-import ru.gsa.biointerface.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.ErrorResponse;
 
 import java.time.LocalDateTime;
 
@@ -48,7 +48,7 @@ public class ExceptionRestControllerAdvice {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException exception) {
 
-        return buildResponse(exception.getStatus(), exception.getMessage());
+        return buildResponse(exception.getStatus(), exception.getReason());
     }
 
     /**

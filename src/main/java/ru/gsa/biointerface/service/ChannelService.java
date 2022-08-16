@@ -7,7 +7,6 @@ import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.ChannelID;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.dto.ChannelDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 import ru.gsa.biointerface.repository.ChannelRepository;
@@ -66,25 +65,6 @@ public class ChannelService {
     }
 
     /**
-     * Обновление канала
-     *
-     * @param dto DTO канала {@link ChannelDTO}
-     * @return Канал {@link Channel}
-     */
-    @Transactional
-    public Channel update(ChannelDTO dto) {
-        Channel entity = repository.getOrThrow(dto.getExaminationId(), dto.getNumber());
-
-        if (!entity.getChannelName().getId().equals(dto.getChannelNameId())) {
-            entity.setChannelName(channelNameRepository.getOrThrow(dto.getChannelNameId()));
-        }
-
-        log.info("Channel(id={}) is update", entity.getId());
-
-        return entity;
-    }
-
-    /**
      * Сохранение нового канала
      *
      * @param entity Новый канал {@link Channel}
@@ -93,6 +73,22 @@ public class ChannelService {
     public Channel save(Channel entity) {
         entity = repository.save(entity);
         log.info("Channel(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
+     * Обновление канала
+     *
+     * @param request Канал {@link Channel}
+     * @return Канал {@link Channel}
+     */
+    @Transactional
+    public Channel update(Channel request) {
+        Channel entity = repository.getOrThrow(request.getId());
+        entity.setChannelName(request.getChannelName());
+        entity.setComment(request.getComment());
+        log.info("Channel(id={}) is update", entity.getId());
 
         return entity;
     }
@@ -107,6 +103,6 @@ public class ChannelService {
     public void delete(UUID examinationId, Byte number) {
         Channel entity = repository.getOrThrow(examinationId, number);
         repository.delete(entity);
-        log.debug("Channel(examinationId={}, number={}) is deleted", examinationId, number);
+        log.info("Channel(examinationId={}, number={}) is deleted", examinationId, number);
     }
 }

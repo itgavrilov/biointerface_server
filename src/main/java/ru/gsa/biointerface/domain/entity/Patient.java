@@ -1,10 +1,13 @@
 package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,17 +17,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,6 +37,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity(name = "patient")
 @Table(name = "patient")
 public class Patient implements Serializable, Comparable<Object> {
@@ -76,7 +77,7 @@ public class Patient implements Serializable, Comparable<Object> {
      */
     @Past(message = "Birthday should be in past")
     @Column(name = "birthday", nullable = false)
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     /**
      * Болезни по ICD {@link Icd}
@@ -93,30 +94,26 @@ public class Patient implements Serializable, Comparable<Object> {
     private String comment;
 
     /**
-     * Список исследований {@link List<Examination>}
+     * Дата создания
      */
-    @NotNull(message = "Examinations can't be null")
-    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    private List<Examination> examinations;
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false, updatable = false)
+    private LocalDateTime creationDate;
 
-    public Patient(String secondName, String firstName, String patronymic, LocalDateTime birthday, Icd icd, String comment) {
+    /**
+     * Дата последнего изменений
+     */
+    @UpdateTimestamp
+    @Column(name = "modify_date", nullable = false)
+    private LocalDateTime modifyDate;
+
+    public Patient(String secondName, String firstName, String patronymic, LocalDate birthday, Icd icd, String comment) {
         this.firstName = firstName;
         this.secondName = secondName;
         this.patronymic = patronymic;
         this.birthday = birthday;
         this.comment = comment;
         this.icd = icd;
-        examinations = new ArrayList<>();
-    }
-
-    public void addExamination(Examination examination) {
-        examinations.add(examination);
-        examination.setPatient(this);
-    }
-
-    public void removeExamination(Examination examination) {
-        examinations.remove(examination);
-        examination.setPatient(null);
     }
 
     @Override
@@ -160,7 +157,7 @@ public class Patient implements Serializable, Comparable<Object> {
                 ", second_name='" + secondName + '\'' +
                 ", first_name='" + firstName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", birthday=" + birthday.format(formatter) +
+                ", birthday=" + formatter.format(birthday) +
                 ", icd_id=" + icd_id +
                 '}';
     }

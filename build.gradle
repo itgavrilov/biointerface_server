@@ -1,13 +1,15 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'org.springframework.boot' version '2.5.6'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.6.3'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id 'org.springdoc.openapi-gradle-plugin' version '1.4.0'
 }
 
 group = 'ru.gsa'
-version = '0.0.2-SNAPSHOT'
-sourceCompatibility = '16'
+version = '0.0.1-SNAPSHOT'
+targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_16
 
 def defaultEncoding = 'UTF-8'
 [compileJava, compileTestJava]*.options*.encoding = defaultEncoding
@@ -18,14 +20,12 @@ repositories {
 
 def slf4jVersion = '1.7.36'
 def log4jVersion = '2.17.2'
-def springBootVersion = '2.7.0'
+def springBootVersion = '2.6.3'
 def junitVersion = '5.8.2'
-def lombokVersion = '1.18.24'
-def mapstructVersion = '1.5.1.Final'
+def lombokVersion = '1.18.22'
+def mapstructVersion = '1.5.2.Final'
 
 dependencies {
-    implementation 'junit:junit:4.13.1'
-
     // сахар дря разработки.
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
@@ -35,23 +35,23 @@ dependencies {
     implementation('com.fazecast:jSerialComm:2.9.1')
 //-----------Logging------------------------
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation("org.slf4j:jcl-over-slf4j:$slf4jVersion"){
+    implementation("org.slf4j:jcl-over-slf4j:$slf4jVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
-    implementation("org.slf4j:jul-to-slf4j:$slf4jVersion"){
+    implementation("org.slf4j:jul-to-slf4j:$slf4jVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-web:$log4jVersion")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion"){
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
 //-----------Spring Date JPA-------------------
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
-    runtimeOnly('org.postgresql:postgresql:42.3.6')
+    runtimeOnly('org.postgresql:postgresql:42.3.3')
     implementation("org.flywaydb:flyway-core:8.5.13")
 //-----------Validator-----------------------
     implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion")
@@ -60,22 +60,22 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
-//    для JSP. JSP не поддерживается Spring Boot
-//    implementation("javax.servlet:jstl:1.2")
-//    implementation("org.apache.tomcat.embed:tomcat-embed-jasper:10.0.12")
 //-----------Mapstruct-----------------------
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
     implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+//-----------Swagger --------------------------
+    implementation('org.springdoc:springdoc-openapi-ui:1.6.6')
+//----------- Jackson --------------------------
+//    LocalDateTime Enhance JSR-310
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
 //-----------Tests--------------------------
-    implementation('org.springdoc:springdoc-openapi-ui:1.6.9')
-//-----------Tests--------------------------
-    testImplementation('com.h2database:h2:2.1.212')
+    implementation('com.h2database:h2:2.1.210')
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
-    implementation("org.jeasy:easy-random-core:5.0.0")
+    testImplementation("org.jeasy:easy-random-core:5.0.0")
 }
 
 configurations.all {

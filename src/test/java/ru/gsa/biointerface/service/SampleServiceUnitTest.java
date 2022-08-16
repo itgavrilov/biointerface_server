@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
@@ -42,6 +43,13 @@ class SampleServiceUnitTest {
         List<Sample> entityTests = service.findAllByExaminationIdAndChannelNumber(examinationId, number);
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getChannel(), entityTests.get(i).getChannel());
+            assertEquals(entities.get(i).getValue(), entityTests.get(i).getValue());
+        }
+
         verify(repository).findAllByExaminationIdAndChannelNumber(examinationId, number);
     }
 
@@ -74,6 +82,13 @@ class SampleServiceUnitTest {
         List<Sample> entityTests = service.findAllByChannel(channel);
         assertNotNull(entityTests);
         assertIterableEquals(entities, entityTests);
+        for (int i = 0; i < entityTests.size(); i++) {
+            assertNotNull(entities.get(i));
+            assertEquals(entities.get(i).getId(), entityTests.get(i).getId());
+            assertEquals(entities.get(i).getChannel(), entityTests.get(i).getChannel());
+            assertEquals(entities.get(i).getValue(), entityTests.get(i).getValue());
+        }
+
         verify(repository).findAllByChannel(channel);
     }
 

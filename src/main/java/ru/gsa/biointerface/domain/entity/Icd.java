@@ -1,27 +1,27 @@
 package ru.gsa.biointerface.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -33,6 +33,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity(name = "icd")
 @Table(name = "icd")
 public class Icd implements Serializable, Comparable<Object> {
@@ -51,17 +52,17 @@ public class Icd implements Serializable, Comparable<Object> {
      * Наименование заболевания по ICD
      */
     @NotBlank(message = "Name can't be blank")
-    @Size(min = 3, max = 35, message = "Name should be have chars between 3-35")
-    @Column(name = "name", nullable = false, length = 35)
+    @Column(name = "name", nullable = false)
     private String name;
 
     /**
      * Версия ICD
      */
+    @NotNull(message = "Version can't be null")
     @Min(value = 10, message = "Version can't be lass then 10")
     @Max(value = 99, message = "Version can't be more than 99")
     @Column(name = "version", nullable = false)
-    private int version;
+    private Integer version;
 
     /**
      * Комментарий
@@ -71,26 +72,23 @@ public class Icd implements Serializable, Comparable<Object> {
     private String comment;
 
     /**
-     * Список карточек пациентов с этим заболеванием {@link Set<Patient>}
+     * Дата создания
      */
-    @OneToMany(mappedBy = "icd", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Patient> patients;
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false, updatable = false)
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @UpdateTimestamp
+    @Column(name = "modify_date", nullable = false)
+    private LocalDateTime modifyDate;
 
     public Icd(String name, int version, String comment) {
         this.name = name;
         this.version = version;
         this.comment = comment;
-        patients = new ArrayList<>();
-    }
-
-    public void addPatient(Patient patient) {
-        patients.add(patient);
-        patient.setIcd(this);
-    }
-
-    public void removePatient(Patient patient) {
-        patients.remove(patient);
-        patient.setIcd(null);
     }
 
     @Override

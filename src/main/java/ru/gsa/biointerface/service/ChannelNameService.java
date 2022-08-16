@@ -5,15 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gsa.biointerface.domain.entity.ChannelName;
-import ru.gsa.biointerface.dto.ChannelNameDTO;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -68,25 +68,47 @@ public class ChannelNameService {
     }
 
     /**
-     * Создание/обновление наименования
+     * Получение наименования по id
      *
-     * @param dto DTO наименования {@link ChannelNameDTO}
+     * @param id Идентификатор {@link ChannelName#getId()}
+     * @return Наименование {@link ChannelName}
+     * @throws NotFoundException если наименование с id не найдено
+     */
+    public ChannelName getByIdOrNull(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    /**
+     * Создание наименования
+     *
+     * @param request Новое наименование {@link ChannelName}
      * @return Наименование {@link ChannelName}
      */
-    public ChannelName saveOrUpdate(ChannelNameDTO dto) {
-        Optional<ChannelName> optional = repository.findById(dto.getId());
-        ChannelName entity;
-
-        if (optional.isEmpty()) {
-            entity = new ChannelName(dto.getName(), dto.getComment());
-        } else {
-            entity = optional.get();
-            entity.setName(dto.getName());
-            entity.setComment(dto.getComment());
+    public ChannelName save(ChannelName request) {
+        if(repository.existsByName(request.getName())){
+            throw new BadRequestException(String.format("ChannelName(name=%s) already exists", request.getName()));
         }
 
-        entity = repository.save(entity);
-        log.debug("ChannelName(id={}) is save", entity.getId());
+        request.setId(null);
+        ChannelName entity = repository.save(request);
+        log.info("ChannelName(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
+     * Обновление наименования
+     *
+     * @param request наименование канала {@link ChannelName}
+     * @return Наименование {@link ChannelName}
+     */
+    @Transactional
+    public ChannelName update(ChannelName request) {
+        ChannelName entity = repository.getOrThrow(request.getId());
+
+        entity.setName(request.getName());
+        entity.setComment(request.getComment());
+        log.info("ChannelName(id={}) is update", entity.getId());
 
         return entity;
     }
@@ -100,6 +122,6 @@ public class ChannelNameService {
     public void delete(UUID id) {
         ChannelName entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("ChannelName(id={}) is deleted", id);
+        log.info("ChannelName(id={}) is deleted", id);
     }
 }

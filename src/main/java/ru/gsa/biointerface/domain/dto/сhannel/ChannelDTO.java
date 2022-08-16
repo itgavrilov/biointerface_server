@@ -1,13 +1,16 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto.сhannel;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,11 +19,12 @@ import java.util.UUID;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Data
-@Builder
-@Schema(name = "Channel", description = "controller`s channel")
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class ChannelDTO implements Serializable, Comparable<Object> {
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
+@Schema(name = "ChannelDTO", description = "Controller`s channel")
+public class ChannelDTO extends ChannelUpdateDTO implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
 
     /**
@@ -38,10 +42,16 @@ public class ChannelDTO implements Serializable, Comparable<Object> {
     private Byte number;
 
     /**
-     * Идентификатор наименования канала контроллера биоинтерфейса {@link ChannelNameDTO#getId()}
+     * Дата создания
      */
-    @Schema(description = "channel`s name ID")
-    private UUID channelNameId;
+    @Schema(description = "Creation date")
+    private LocalDateTime creationDate;
+
+    /**
+     * Дата последнего изменений
+     */
+    @Schema(description = "Modify date")
+    private LocalDateTime modifyDate;
 
     @Override
     public boolean equals(Object o) {
@@ -70,10 +80,11 @@ public class ChannelDTO implements Serializable, Comparable<Object> {
     @Override
     public String toString() {
 
-        return "Channel{" +
+        return "ChannelDTO{" +
                 "number=" + number +
                 ", examination_id=" + examinationId +
                 ", channelName_id=" + channelNameId +
+                ", comment=" + comment +
                 '}';
     }
 }

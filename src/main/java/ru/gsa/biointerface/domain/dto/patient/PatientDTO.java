@@ -1,13 +1,11 @@
-package ru.gsa.biointerface.dto;
+package ru.gsa.biointerface.domain.dto.patient;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,11 +17,13 @@ import java.util.UUID;
  * <p>
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 17/11/2021
  */
-@Data
-@Builder
-@Schema(name = "Patient", description = "patient record")
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class PatientDTO implements Serializable, Comparable<Object> {
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
+@Schema(name = "PatientDTO", description = "Patient record")
+public class PatientDTO extends PatientSaveOrUpdateDTO implements Serializable, Comparable<Object> {
+
     static final long SerialVersionUID = 1L;
 
     /**
@@ -33,62 +33,37 @@ public class PatientDTO implements Serializable, Comparable<Object> {
     private UUID id;
 
     /**
-     * Фамилия
+     * Дата создания
      */
-    @Schema(description = "Second name", required = true)
-    @NotBlank(message = "Second name can't be blank")
-    private String secondName;
+    @Schema(description = "Creation date")
+    private LocalDateTime creationDate;
 
     /**
-     * Имя
+     * Дата последнего изменений
      */
-    @Schema(description = "First name", required = true)
-    @NotBlank(message = "First name can't be blank")
-    private String firstName;
-
-    /**
-     * Отчество
-     */
-    @Schema(description = "Patronymic")
-    private String patronymic;
-
-    /**
-     * Дата рождения {@link LocalDateTime}
-     */
-    @Schema(description = "Birthday", required = true)
-    @Past(message = "Birthday should be in past")
-    private LocalDateTime birthday;
-
-    /**
-     * Идентификатор заболевания по ICD {@link IcdDTO#getId()}
-     */
-    @Schema(description = "ICD ID")
-    private UUID icdId;
-
-    /**
-     * Комментарий
-     */
-    @Schema(description = "Comment")
-    @Max(value = 400, message = "Comment can't be more than 400 chars")
-    private String comment;
+    @Schema(description = "Modify date")
+    private LocalDateTime modifyDate;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PatientDTO that = (PatientDTO) o;
-        return id == that.id;
+        PatientSaveOrUpdateDTO that = (PatientSaveOrUpdateDTO) o;
+        return secondName.equals(that.secondName)
+                && firstName.equals(that.firstName)
+                && patronymic.equals(that.patronymic)
+                && birthday.equals(that.birthday);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(secondName, firstName, patronymic, birthday);
     }
 
     @Override
     public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
-        PatientDTO that = (PatientDTO) o;
+        PatientSaveOrUpdateDTO that = (PatientSaveOrUpdateDTO) o;
 
         int result = secondName.compareTo(that.secondName);
         if (result == 0) result = firstName.compareTo(that.firstName);
@@ -102,13 +77,14 @@ public class PatientDTO implements Serializable, Comparable<Object> {
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return "PatientRecord{" +
+        return "PatientDTO{" +
                 "id=" + id +
                 ", second_name='" + secondName + '\'' +
                 ", first_name='" + firstName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", birthday=" + formatter.format(birthday) +
                 ", icd_id=" + icdId +
+                ", comment=" + comment +
                 '}';
     }
 }

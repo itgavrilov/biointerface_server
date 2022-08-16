@@ -15,4 +15,4 @@ public class TransactionException extends ResponseStatusException {
     public TransactionException(String reason) {
         super(HttpStatus.SERVICE_UNAVAILABLE, reason);
     }
- }
+}

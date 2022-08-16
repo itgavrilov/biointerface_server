@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.gsa.biointerface.domain.entity.Channel;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
@@ -32,7 +31,8 @@ import java.util.UUID;
 public class ExaminationService {
 
     private final ExaminationRepository repository;
-    private final ChannelService channelService;
+    private final PatientService patientService;
+    private final DeviceService deviceService;
     private final SampleService sampleService;
 
     @PostConstruct
@@ -80,15 +80,43 @@ public class ExaminationService {
     }
 
     /**
+     * Создание исследования
+     *
+     * @param request Сущность исследования {@link Examination}
+     * @return Карточка пациента {@link Patient}
+     */
+    public Examination save(Examination request) {
+        if (repository.existsByPatientIdAndDeviceIdAndDatetime(
+                request.getPatientId(),
+                request.getDeviceId(),
+                request.getDatetime())) {
+            throw new BadRequestException(String.format(
+                    "Examination(patientId=%s, deviceId=%s, datetime=%s) already exists",
+                    request.getPatientId(), request.getDeviceId(), request.getDatetime()));
+        }
+
+        patientService.getById(request.getPatientId());
+        deviceService.getById(request.getDeviceId());
+        Examination entity = repository.save(request);
+        log.info("Examination(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
      * Создание/обновление исследования
      *
-     * @param entity Сущность исследования {@link Examination}
+     * @param request Сущность исследования {@link Examination}
      * @return Карточка пациента {@link Patient}
      */
     @Transactional
-    public Examination save(@Valid Examination entity) {
-        entity = repository.save(entity);
-        log.debug("Examination(id={}) is save", entity.getId());
+    public Examination update(Examination request) {
+        patientService.getById(request.getPatientId());
+
+        Examination entity = repository.getOrThrow(request.getId());
+        entity.setPatientId(request.getPatientId());
+        entity.setComment(request.getComment());
+        log.info("Examination(id={}) is save", entity.getId());
 
         return entity;
     }
@@ -103,16 +131,19 @@ public class ExaminationService {
     public void delete(UUID id) {
         Examination entity = repository.getOrThrow(id);
         repository.delete(entity);
-        log.debug("Examination(id={}) is deleted", id);
+        log.info("Examination(id={}) is deleted", id);
     }
 
+    @Transactional
     public Examination loadWithGraphsById(UUID id) {
         Examination entity = getById(id);
-        entity.setChannels(channelService.findAll(entity.getId(), null));
-
-        for (Channel channel : entity.getChannels()) {
-            channel.setSamples(sampleService.findAllByChannel(channel));
+        if (entity.getChannels() == null) {
+            throw new NotFoundException(String.format(
+                    "No graph is found for Examination(id=%s).",
+                    entity.getId()));
         }
+        entity.getChannels().forEach(channel -> {
+        });
 
         log.info("Examination(id={}) load with channels from database", entity.getId());
 
@@ -120,8 +151,6 @@ public class ExaminationService {
     }
 
     public void recordingStart(@Valid Examination entity) throws Exception {
-        if (entity.getChannels().size() != entity.getDevice().getAmountChannels())
-            throw new BadRequestException("Amount channels differs from amount in device");
 
         Optional<Examination> optional = repository.findById(entity.getId());
 

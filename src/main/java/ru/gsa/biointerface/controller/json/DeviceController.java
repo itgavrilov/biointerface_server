@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,19 +22,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.gsa.biointerface.domain.dto.ErrorResponse;
+import ru.gsa.biointerface.domain.dto.device.DeviceDTO;
+import ru.gsa.biointerface.domain.dto.device.DeviceUpdateDTO;
+import ru.gsa.biointerface.domain.dto.icd.IcdDTO;
 import ru.gsa.biointerface.domain.entity.Device;
-import ru.gsa.biointerface.dto.DeviceDTO;
-import ru.gsa.biointerface.dto.ErrorResponse;
-import ru.gsa.biointerface.dto.IcdDTO;
 import ru.gsa.biointerface.mapper.DeviceMapper;
 import ru.gsa.biointerface.service.DeviceService;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * JSON CRUD-контроллер для работы с контроллерами биоинтерфейсов
@@ -46,20 +46,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Devices", description = "biointerface controllers")
 @RestController
-@RequestMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/devices")
 public class DeviceController {
-
-    private static final String version = "0.0.1-SNAPSHOT";
 
     private final DeviceService service;
     private final DeviceMapper mapper;
 
-    @Operation(summary = "get all biointerface controllers")
+    @Operation(summary = "Get all biointerface controllers")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
-                    content = @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DeviceDTO>> getAll() {
         log.debug("REST GET /devices");
         List<DeviceDTO> responses = service.findAll().stream()
@@ -70,11 +67,13 @@ public class DeviceController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get all biointerface controllers wish paging")
+    @Operation(summary = "Get all biointerface controllers wish paging")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping(value = "/pageable")
+    @GetMapping(path = "/pageable",
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<DeviceDTO>> getAll(Pageable pageable) {
         log.debug("REST GET /devices/pageable");
         Page<DeviceDTO> responses = service.findAll(pageable)
@@ -84,13 +83,14 @@ public class DeviceController {
         return ResponseEntity.ok(responses);
     }
 
-    @Operation(summary = "get biointerface controller by ID")
+    @Operation(summary = "Get biointerface controller by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(schema = @Schema(implementation = DeviceDTO.class))),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<DeviceDTO> get(
             @Parameter(description = "Device's ID", required = true)
             @PathVariable(value = "id") UUID id) {
@@ -101,23 +101,7 @@ public class DeviceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "delete biointerface controller by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "successfully"),
-            @ApiResponse(responseCode = "404", description = "object not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "Device's ID", required = true)
-            @PathVariable(value = "id") UUID id) {
-        log.info("REST DELETE /devices/{}", id);
-        service.delete(id);
-        log.debug("End REST DELETE /devices/{}", id);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "save new biointerface controller")
+    @Operation(summary = "Update new biointerface controller")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created",
                     content = @Content(schema = @Schema(implementation = IcdDTO.class))),
@@ -125,31 +109,34 @@ public class DeviceController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "406", description = "validation error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @PutMapping
-    public ResponseEntity<DeviceDTO> save(
+    @PutMapping(path = "/{id}",
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<DeviceDTO> update(
+            @Parameter(description = "Device's ID", required = true)
+            @PathVariable(value = "id") UUID id,
             @Parameter(description = "Device's DTO", required = true)
-            @Valid @RequestBody DeviceDTO dto) {
-        log.info("REST PUT /devices wish params: {}", dto);
-        Device entity = service.update(dto);
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/devices/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-        DeviceDTO response = mapper.toDTO(entity);
+            @Valid @RequestBody DeviceUpdateDTO dto) {
+        log.info("REST PUT /devices wish params: id={}, dto={}", id, dto);
+        Device request = mapper.toEntity(dto, id);
+        DeviceDTO response = mapper.toDTO(service.update(request));
         log.debug("End REST PUT /devices");
 
-        return ResponseEntity.created(newResource).body(response);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/health")
+    @Operation(summary = "Delete biointerface controller by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "successfully"),
+            @ApiResponse(responseCode = "404", description = "object not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
+    @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void health() {
-        log.debug("REST GET /health");
-    }
-
-    @GetMapping("/version")
-    @ResponseStatus(HttpStatus.OK)
-    public String version() {
-        log.debug("REST GET /version");
-        return version;
+    public void delete(
+            @Parameter(description = "Device's ID", required = true)
+            @PathVariable(value = "id") UUID id) {
+        log.info("REST DELETE /devices/{}", id);
+        service.delete(id);
+        log.debug("End REST DELETE /devices/{}", id);
     }
 }

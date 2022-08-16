@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.service;
 
-import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,20 +9,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
-import ru.gsa.biointerface.dto.PatientDTO;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -32,24 +32,27 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PatientServiceUnitTest {
 
-    private final EasyRandom generator = new EasyRandom();
-
     @Mock
     private PatientRepository repository;
-    @Mock
-    private IcdService icdService;
 
     @InjectMocks
     private PatientService service;
 
     @Test
     void findAll() {
-        List<Patient> entities = generator.objects(Patient.class, 5).toList();
+        List<Patient> entities = getNewEntityList(null, 5);
         when(repository.findAllByIcd(null)).thenReturn(entities);
 
         List<Patient> entityTests = service.findAll(null);
         assertNotNull(entityTests);
-        assertIterableEquals(entities, entityTests);
+
+        entityTests.forEach(entityTest -> {
+            Patient entity = entities.stream()
+                    .filter(e -> e.getId().equals(entityTest.getId()))
+                    .findAny().orElseThrow();
+            assertEqualsEntity(entity, entityTest);
+        });
+
         verify(repository).findAllByIcd(null);
     }
 
@@ -65,20 +68,26 @@ class PatientServiceUnitTest {
 
     @Test
     void findAll_byIcd() {
-        List<Patient> entities = generator.objects(Patient.class, 5).toList();
-        Icd icd = generator.nextObject(Icd.class);
-        entities.forEach(e -> e.setIcd(icd));
+        Icd icd = TestUtils.getNewIcd(10);
+        List<Patient> entities = getNewEntityList(icd, 5);
         when(repository.findAllByIcd(icd.getId())).thenReturn(entities);
 
         List<Patient> entityTests = service.findAll(icd.getId());
         assertNotNull(entityTests);
-        assertIterableEquals(entities, entityTests);
+
+        entityTests.forEach(entityTest -> {
+            Patient entity = entities.stream()
+                    .filter(e -> e.getId().equals(entityTest.getId()))
+                    .findAny().orElseThrow();
+            assertEqualsEntity(entity, entityTest);
+        });
+
         verify(repository).findAllByIcd(icd.getId());
     }
 
     @Test
     void findAllPageable() {
-        List<Patient> entities = generator.objects(Patient.class, 15).toList();
+        List<Patient> entities = getNewEntityList(null, 15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
@@ -90,7 +99,15 @@ class PatientServiceUnitTest {
 
             Page<Patient> entityPageTests = service.findAll(null, pageable);
             assertNotNull(entityPageTests);
-            assertIterableEquals(entityPage, entityPageTests);
+
+            entityPageTests.getContent().forEach(entityTest -> {
+                assertNotNull(entityTest);
+                Patient entity = entities.stream()
+                        .filter(e -> e.getId().equals(entityTest.getId()))
+                        .findAny().orElseThrow();
+                assertEqualsEntity(entity, entityTest);
+            });
+
             verify(repository).findAllByIcd(null, pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -110,9 +127,8 @@ class PatientServiceUnitTest {
 
     @Test
     void findAllPageable_byIcd() {
-        List<Patient> entities = generator.objects(Patient.class, 15).toList();
-        Icd icd = generator.nextObject(Icd.class);
-        entities.forEach(e -> e.setIcd(icd));
+        Icd icd = TestUtils.getNewIcd(10);
+        List<Patient> entities = getNewEntityList(icd, 15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
@@ -124,7 +140,15 @@ class PatientServiceUnitTest {
 
             Page<Patient> entityPageTests = service.findAll(icd.getId(), pageable);
             assertNotNull(entityPageTests);
-            assertIterableEquals(entityPage, entityPageTests);
+
+            entityPageTests.getContent().forEach(entityTest -> {
+                assertNotNull(entityTest);
+                Patient entity = entities.stream()
+                        .filter(e -> e.getId().equals(entityTest.getId()))
+                        .findAny().orElseThrow();
+                assertEqualsEntity(entity, entityTest);
+            });
+
             verify(repository).findAllByIcd(icd.getId(), pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
@@ -132,12 +156,14 @@ class PatientServiceUnitTest {
 
     @Test
     void getById() {
-        Patient entity = generator.nextObject(Patient.class);
+        Patient entity = TestUtils.getNewPatient(null, 10);
+
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Patient entityTest = service.getById(entity.getId());
-        assertNotNull(entityTest);
-        assertEquals(entity, entityTest);
+
+        assertEqualsEntity(entity, entityTest);
+
         verify(repository).getOrThrow(entity.getId());
     }
 
@@ -152,35 +178,72 @@ class PatientServiceUnitTest {
     }
 
     @Test
+    void saveWithoutIcd() {
+        Patient entity = TestUtils.getNewPatient(null, 10);
+        Patient entityClone = entity.toBuilder().build();
+
+        when(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
+                entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday())).thenReturn(false);
+        when(repository.save(entityClone)).thenReturn(entity);
+
+        Patient entityTest = service.save(entityClone);
+        assertEqualsEntity(entity, entityTest);
+
+        verify(repository).existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
+                entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday());
+        verify(repository).save(entityClone);
+    }
+
+    @Test
     void save() {
-        PatientDTO dto = generator.nextObject(PatientDTO.class);
-        Icd icd = generator.nextObject(Icd.class);
-        dto.setIcdId(icd.getId());
-        Patient entity = new Patient(
-                dto.getId(),
-                dto.getFirstName(),
-                dto.getSecondName(),
-                dto.getPatronymic(),
-                dto.getBirthday(),
-                icd,
-                dto.getComment(),
-                new ArrayList<>());
+        Icd icd = TestUtils.getNewIcd(10);
+        Patient entity = TestUtils.getNewPatient(icd, 10);
+        Patient entityClone = entity.toBuilder().build();
 
-        when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
-        when(repository.save(entity)).thenReturn(entity);
-        when(icdService.getById(icd.getId())).thenReturn(icd);
+        when(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
+                entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday())).thenReturn(false);
+        when(repository.save(entityClone)).thenReturn(entity);
 
-        Patient entityTest = service.saveOrUpdate(dto);
-        assertNotNull(entityTest);
-        assertEquals(entity, entityTest);
-        verify(repository).findById(entity.getId());
-        verify(icdService).getById(icd.getId());
-        verify(repository).save(entity);
+        Patient entityTest = service.save(entityClone);
+        assertEqualsEntity(entity, entityTest);
+
+        verify(repository).existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
+                entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday());
+        verify(repository).save(entityClone);
+    }
+
+    @Test
+    @Transactional
+    void update() {
+        Patient entity = TestUtils.getNewPatient(null, 10);
+        Patient entityClone = entity.toBuilder().build();
+
+        Icd icd = TestUtils.getNewIcd(10);
+        Patient entityForTest = TestUtils.getNewPatient(icd, 50);
+        entityForTest.setId(entity.getId());
+        entityForTest.setCreationDate(entity.getCreationDate());
+        entityForTest.setModifyDate(entity.getModifyDate());
+
+        when(repository.getOrThrow(entity.getId())).thenReturn(entityClone);
+
+        Patient entityTest = service.update(entityForTest);
+        assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
+        assertEquals(entityForTest.getId(), entityTest.getId());
+
+        assertEquals(entity.getId(), entityTest.getId());
+        assertNotEquals(entity.getFirstName(), entityTest.getFirstName());
+        assertNotEquals(entity.getSecondName(), entityTest.getSecondName());
+        assertNotEquals(entity.getPatronymic(), entityTest.getPatronymic());
+        assertNotEquals(entity.getBirthday(), entityTest.getBirthday());
+        assertNotEquals(entity.getIcd(), entityTest.getIcd());
+        assertNotEquals(entity.getComment(), entityTest.getComment());
+
+        verify(repository).getOrThrow(entity.getId());
     }
 
     @Test
     void delete() {
-        Patient entity = generator.nextObject(Patient.class);
+        Patient entity = TestUtils.getNewPatient(null, 10);
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
@@ -196,5 +259,32 @@ class PatientServiceUnitTest {
 
         assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
         verify(repository).getOrThrow(rndId);
+    }
+
+    private List<Patient> getNewEntityList(Icd icd, int count) {
+        List<Patient> entities = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            entities.add(TestUtils.getNewPatient(icd, 10));
+        }
+        repository.saveAll(entities);
+
+        return repository.findAll();
+    }
+
+    private void assertEqualsEntity(Patient entity, Patient test) {
+        assertEqualsEntityWithoutIdAndTimestamps(entity, test);
+        assertEquals(entity.getId(), test.getId());
+    }
+
+    private void assertEqualsEntityWithoutIdAndTimestamps(Patient entity, Patient test) {
+        assertNotNull(entity);
+        assertNotNull(test);
+        assertEquals(entity.getFirstName(), test.getFirstName());
+        assertEquals(entity.getSecondName(), test.getSecondName());
+        assertEquals(entity.getPatronymic(), test.getPatronymic());
+        assertEquals(entity.getBirthday(), test.getBirthday());
+        assertEquals(entity.getIcd(), test.getIcd());
+        assertEquals(entity.getComment(), test.getComment());
     }
 }

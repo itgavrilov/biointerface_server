@@ -11,7 +11,6 @@ import ru.gsa.biointerface.domain.entity.ChannelID;
 import ru.gsa.biointerface.exception.NotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -21,21 +20,24 @@ import java.util.UUID;
 public interface ChannelRepository extends JpaRepository<Channel, ChannelID> {
 
     String MASK_NOT_FOUND = "Channel(examinationId=%s, number=%s) is not found";
-
-    default Optional<Channel> getByNumberAndExaminationId(UUID examinationId, Byte number) {
-        ChannelID id = new ChannelID(examinationId, number);
-
-        return findById(id);
-    }
+    String MASK_NOT_FOUND_BY_ID = "Channel(id=%s) is not found";
 
     default Channel getOrThrow(UUID examinationId, Byte number) {
+        if (examinationId == null || number == null) {
+            throw new NotFoundException(String.format(MASK_NOT_FOUND, examinationId, number));
+        }
+
         ChannelID id = new ChannelID(examinationId, number);
         return getOrThrow(id);
     }
 
     default Channel getOrThrow(ChannelID id) {
+        if (id == null || id.getExaminationId() == null || id.getNumber() == null) {
+            throw new NotFoundException(String.format(MASK_NOT_FOUND_BY_ID, id));
+        }
+
         return findById(id).orElseThrow(() -> new NotFoundException(String.format(
-                MASK_NOT_FOUND, id.getExaminationId(), id.getNumber())));
+                MASK_NOT_FOUND_BY_ID, id)));
     }
 
     @Query(nativeQuery = true,

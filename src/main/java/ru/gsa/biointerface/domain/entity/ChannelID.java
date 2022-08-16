@@ -1,5 +1,7 @@
 package ru.gsa.biointerface.domain.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +22,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Embeddable
 public class ChannelID implements Serializable, Comparable<Object> {
     static final long SerialVersionUID = 1L;
@@ -34,9 +38,10 @@ public class ChannelID implements Serializable, Comparable<Object> {
     /**
      * Порядковый номер
      */
+    @NotNull(message = "Number can't be null")
     @Min(value = 0, message = "Number can't be lass then 0")
-    @Column(name = "number")
-    private byte number;
+    @Column(name = "number", nullable = false)
+    private Byte number;
 
     public ChannelID(UUID examinationId, byte number) {
         this.examinationId = examinationId;
