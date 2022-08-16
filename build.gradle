@@ -79,6 +79,10 @@ dependencies {
 //-----------Tests lombok--------------------------
     testCompileOnly("org.projectlombok:lombok:$lombokVersion")
     testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
+//-----------Tests Mapstruct-----------------------
+    testImplementation("org.mapstruct:mapstruct:$mapstructVersion")
+    testAnnotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+    testImplementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 }
 
 configurations.all {

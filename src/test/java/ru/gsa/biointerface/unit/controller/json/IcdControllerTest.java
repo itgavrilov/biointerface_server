@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.gsa.biointerface.controller.json.IcdController;
 import ru.gsa.biointerface.domain.entity.Icd;
@@ -25,7 +26,8 @@ import static ru.gsa.biointerface.utils.IcdUtil.getIcds;
 @Import({
         IcdMapperImpl.class
 })
-class IcdControllerUnitTest {
+@Profile("!dev")
+class IcdControllerTest {
 
     @Autowired
     private MockMvc mvc;
