@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
+import ru.gsa.biointerface.exception.BadRequestException;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ExaminationRepository;
 
@@ -85,6 +86,15 @@ public class ExaminationService {
      * @return Карточка пациента {@link Patient}
      */
     public Examination save(Examination request) {
+        if (repository.existsByPatientIdAndDeviceIdAndDatetime(
+                request.getPatientId(),
+                request.getDeviceId(),
+                request.getDatetime())) {
+            throw new BadRequestException(String.format(
+                    "Examination(patientId=%s, deviceId=%s, datetime=%s) already exists",
+                    request.getPatientId(), request.getDeviceId(), request.getDatetime()));
+        }
+
         patientService.getById(request.getPatientId());
         deviceService.getById(request.getDeviceId());
         Examination entity = repository.save(request);

@@ -252,6 +252,23 @@ class ExaminationServiceTest {
     }
 
     @Test
+    void save() {
+        Examination entity = getNewEntityWithoutIdAndTimestamps(getPatientFromDB(), getDeviceFromDB());
+        Examination entityClone = entity.toBuilder().build();
+
+        Examination entityTest = service.save(entityClone);
+
+        assertEqualsEntityWithoutIDatetimeDeviceTimestamps(entity, entityTest);
+
+        assertNotNull(entityTest.getId());
+        assertNotEquals(entity.getId(), entityTest.getId());
+        assertNotNull(entityTest.getCreationDate());
+        assertNotEquals(entity.getCreationDate(), entityTest.getCreationDate());
+        assertNotNull(entityTest.getModifyDate());
+        assertNotEquals(entity.getModifyDate(), entityTest.getModifyDate());
+    }
+
+    @Test
     void update() {
         Examination entity = getNewEntityFromDB(getPatientFromDB(), getDeviceFromDB());
         Examination entityClone = entity.toBuilder().build();
