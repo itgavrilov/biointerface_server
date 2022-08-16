@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -19,13 +20,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-
 /**
  * Created by Gavrilov Stepan (itgavrilov@gmail.com) on 07/11/2021
  */
 @Slf4j
 @Configuration
 @EnableWebMvc
+@ComponentScan("ru.gsa.biointerface.mapper")
 public class MvcConfig implements WebMvcConfigurer {
 
     @Override
