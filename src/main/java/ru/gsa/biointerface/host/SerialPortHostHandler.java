@@ -231,9 +231,9 @@ public class SerialPortHostHandler implements DataCollector, HostHandler {
             throw new HostNotTransmissionException();
 
         if (!isRecording()) {
-            examination = new Examination(patient, device, comment);
             device = deviceService.save(device);
-            examination = examinationService.update(examination);
+            examination = new Examination(patient.getId(), device.getId(), comment);
+            examination = examinationService.save(examination);
 
             for (byte i = 0; i < device.getAmountChannels(); i++) {
                 Channel channel = new Channel(i, examination, channelNames.get(i));

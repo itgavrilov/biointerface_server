@@ -46,7 +46,7 @@ public class DeviceDTO extends DeviceUpdateDTO implements Serializable, Comparab
     @Schema(description = "device Amount channels", required = true)
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
-    private Integer amountChannels;
+    private Byte amountChannels;
 
     /**
      * Дата создания

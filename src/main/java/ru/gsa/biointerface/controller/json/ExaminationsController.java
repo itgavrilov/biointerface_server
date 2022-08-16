@@ -27,13 +27,9 @@ import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.channelName.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
 import ru.gsa.biointerface.domain.dto.examination.ExaminationUpdateDTO;
-import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.mapper.ExaminationMapper;
-import ru.gsa.biointerface.service.DeviceService;
 import ru.gsa.biointerface.service.ExaminationService;
-import ru.gsa.biointerface.service.PatientService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -53,8 +49,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ExaminationsController {
 
     private final ExaminationService service;
-    private final PatientService patientService;
-    private final DeviceService deviceService;
     private final ExaminationMapper mapper;
 
     @Operation(summary = "Get all results of biopotential measurements")
@@ -135,10 +129,7 @@ public class ExaminationsController {
             @Parameter(description = "Examination's DTO", required = true)
             @Valid @RequestBody ExaminationUpdateDTO dto) {
         log.info("REST PUT /examinations wish params: {}", dto);
-
-        Patient patient = patientService.getById(dto.getPatientId());
-        Device device = deviceService.getById(dto.getDeviceId());
-        Examination request = mapper.toEntity(dto, id, patient, device);
+        Examination request = mapper.toEntity(dto, id);
         ExaminationDTO response = mapper.toDTO(service.update(request));
         log.debug("End REST PUT /examinations");
 

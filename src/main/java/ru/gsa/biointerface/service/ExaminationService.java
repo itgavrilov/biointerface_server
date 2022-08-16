@@ -30,7 +30,8 @@ import java.util.UUID;
 public class ExaminationService {
 
     private final ExaminationRepository repository;
-    private final ChannelService channelService;
+    private final PatientService patientService;
+    private final DeviceService deviceService;
     private final SampleService sampleService;
 
     @PostConstruct
@@ -78,19 +79,36 @@ public class ExaminationService {
     }
 
     /**
+     * Создание исследования
+     *
+     * @param request Сущность исследования {@link Examination}
+     * @return Карточка пациента {@link Patient}
+     */
+    public Examination save(Examination request) {
+        patientService.getById(request.getPatientId());
+        deviceService.getById(request.getDeviceId());
+        Examination entity = repository.save(request);
+        log.info("Examination(id={}) is save", entity.getId());
+
+        return entity;
+    }
+
+    /**
      * Создание/обновление исследования
      *
      * @param request Сущность исследования {@link Examination}
      * @return Карточка пациента {@link Patient}
      */
+    @Transactional
     public Examination update(Examination request) {
+        patientService.getById(request.getPatientId());
+
         Examination entity = repository.getOrThrow(request.getId());
-        entity.setPatient(request.getPatient());
+        entity.setPatientId(request.getPatientId());
         entity.setComment(request.getComment());
-        repository.save(entity);
         log.info("Examination(id={}) is save", entity.getId());
 
-        return repository.getOrThrow(entity.getId());
+        return entity;
     }
 
     /**
@@ -106,8 +124,16 @@ public class ExaminationService {
         log.info("Examination(id={}) is deleted", id);
     }
 
+    @Transactional
     public Examination loadWithGraphsById(UUID id) {
         Examination entity = getById(id);
+        if (entity.getChannels() == null) {
+            throw new NotFoundException(String.format(
+                    "No graph is found for Examination(id=%s).",
+                    entity.getId()));
+        }
+        entity.getChannels().forEach(channel -> {
+        });
 
         log.info("Examination(id={}) load with channels from database", entity.getId());
 

@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.service;
 
-import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.Thread.sleep;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,8 +34,6 @@ class ChannelNameServiceTest {
     private ChannelNameService service;
     @Autowired
     private ChannelNameRepository repository;
-
-    private final EasyRandom generator = new EasyRandom();
 
     @AfterEach
     void tearDown() {
@@ -133,10 +130,9 @@ class ChannelNameServiceTest {
     void update() {
         ChannelName entity = getNewEntityFromDB();
 
-        ChannelName entityForTest = entity.toBuilder()
-                .name(generator.nextObject(String.class))
-                .comment(generator.nextObject(String.class))
-                .build();
+        ChannelName entityForTest = TestUtils.getNewChannelName();
+        entityForTest.setId(entity.getId());
+        entityForTest.setCreationDate(entity.getCreationDate());
 
         ChannelName entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
@@ -159,7 +155,7 @@ class ChannelNameServiceTest {
 
     @Test
     void update_rnd() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
+        ChannelName entity = TestUtils.getNewChannelName();
 
         String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
         assertThrows(NotFoundException.class, () -> service.update(entity), message);
@@ -167,9 +163,7 @@ class ChannelNameServiceTest {
 
     @Test
     void delete() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
-        entity.setId(null);
-        entity = repository.save(entity);
+        ChannelName entity = getNewEntityFromDB();
 
         ChannelName finalEntity = entity;
         assertDoesNotThrow(() -> service.delete(finalEntity.getId()));
@@ -182,8 +176,8 @@ class ChannelNameServiceTest {
         assertDoesNotThrow(() -> service.delete(entity.getId()));
     }
 
-    private ChannelName getNewEntityWithoutIdAndTimestamps(){
-        ChannelName entity = generator.nextObject(ChannelName.class);
+    private ChannelName getNewEntityWithoutIdAndTimestamps() {
+        ChannelName entity = TestUtils.getNewChannelName();
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);
@@ -191,24 +185,20 @@ class ChannelNameServiceTest {
         return entity;
     }
 
-    private ChannelName getNewEntityFromDB(){
-        ChannelName entity = repository.save(getNewEntityWithoutIdAndTimestamps());
-        try {
-            sleep(10);
-        } catch (Exception ignored) {}
+    private ChannelName getNewEntityFromDB() {
+        ChannelName entity = TestUtils.getNewChannelName();
 
-        return entity;
+        return repository.save(entity);
     }
 
-    private List<ChannelName> getNewEntityListFromDB(int count){
+    private List<ChannelName> getNewEntityListFromDB(int count) {
         List<ChannelName> entities = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             entities.add(getNewEntityWithoutIdAndTimestamps());
         }
-        entities = repository.saveAll(entities);
 
-        return entities;
+        return repository.saveAll(entities);
     }
 
     private void assertEqualsEntity(ChannelName entity, ChannelName test) {
@@ -218,7 +208,7 @@ class ChannelNameServiceTest {
         assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
-    private void assertEqualsEntityWithoutIdAndTimestamps(ChannelName entity, ChannelName test){
+    private void assertEqualsEntityWithoutIdAndTimestamps(ChannelName entity, ChannelName test) {
         assertNotNull(entity);
         assertNotNull(test);
         assertEquals(entity.getName(), test.getName());

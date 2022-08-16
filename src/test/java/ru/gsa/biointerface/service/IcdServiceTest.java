@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.service;
 
-import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.Thread.sleep;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,8 +34,6 @@ class IcdServiceTest {
     private IcdService service;
     @Autowired
     private IcdRepository repository;
-
-    private final EasyRandom generator = new EasyRandom();
 
     @AfterEach
     void tearDown() {
@@ -132,27 +129,24 @@ class IcdServiceTest {
     @Test
     void update() {
         Icd entity = getNewEntityFromDB(10);
-
-        Icd entityForTest = entity.toBuilder()
-                .name(generator.nextObject(String.class))
-                .version(11)
-                .comment(generator.nextObject(String.class))
-                .build();
+        Icd entityForTest = TestUtils.getNewIcd(11);
+        entityForTest.setId(entity.getId());
+        entityForTest.setCreationDate(entity.getCreationDate());
 
         Icd entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
-        assertEquals(entityForTest.getCreationDate(), entityTest.getCreationDate());
+        assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
 
         Icd entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityFromBD);
         assertEquals(entityForTest.getId(), entityFromBD.getId());
-        assertEquals(entityForTest.getCreationDate(), entityFromBD.getCreationDate());
+        assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityFromBD.getCreationDate());
 
         assertEqualsEntity(entityFromBD, entityTest);
 
         assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getCreationDate(), entityTest.getCreationDate());
+        assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
         assertNotEquals(entity.getName(), entityTest.getName());
         assertNotEquals(entity.getVersion(), entityTest.getVersion());
         assertNotEquals(entity.getComment(), entityTest.getComment());
@@ -161,7 +155,7 @@ class IcdServiceTest {
 
     @Test
     void update_rnd() {
-        Icd entity = generator.nextObject(Icd.class);
+        Icd entity = TestUtils.getNewIcd(10);
         String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
 
         assertThrows(NotFoundException.class, () -> service.update(entity), message);
@@ -181,34 +175,29 @@ class IcdServiceTest {
         assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
     }
 
-    private Icd getNewEntityWithoutIdAndTimestamps(int version){
-        Icd entity = generator.nextObject(Icd.class);
+    private Icd getNewEntityWithoutIdAndTimestamps(int version) {
+        Icd entity = TestUtils.getNewIcd(version);
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);
-        entity.setVersion(version);
 
         return entity;
     }
 
-    private Icd getNewEntityFromDB(int version){
-        Icd entity = repository.saveAndFlush(getNewEntityWithoutIdAndTimestamps(version));
-        try {
-            sleep(10);
-        } catch (Exception ignored) {}
+    private Icd getNewEntityFromDB(int version) {
+        Icd entity = getNewEntityWithoutIdAndTimestamps(version);
 
-        return repository.getOrThrow(entity.getId());
+        return repository.save(entity);
     }
 
-    private List<Icd> getNewEntityListFromDB(int version, int count){
+    private List<Icd> getNewEntityListFromDB(int version, int count) {
         List<Icd> entities = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             entities.add(getNewEntityWithoutIdAndTimestamps(version));
         }
-        repository.saveAllAndFlush(entities);
 
-        return repository.findAll();
+        return repository.saveAll(entities);
     }
 
     private void assertEqualsEntity(Icd entity, Icd test) {
@@ -218,7 +207,7 @@ class IcdServiceTest {
         assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
-    private void assertEqualsEntityWithoutIdAndTimestamps(Icd entity, Icd test){
+    private void assertEqualsEntityWithoutIdAndTimestamps(Icd entity, Icd test) {
         assertNotNull(entity);
         assertNotNull(test);
         assertEquals(entity.getName(), test.getName());

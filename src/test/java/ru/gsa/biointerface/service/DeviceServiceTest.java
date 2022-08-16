@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.service;
 
-import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.DeviceRepository;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.Thread.sleep;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,8 +34,6 @@ class DeviceServiceTest {
     private DeviceService service;
     @Autowired
     private DeviceRepository repository;
-
-    private final EasyRandom generator = new EasyRandom();
 
     @AfterEach
     void tearDown() {
@@ -134,31 +131,32 @@ class DeviceServiceTest {
     void update() {
         Device entity = getNewEntityFromDB(8);
 
-        Device entityForTest = entity.toBuilder()
-                .comment(generator.nextObject(String.class))
-                .build();
+        Device entityForTest = TestUtils.getNewDevice(8);
+        entityForTest.setId(entity.getId());
+        entityForTest.setNumber(entity.getNumber());
+        entityForTest.setCreationDate(entity.getCreationDate());
 
         Device entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
-        assertEquals(entityForTest.getCreationDate(), entityTest.getCreationDate());
+        assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
 
         Device entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityFromBD);
         assertEquals(entityForTest.getId(), entityFromBD.getId());
-        assertEquals(entityForTest.getCreationDate(), entityFromBD.getCreationDate());
+        assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityFromBD.getCreationDate());
 
         assertEqualsEntity(entityFromBD, entityTest);
 
         assertEquals(entity.getId(), entityTest.getId());
-        assertEquals(entity.getCreationDate(), entityTest.getCreationDate());
+        assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
         assertNotEquals(entity.getComment(), entityTest.getComment());
         assertNotEquals(entity.getModifyDate(), entityTest.getModifyDate());
     }
 
     @Test
     void update_rnd() {
-        Device entity = generator.nextObject(Device.class);
+        Device entity = TestUtils.getNewDevice(8);
         UUID rnd = entity.getId();
         String message = String.format(repository.MASK_NOT_FOUND, rnd);
 
@@ -180,34 +178,29 @@ class DeviceServiceTest {
         assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
     }
 
-    private Device getNewEntityWithoutIdAndTimestamps(int amountChannels){
-        Device entity = generator.nextObject(Device.class);
+    private Device getNewEntityWithoutIdAndTimestamps(int amountChannels) {
+        Device entity = TestUtils.getNewDevice(amountChannels);
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);
-        entity.setAmountChannels(amountChannels);
 
         return entity;
     }
 
-    private Device getNewEntityFromDB(int amountChannels){
-        Device entity = repository.saveAndFlush(getNewEntityWithoutIdAndTimestamps(amountChannels));
-        try {
-            sleep(10);
-        } catch (Exception ignored) {}
+    private Device getNewEntityFromDB(int amountChannels) {
+        Device entity = getNewEntityWithoutIdAndTimestamps(amountChannels);
 
-        return repository.getOrThrow(entity.getId());
+        return repository.save(entity);
     }
 
-    private List<Device> getNewEntityListFromDB(int amountChannels, int count){
+    private List<Device> getNewEntityListFromDB(int amountChannels, int count) {
         List<Device> entities = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             entities.add(getNewEntityWithoutIdAndTimestamps(amountChannels));
         }
-        repository.saveAllAndFlush(entities);
 
-        return repository.findAll();
+        return repository.saveAll(entities);
     }
 
     private void assertEqualsEntity(Device entity, Device test) {
@@ -217,7 +210,7 @@ class DeviceServiceTest {
         assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
-    private void assertEqualsEntityWithoutIdAndTimestamps(Device entity, Device test){
+    private void assertEqualsEntityWithoutIdAndTimestamps(Device entity, Device test) {
         assertNotNull(entity);
         assertNotNull(test);
         assertEquals(entity.getNumber(), test.getNumber());

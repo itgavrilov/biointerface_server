@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Сущность канала контроллера биоинтерфейса
@@ -51,7 +52,7 @@ public class Channel implements Serializable, Comparable<Object> {
      * Исследование {@link Examination}
      */
     @NotNull(message = "Examination can't be null")
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "examination_id", referencedColumnName = "id", nullable = false)
     @MapsId("examinationId")
     private Examination examination;
@@ -90,6 +91,31 @@ public class Channel implements Serializable, Comparable<Object> {
     @NotNull(message = "Samples can't be null")
     @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Sample> samples;
+
+    public void setExamination(Examination examination) {
+        UUID examinationId = null;
+
+        if (examination != null) {
+            examinationId = examination.getId();
+        }
+
+        this.examination = examination;
+
+        if (id == null) {
+            id = new ChannelID(examinationId, null);
+        } else {
+            id.setExaminationId(examinationId);
+        }
+    }
+
+    public void setNumber(Byte number) {
+
+        if (id == null) {
+            id = new ChannelID(null, number);
+        } else {
+            id.setNumber(number);
+        }
+    }
 
     public Channel(Byte number, Examination examination, ChannelName channelName) {
         this.id = new ChannelID(examination.getId(), number);

@@ -15,16 +15,14 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -64,18 +62,16 @@ public class Examination implements Serializable, Comparable<Object> {
     /**
      * Карточка пациента
      */
-    @NotNull(message = "Patient can't be null")
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "patient_id", referencedColumnName = "id", nullable = false)
-    private Patient patient;
+    @NotNull(message = "Patient's ID can't be null")
+    @Column(name = "patient_id", nullable = false)
+    private UUID patientId;
 
     /**
      * Контроллер биоинтерфейса
      */
-    @NotNull(message = "Device can't be null")
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "device_id", referencedColumnName = "id", nullable = false)
-    private Device device;
+    @NotNull(message = "Device's ID can't be null")
+    @Column(name = "device_id", nullable = false)
+    private UUID deviceId;
 
     /**
      * Комментарий
@@ -104,11 +100,19 @@ public class Examination implements Serializable, Comparable<Object> {
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
 
-    public Examination(Patient patient, Device device, String comment) {
+    public void setChannels(List<Channel> channels) {
+        this.channels = channels;
+
+        if (this.channels != null) {
+            this.channels.forEach(c -> c.setExamination(this));
+        }
+    }
+
+    public Examination(UUID patientId, UUID deviceId, String comment) {
         this.datetime = LocalDateTime.now();
         this.comment = comment;
-        this.device = device;
-        this.patient = patient;
+        this.patientId = patientId;
+        this.deviceId = deviceId;
         channels = new ArrayList<>();
     }
 
@@ -135,13 +139,13 @@ public class Examination implements Serializable, Comparable<Object> {
 
     @Override
     public String toString() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyy-MM-dd hh:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyy-MM-dd hh:mm:ss");
 
         return "Examination{" +
                 "id=" + id +
                 ", datetime=" + formatter.format(datetime) +
-                ", patientRecord_id=" + patient.getId() +
-                ", device_id=" + device.getId() +
+                ", patientRecord_id=" + patientId +
+                ", device_id=" + deviceId +
                 '}';
     }
 }

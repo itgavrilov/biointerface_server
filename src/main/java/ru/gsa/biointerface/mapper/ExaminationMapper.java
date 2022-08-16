@@ -5,9 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import ru.gsa.biointerface.domain.dto.examination.ExaminationDTO;
 import ru.gsa.biointerface.domain.dto.examination.ExaminationUpdateDTO;
-import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
-import ru.gsa.biointerface.domain.entity.Patient;
 
 import java.util.UUID;
 
@@ -18,27 +16,23 @@ import java.util.UUID;
 public interface ExaminationMapper {
 
     @Mappings({
-            @Mapping(target = "patientId", source = "examination.patient.id"),
-            @Mapping(target = "deviceId", source = "examination.device.id")
+            @Mapping(target = "patientId", source = "examination.patientId"),
+            @Mapping(target = "deviceId", source = "examination.deviceId")
     })
     ExaminationDTO toDTO(Examination examination);
 
     @Mappings({
-            @Mapping(target = "id", source = "id"),
-            @Mapping(target = "comment", source = "dto.comment"),
             @Mapping(target = "datetime", ignore = true),
             @Mapping(target = "creationDate", ignore = true),
             @Mapping(target = "modifyDate", ignore = true),
             @Mapping(target = "channels", expression = "java(new java.util.ArrayList<>())")
     })
-    Examination toEntity(ExaminationUpdateDTO dto, UUID id, Patient patient, Device device);
+    Examination toEntity(ExaminationUpdateDTO dto, UUID id);
 
     @Mappings({
-            @Mapping(target = "id", source = "dto.id"),
-            @Mapping(target = "comment", source = "dto.comment"),
             @Mapping(target = "creationDate", source = "dto.creationDate"),
             @Mapping(target = "modifyDate", source = "dto.modifyDate"),
             @Mapping(target = "channels", expression = "java(new java.util.ArrayList<>())")
     })
-    Examination toEntity(ExaminationDTO dto, Patient patient, Device device);
+    Examination toEntity(ExaminationDTO dto);
 }

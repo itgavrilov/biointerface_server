@@ -1,6 +1,5 @@
 package ru.gsa.biointerface.service;
 
-import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ChannelNameRepository;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -30,8 +29,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ChannelNameServiceUnitTest {
-
-    private final EasyRandom generator = new EasyRandom();
 
     @Mock
     private ChannelNameRepository repository;
@@ -110,7 +107,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void getById() {
-        ChannelName entity = getNewEntity();
+        ChannelName entity = TestUtils.getNewChannelName();
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         ChannelName entityTest = service.getById(entity.getId());
@@ -132,7 +129,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void save() {
-        ChannelName entity = getNewEntity();
+        ChannelName entity = TestUtils.getNewChannelName();
         ChannelName entityClone = entity.toBuilder().build();
         when(repository.existsByName(entityClone.getName())).thenReturn(false);
         when(repository.save(entityClone)).thenReturn(entity);
@@ -146,12 +143,11 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void update() {
-        ChannelName entity = getNewEntity();
+        ChannelName entity = TestUtils.getNewChannelName();
 
-        ChannelName entityForTest = entity.toBuilder()
-                .name(generator.nextObject(String.class))
-                .comment(generator.nextObject(String.class))
-                .build();
+        ChannelName entityForTest = TestUtils.getNewChannelName();
+        entityForTest.setId(entity.getId());
+
         when(repository.getOrThrow(entity.getId())).thenReturn(entity.toBuilder().build());
 
         ChannelName entityTest = service.update(entityForTest);
@@ -167,7 +163,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void update_rnd() {
-        ChannelName entity = getNewEntity();
+        ChannelName entity = TestUtils.getNewChannelName();
         String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
         when(repository.getOrThrow(entity.getId())).thenThrow(new NotFoundException(message));
 
@@ -177,7 +173,7 @@ class ChannelNameServiceUnitTest {
 
     @Test
     void delete() {
-        ChannelName entity = getNewEntity();
+        ChannelName entity = TestUtils.getNewChannelName();
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
@@ -195,21 +191,11 @@ class ChannelNameServiceUnitTest {
         verify(repository).getOrThrow(rnd);
     }
 
-    private ChannelName getNewEntity() {
-        ChannelName entity = generator.nextObject(ChannelName.class);
-        try {
-            sleep(10);
-        } catch (Exception ignored) {
-        }
-
-        return entity;
-    }
-
     private List<ChannelName> getNewEntity(int count) {
         List<ChannelName> entities = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            entities.add(getNewEntity());
+            entities.add(TestUtils.getNewChannelName());
         }
 
         return entities;

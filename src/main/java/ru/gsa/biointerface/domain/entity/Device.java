@@ -65,7 +65,7 @@ public class Device implements Serializable, Comparable<Object> {
     @Min(value = 1, message = "Amount channels can't be lass then 1")
     @Max(value = 8, message = "Amount channels can't be more than 8")
     @Column(name = "amount_channels", nullable = false)
-    private Integer amountChannels;
+    private Byte amountChannels;
 
     /**
      * Комментарий
@@ -88,7 +88,7 @@ public class Device implements Serializable, Comparable<Object> {
     @Column(name = "modify_date", nullable = false)
     private LocalDateTime modifyDate;
 
-    public Device(String number, int amountChannels, String comment) {
+    public Device(String number, Byte amountChannels, String comment) {
         this.number = number;
         this.amountChannels = amountChannels;
         this.comment = comment;
@@ -99,12 +99,12 @@ public class Device implements Serializable, Comparable<Object> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Device that = (Device) o;
-        return id == that.id;
+        return number == that.number;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(number);
     }
 
     @Override
