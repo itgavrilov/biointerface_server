@@ -26,6 +26,7 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
+//@ComponentScan("ru.gsa.biointerface.controller")
 @EnableWebMvc
 @RequiredArgsConstructor
 public class MvcConfig implements WebMvcConfigurer {

@@ -8,9 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.gsa.biointerface.config.TestConfig;
 import ru.gsa.biointerface.controller.json.IcdController;
 import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.mapper.IcdMapperImpl;
 import ru.gsa.biointerface.service.IcdService;
 
 import java.util.List;
@@ -24,7 +24,7 @@ import static ru.gsa.biointerface.utils.IcdUtil.getIcds;
 @Tag("UnitTest")
 @WebMvcTest(IcdController.class)
 @Import({
-        TestConfig.class
+        IcdMapperImpl.class
 })
 @ActiveProfiles("test")
 class IcdControllerTest {
