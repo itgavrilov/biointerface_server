@@ -47,14 +47,14 @@ class IcdControllerTest {
                 .andExpect(jsonPath("$.[1].name").value(entities.get(0).getName()))
                 .andExpect(jsonPath("$.[1].version").value(entities.get(0).getVersion()))
                 .andExpect(jsonPath("$.[1].comment").value(entities.get(0).getComment()))
-                .andExpect(jsonPath("$.[1].creationDate").value(entities.get(0).getCreationDate()))
-                .andExpect(jsonPath("$.[1].modifyDate").value(entities.get(0).getModifyDate()))
+                .andExpect(jsonPath("$.[1].creationDate").value(entities.get(0).getCreationDate().toString()))
+                .andExpect(jsonPath("$.[1].modifyDate").value(entities.get(0).getModifyDate().toString()))
                 .andExpect(jsonPath("$.[0].id").value(entities.get(1).getId().toString()))
                 .andExpect(jsonPath("$.[0].name").value(entities.get(1).getName()))
                 .andExpect(jsonPath("$.[0].version").value(entities.get(1).getVersion()))
                 .andExpect(jsonPath("$.[0].comment").value(entities.get(1).getComment()))
-                .andExpect(jsonPath("$.[0].creationDate").value(entities.get(1).getCreationDate()))
-                .andExpect(jsonPath("$.[0].modifyDate").value(entities.get(1).getModifyDate()));
+                .andExpect(jsonPath("$.[0].creationDate").value(entities.get(1).getCreationDate().toString()))
+                .andExpect(jsonPath("$.[0].modifyDate").value(entities.get(1).getModifyDate().toString()));
     }
 
 //    @Test
