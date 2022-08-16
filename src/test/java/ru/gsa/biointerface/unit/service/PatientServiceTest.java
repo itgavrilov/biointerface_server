@@ -1,5 +1,6 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.unit.service;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,11 +11,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.PatientRepository;
+import ru.gsa.biointerface.service.PatientService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +29,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static ru.gsa.biointerface.utils.IcdUtil.getIcd;
+import static ru.gsa.biointerface.utils.PatientUtil.assertEqualsPatient;
+import static ru.gsa.biointerface.utils.PatientUtil.assertEqualsPatientLight;
+import static ru.gsa.biointerface.utils.PatientUtil.getPatient;
+import static ru.gsa.biointerface.utils.PatientUtil.getPatients;
 
+@Tag("UnitTest")
 @ExtendWith(MockitoExtension.class)
-class PatientServiceUnitTest {
+class PatientServiceTest {
 
     @Mock
     private PatientRepository repository;
@@ -40,7 +47,7 @@ class PatientServiceUnitTest {
 
     @Test
     void findAll() {
-        List<Patient> entities = getNewEntityList(null, 5);
+        List<Patient> entities = getPatients(null, 5);
         when(repository.findAllByIcd(null)).thenReturn(entities);
 
         List<Patient> entityTests = service.findAll(null);
@@ -50,7 +57,7 @@ class PatientServiceUnitTest {
             Patient entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsPatient(entity, entityTest);
         });
 
         verify(repository).findAllByIcd(null);
@@ -68,8 +75,8 @@ class PatientServiceUnitTest {
 
     @Test
     void findAll_byIcd() {
-        Icd icd = TestUtils.getNewIcd(10);
-        List<Patient> entities = getNewEntityList(icd, 5);
+        Icd icd = getIcd(10);
+        List<Patient> entities = getPatients(icd, 5);
         when(repository.findAllByIcd(icd.getId())).thenReturn(entities);
 
         List<Patient> entityTests = service.findAll(icd.getId());
@@ -79,7 +86,7 @@ class PatientServiceUnitTest {
             Patient entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsPatient(entity, entityTest);
         });
 
         verify(repository).findAllByIcd(icd.getId());
@@ -87,7 +94,7 @@ class PatientServiceUnitTest {
 
     @Test
     void findAllPageable() {
-        List<Patient> entities = getNewEntityList(null, 15);
+        List<Patient> entities = getPatients(null, 15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
@@ -105,7 +112,7 @@ class PatientServiceUnitTest {
                 Patient entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsPatient(entity, entityTest);
             });
 
             verify(repository).findAllByIcd(null, pageable);
@@ -127,8 +134,8 @@ class PatientServiceUnitTest {
 
     @Test
     void findAllPageable_byIcd() {
-        Icd icd = TestUtils.getNewIcd(10);
-        List<Patient> entities = getNewEntityList(icd, 15);
+        Icd icd = getIcd(10);
+        List<Patient> entities = getPatients(icd, 15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
@@ -146,7 +153,7 @@ class PatientServiceUnitTest {
                 Patient entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsPatient(entity, entityTest);
             });
 
             verify(repository).findAllByIcd(icd.getId(), pageable);
@@ -156,13 +163,13 @@ class PatientServiceUnitTest {
 
     @Test
     void getById() {
-        Patient entity = TestUtils.getNewPatient(null, 10);
+        Patient entity = getPatient(null, 10);
 
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Patient entityTest = service.getById(entity.getId());
 
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsPatient(entity, entityTest);
 
         verify(repository).getOrThrow(entity.getId());
     }
@@ -179,7 +186,7 @@ class PatientServiceUnitTest {
 
     @Test
     void saveWithoutIcd() {
-        Patient entity = TestUtils.getNewPatient(null, 10);
+        Patient entity = getPatient(null, 10);
         Patient entityClone = entity.toBuilder().build();
 
         when(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
@@ -187,7 +194,7 @@ class PatientServiceUnitTest {
         when(repository.save(entityClone)).thenReturn(entity);
 
         Patient entityTest = service.save(entityClone);
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsPatient(entity, entityTest);
 
         verify(repository).existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
                 entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday());
@@ -196,8 +203,8 @@ class PatientServiceUnitTest {
 
     @Test
     void save() {
-        Icd icd = TestUtils.getNewIcd(10);
-        Patient entity = TestUtils.getNewPatient(icd, 10);
+        Icd icd = getIcd(10);
+        Patient entity = getPatient(icd, 10);
         Patient entityClone = entity.toBuilder().build();
 
         when(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
@@ -205,7 +212,7 @@ class PatientServiceUnitTest {
         when(repository.save(entityClone)).thenReturn(entity);
 
         Patient entityTest = service.save(entityClone);
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsPatient(entity, entityTest);
 
         verify(repository).existsBySecondNameAndFirstNameAndPatronymicAndBirthday(entityClone.getSecondName(),
                 entityClone.getFirstName(), entityClone.getPatronymic(), entityClone.getBirthday());
@@ -215,11 +222,11 @@ class PatientServiceUnitTest {
     @Test
     @Transactional
     void update() {
-        Patient entity = TestUtils.getNewPatient(null, 10);
+        Patient entity = getPatient(null, 10);
         Patient entityClone = entity.toBuilder().build();
 
-        Icd icd = TestUtils.getNewIcd(10);
-        Patient entityForTest = TestUtils.getNewPatient(icd, 50);
+        Icd icd = getIcd(10);
+        Patient entityForTest = getPatient(icd, 50);
         entityForTest.setId(entity.getId());
         entityForTest.setCreationDate(entity.getCreationDate());
         entityForTest.setModifyDate(entity.getModifyDate());
@@ -227,7 +234,7 @@ class PatientServiceUnitTest {
         when(repository.getOrThrow(entity.getId())).thenReturn(entityClone);
 
         Patient entityTest = service.update(entityForTest);
-        assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
+        assertEqualsPatientLight(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
 
         assertEquals(entity.getId(), entityTest.getId());
@@ -243,7 +250,7 @@ class PatientServiceUnitTest {
 
     @Test
     void delete() {
-        Patient entity = TestUtils.getNewPatient(null, 10);
+        Patient entity = getPatient(null, 10);
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
@@ -259,32 +266,5 @@ class PatientServiceUnitTest {
 
         assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
         verify(repository).getOrThrow(rndId);
-    }
-
-    private List<Patient> getNewEntityList(Icd icd, int count) {
-        List<Patient> entities = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            entities.add(TestUtils.getNewPatient(icd, 10));
-        }
-        repository.saveAll(entities);
-
-        return repository.findAll();
-    }
-
-    private void assertEqualsEntity(Patient entity, Patient test) {
-        assertEqualsEntityWithoutIdAndTimestamps(entity, test);
-        assertEquals(entity.getId(), test.getId());
-    }
-
-    private void assertEqualsEntityWithoutIdAndTimestamps(Patient entity, Patient test) {
-        assertNotNull(entity);
-        assertNotNull(test);
-        assertEquals(entity.getFirstName(), test.getFirstName());
-        assertEquals(entity.getSecondName(), test.getSecondName());
-        assertEquals(entity.getPatronymic(), test.getPatronymic());
-        assertEquals(entity.getBirthday(), test.getBirthday());
-        assertEquals(entity.getIcd(), test.getIcd());
-        assertEquals(entity.getComment(), test.getComment());
     }
 }

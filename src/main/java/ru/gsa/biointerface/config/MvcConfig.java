@@ -41,6 +41,4 @@ public class MvcConfig implements WebMvcConfigurer {
         converters.add(jacksonMessageConverter);
         WebMvcConfigurer.super.configureMessageConverters(converters);
     }
-
-
 }

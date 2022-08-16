@@ -1,6 +1,7 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.integration.service;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,10 +10,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import ru.gsa.biointerface.TestUtils;
-import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.domain.entity.ChannelName;
 import ru.gsa.biointerface.exception.NotFoundException;
-import ru.gsa.biointerface.repository.IcdRepository;
+import ru.gsa.biointerface.repository.ChannelNameRepository;
+import ru.gsa.biointerface.service.ChannelNameService;
+import ru.gsa.biointerface.utils.ChannelNameUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +28,19 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Tag("IntegrationTest")
 @SpringBootTest
 @ActiveProfiles("test")
-class IcdServiceTest {
+class ChannelNameServiceTest {
+
+    private final ChannelNameService service;
+    private final ChannelNameRepository repository;
 
     @Autowired
-    private IcdService service;
-    @Autowired
-    private IcdRepository repository;
+    public ChannelNameServiceTest(ChannelNameService service, ChannelNameRepository repository) {
+        this.service = service;
+        this.repository = repository;
+    }
 
     @AfterEach
     void tearDown() {
@@ -42,14 +49,14 @@ class IcdServiceTest {
 
     @Test
     void findAll() {
-        List<Icd> entities = getNewEntityListFromDB(10, 5);
+        List<ChannelName> entities = getNewEntityListFromDB(5);
 
-        List<Icd> entityTests = service.findAll();
+        List<ChannelName> entityTests = service.findAll();
 
         assertNotNull(entityTests);
 
         entityTests.forEach(entityTest -> {
-            Icd entity = entities.stream()
+            ChannelName entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
             assertEqualsEntity(entity, entityTest);
@@ -58,23 +65,23 @@ class IcdServiceTest {
 
     @Test
     void findAll_empty() {
-        List<Icd> entityTests = service.findAll();
+        List<ChannelName> entityTests = service.findAll();
         assertNotNull(entityTests);
         assertIterableEquals(new ArrayList<>(), entityTests);
     }
 
     @Test
     void findAllPageable() {
-        List<Icd> entities = getNewEntityListFromDB(10, 15);
+        List<ChannelName> entities = getNewEntityListFromDB(15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
-            Page<Icd> entityPageTests = service.findAll(pageable);
+            Page<ChannelName> entityPageTests = service.findAll(pageable);
             assertNotNull(entityPageTests);
 
             entityPageTests.getContent().forEach(entityTest -> {
                 assertNotNull(entityTest);
-                Icd entity = entities.stream()
+                ChannelName entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
                 assertEqualsEntity(entity, entityTest);
@@ -87,38 +94,38 @@ class IcdServiceTest {
     @Test
     void findAllPageable_empty() {
         Pageable pageable = PageRequest.of(0, 5);
-        Page<Icd> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
+        Page<ChannelName> entityPage = new PageImpl<>(new ArrayList<>(), pageable, 0);
 
-        Page<Icd> entityPageTests = service.findAll(pageable);
+        Page<ChannelName> entityPageTests = service.findAll(pageable);
         assertNotNull(entityPageTests);
-        assertEquals(entityPage, entityPageTests);
+        assertIterableEquals(entityPage, entityPageTests);
     }
 
     @Test
     void getById() {
-        Icd entity = getNewEntityFromDB(10);
+        ChannelName entity = getNewEntityFromDB();
 
-        Icd entityTest = service.getById(entity.getId());
+        ChannelName entityTest = service.getById(entity.getId());
 
         assertEqualsEntity(entity, entityTest);
     }
 
     @Test
     void getById_rnd() {
-        UUID rndId = UUID.randomUUID();
-        String message = String.format(repository.MASK_NOT_FOUND, rndId);
+        UUID rnd = UUID.randomUUID();
+        String message = String.format(repository.MASK_NOT_FOUND, rnd);
 
-        assertThrows(NotFoundException.class, () -> service.getById(rndId), message);
+        assertThrows(NotFoundException.class, () -> service.getById(rnd), message);
     }
 
     @Test
     void save() {
-        Icd entity = getNewEntityWithoutIdAndTimestamps(10);
+        ChannelName entity = getNewEntityWithoutIdAndTimestamps();
 
-        Icd entityTest = service.save(entity.toBuilder().build());
+        ChannelName entityTest = service.save(entity.toBuilder().build());
         assertEqualsEntityWithoutIdAndTimestamps(entity, entityTest);
 
-        Icd entityFromBD = repository.getOrThrow(entityTest.getId());
+        ChannelName entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntity(entityFromBD, entityTest);
 
         assertNotEquals(entity.getId(), entityTest.getId());
@@ -128,17 +135,18 @@ class IcdServiceTest {
 
     @Test
     void update() {
-        Icd entity = getNewEntityFromDB(10);
-        Icd entityForTest = TestUtils.getNewIcd(11);
+        ChannelName entity = getNewEntityFromDB();
+
+        ChannelName entityForTest = ChannelNameUtil.getChannelName();
         entityForTest.setId(entity.getId());
         entityForTest.setCreationDate(entity.getCreationDate());
 
-        Icd entityTest = service.update(entityForTest);
+        ChannelName entityTest = service.update(entityForTest);
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityTest);
         assertEquals(entityForTest.getId(), entityTest.getId());
         assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
 
-        Icd entityFromBD = repository.getOrThrow(entityTest.getId());
+        ChannelName entityFromBD = repository.getOrThrow(entityTest.getId());
         assertEqualsEntityWithoutIdAndTimestamps(entityForTest, entityFromBD);
         assertEquals(entityForTest.getId(), entityFromBD.getId());
         assertThat(entityForTest.getCreationDate()).isEqualToIgnoringNanos(entityFromBD.getCreationDate());
@@ -148,35 +156,35 @@ class IcdServiceTest {
         assertEquals(entity.getId(), entityTest.getId());
         assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(entityTest.getCreationDate());
         assertNotEquals(entity.getName(), entityTest.getName());
-        assertNotEquals(entity.getVersion(), entityTest.getVersion());
         assertNotEquals(entity.getComment(), entityTest.getComment());
         assertNotEquals(entity.getModifyDate(), entityTest.getModifyDate());
     }
 
     @Test
     void update_rnd() {
-        Icd entity = TestUtils.getNewIcd(10);
-        String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
+        ChannelName entity = ChannelNameUtil.getChannelName();
 
+        String message = String.format(repository.MASK_NOT_FOUND, entity.getId());
         assertThrows(NotFoundException.class, () -> service.update(entity), message);
     }
 
     @Test
     void delete() {
-        Icd entity = getNewEntityFromDB(10);
+        ChannelName entity = getNewEntityFromDB();
 
-        assertDoesNotThrow(() -> service.delete(entity.getId()));
+        ChannelName finalEntity = entity;
+        assertDoesNotThrow(() -> service.delete(finalEntity.getId()));
     }
 
     @Test
     void delete_rnd() {
-        UUID rndId = UUID.randomUUID();
-        String message = String.format(repository.MASK_NOT_FOUND, rndId);
-        assertThrows(NotFoundException.class, () -> service.delete(rndId), message);
+        ChannelName entity = getNewEntityFromDB();
+
+        assertDoesNotThrow(() -> service.delete(entity.getId()));
     }
 
-    private Icd getNewEntityWithoutIdAndTimestamps(int version) {
-        Icd entity = TestUtils.getNewIcd(version);
+    private ChannelName getNewEntityWithoutIdAndTimestamps() {
+        ChannelName entity = ChannelNameUtil.getChannelName();
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);
@@ -184,34 +192,33 @@ class IcdServiceTest {
         return entity;
     }
 
-    private Icd getNewEntityFromDB(int version) {
-        Icd entity = getNewEntityWithoutIdAndTimestamps(version);
+    private ChannelName getNewEntityFromDB() {
+        ChannelName entity = ChannelNameUtil.getChannelName();
 
         return repository.save(entity);
     }
 
-    private List<Icd> getNewEntityListFromDB(int version, int count) {
-        List<Icd> entities = new ArrayList<>();
+    private List<ChannelName> getNewEntityListFromDB(int count) {
+        List<ChannelName> entities = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            entities.add(getNewEntityWithoutIdAndTimestamps(version));
+            entities.add(getNewEntityWithoutIdAndTimestamps());
         }
 
         return repository.saveAll(entities);
     }
 
-    private void assertEqualsEntity(Icd entity, Icd test) {
+    private void assertEqualsEntity(ChannelName entity, ChannelName test) {
         assertEqualsEntityWithoutIdAndTimestamps(entity, test);
         assertEquals(entity.getId(), test.getId());
         assertThat(entity.getCreationDate()).isEqualToIgnoringNanos(test.getCreationDate());
         assertThat(entity.getModifyDate()).isEqualToIgnoringNanos(test.getModifyDate());
     }
 
-    private void assertEqualsEntityWithoutIdAndTimestamps(Icd entity, Icd test) {
+    private void assertEqualsEntityWithoutIdAndTimestamps(ChannelName entity, ChannelName test) {
         assertNotNull(entity);
         assertNotNull(test);
         assertEquals(entity.getName(), test.getName());
-        assertEquals(entity.getVersion(), test.getVersion());
         assertEquals(entity.getComment(), test.getComment());
     }
 }

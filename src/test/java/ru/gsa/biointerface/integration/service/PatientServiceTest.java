@@ -1,6 +1,7 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.integration.service;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,12 +10,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Icd;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.IcdRepository;
 import ru.gsa.biointerface.repository.PatientRepository;
+import ru.gsa.biointerface.service.PatientService;
+import ru.gsa.biointerface.utils.IcdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +29,23 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.gsa.biointerface.utils.PatientUtil.getPatient;
 
+@Tag("IntegrationTest")
 @SpringBootTest
 @ActiveProfiles("test")
 class PatientServiceTest {
 
+    private final PatientService service;
+    private final PatientRepository repository;
+    private final IcdRepository icdRepository;
+
     @Autowired
-    private PatientService service;
-    @Autowired
-    private PatientRepository repository;
-    @Autowired
-    private IcdRepository icdRepository;
+    public PatientServiceTest(PatientService service, PatientRepository repository, IcdRepository icdRepository) {
+        this.service = service;
+        this.repository = repository;
+        this.icdRepository = icdRepository;
+    }
 
     @AfterEach
     void tearDown() {
@@ -233,7 +241,7 @@ class PatientServiceTest {
     }
 
     private Icd getIcdFromDB() {
-        Icd icd = TestUtils.getNewIcd(10);
+        Icd icd = IcdUtil.getIcd(10);
         icd.setId(null);
         icd.setCreationDate(null);
         icd.setModifyDate(null);
@@ -242,7 +250,7 @@ class PatientServiceTest {
     }
 
     private Patient getNewEntityWithoutIdAndTimestamps(Icd icd, int minusDays) {
-        Patient entity = TestUtils.getNewPatient(icd, minusDays);
+        Patient entity = getPatient(icd, minusDays);
         entity.setId(null);
         entity.setCreationDate(null);
         entity.setModifyDate(null);

@@ -76,6 +76,9 @@ dependencies {
     }
     testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
     testImplementation("org.jeasy:easy-random-core:5.0.0")
+//-----------Tests lombok--------------------------
+    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
 }
 
 configurations.all {
