@@ -85,7 +85,7 @@ public class ChannelNameService {
      * @return Наименование {@link ChannelName}
      */
     public ChannelName save(ChannelName request) {
-        if(repository.existsByName(request.getName())){
+        if (repository.existsByName(request.getName())) {
             throw new BadRequestException(String.format("ChannelName(name=%s) already exists", request.getName()));
         }
 

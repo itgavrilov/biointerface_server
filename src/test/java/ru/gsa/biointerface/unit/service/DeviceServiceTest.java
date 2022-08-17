@@ -80,7 +80,7 @@ class DeviceServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Device> pageList = entities.subList(start, end);
-            Page<Device> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Device> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAll(pageable)).thenReturn(entityPage);
 
             Page<Device> entityPageTests = service.findAll(pageable);

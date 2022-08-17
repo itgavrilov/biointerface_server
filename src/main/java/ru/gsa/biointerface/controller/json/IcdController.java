@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.icd.IcdDTO;
 import ru.gsa.biointerface.domain.dto.icd.IcdSaveOrUpdateDTO;
@@ -33,7 +33,7 @@ import ru.gsa.biointerface.service.IcdService;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -60,11 +60,11 @@ public class IcdController {
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = IcdDTO.class))))})
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Set<IcdDTO>> getAll() {
+    public ResponseEntity<List<IcdDTO>> getAll() {
         log.debug("REST GET /icds");
-        Set<IcdDTO> responses = service.findAll().stream()
-                .map(mapper::toDTO)
-                .collect(Collectors.toSet());
+        List<IcdDTO> responses = service.findAll().stream()
+                .map(mapper::toIcdDTO)
+                .collect(Collectors.toList());
         log.debug("End REST GET /icds");
 
         return ResponseEntity.ok(responses);
@@ -75,13 +75,11 @@ public class IcdController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = IcdDTO.class))))})
-    @GetMapping(value = "/pageable",
-            produces = APPLICATION_JSON_VALUE,
-            consumes = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/pageable", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<IcdDTO>> getAll(Pageable pageable) {
         log.debug("REST GET /icds/pageable");
         Page<IcdDTO> responses = service.findAll(pageable)
-                .map(mapper::toDTO);
+                .map(mapper::toIcdDTO);
         log.debug("End REST GET /icds/pageable");
 
         return ResponseEntity.ok(responses);
@@ -99,7 +97,7 @@ public class IcdController {
             @Parameter(description = "ICD's ID", required = true)
             @PathVariable(value = "id") UUID id) {
         log.debug("REST GET /icds/{}", id);
-        IcdDTO response = mapper.toDTO(service.getById(id));
+        IcdDTO response = mapper.toIcdDTO(service.getById(id));
         log.debug("End REST GET /icds/{}", id);
 
         return ResponseEntity.ok(response);
@@ -121,11 +119,10 @@ public class IcdController {
         log.debug("REST POST /icds wish params: {}", dto);
         Icd request = mapper.toEntity(dto, null);
         Icd entity = service.save(request);
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/v1/icds/{id}")
+        URI newResource = UriComponentsBuilder.fromPath("/api/v1/icds/{id}")
                 .buildAndExpand(entity.getId()).toUri();
-        IcdDTO response = mapper.toDTO(entity);
-        log.debug("End ROST PUT /icds");
+        IcdDTO response = mapper.toIcdDTO(entity);
+        log.debug("End POST PUT /icds");
 
         return ResponseEntity.created(newResource).body(response);
     }
@@ -151,7 +148,7 @@ public class IcdController {
         log.debug("REST PUT /icds wish params: {}", dto);
         Icd request = mapper.toEntity(dto, id);
         Icd entity = service.update(request);
-        IcdDTO response = mapper.toDTO(entity);
+        IcdDTO response = mapper.toIcdDTO(entity);
         log.debug("End PUT PUT /icds");
 
         return ResponseEntity.ok(response);

@@ -21,6 +21,7 @@ _______________________________________________________________________
 разработать [клиент](https://github.com/itgavrilov/biointerface_client)
 
 В проекте использован стек:
+
 - Java version 16
 - COM-порт: jSerialComm
 - Spring Boot MVS + REST API + JSON + Spring Boot Validation

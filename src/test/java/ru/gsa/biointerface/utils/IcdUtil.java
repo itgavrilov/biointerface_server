@@ -17,6 +17,7 @@ public class IcdUtil {
     public static Icd getIcd(int version) {
         Icd entity = generator.nextObject(Icd.class);
         entity.setVersion(version);
+
         try {
             sleep(10);
         } catch (Exception ignored) {

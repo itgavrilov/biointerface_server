@@ -101,7 +101,7 @@ class PatientServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Patient> pageList = entities.subList(start, end);
-            Page<Patient> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Patient> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByIcd(null, pageable)).thenReturn(entityPage);
 
             Page<Patient> entityPageTests = service.findAll(null, pageable);
@@ -142,7 +142,7 @@ class PatientServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Patient> pageList = entities.subList(start, end);
-            Page<Patient> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Patient> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByIcd(icd.getId(), pageable)).thenReturn(entityPage);
 
             Page<Patient> entityPageTests = service.findAll(icd.getId(), pageable);

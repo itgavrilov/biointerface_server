@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.patient.PatientDTO;
 import ru.gsa.biointerface.domain.dto.patient.PatientSaveOrUpdateDTO;
@@ -79,9 +79,7 @@ public class PatientsController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = PatientDTO.class))))})
-    @GetMapping(path = "/pageable",
-            produces = APPLICATION_JSON_VALUE,
-            consumes = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/pageable", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<PatientDTO>> getAll(
             @Parameter(description = "ICD's ID")
             @RequestParam(value = "icdId", required = false) UUID icdId,
@@ -128,8 +126,7 @@ public class PatientsController {
         log.info("REST POST /patients wish params: {}", dto);
         Icd icd = icdService.getByIdOrNull(dto.getIcdId());
         Patient entity = service.save(mapper.toEntity(dto, null, icd));
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/patients/{id}")
+        URI newResource = UriComponentsBuilder.fromPath("/api/v1/patients/{id}")
                 .buildAndExpand(entity.getId()).toUri();
         PatientDTO response = mapper.toDTO(entity);
         log.debug("End REST POST /patients");

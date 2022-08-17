@@ -71,9 +71,7 @@ public class DeviceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeviceDTO.class))))})
-    @GetMapping(path = "/pageable",
-            produces = APPLICATION_JSON_VALUE,
-            consumes = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/pageable", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<DeviceDTO>> getAll(Pageable pageable) {
         log.debug("REST GET /devices/pageable");
         Page<DeviceDTO> responses = service.findAll(pageable)

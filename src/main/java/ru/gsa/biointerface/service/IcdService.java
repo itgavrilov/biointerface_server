@@ -85,7 +85,7 @@ public class IcdService {
      * @return Заболивание {@link Icd}
      */
     public Icd save(Icd request) {
-        if(repository.existsByNameAndVersion(request.getName(), request.getVersion())){
+        if (repository.existsByNameAndVersion(request.getName(), request.getVersion())) {
             throw new BadRequestException(String.format("ChannelName(name=%s, version=%s) already exists",
                     request.getName(), request.getVersion()));
         }

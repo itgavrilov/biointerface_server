@@ -21,10 +21,25 @@ class IcdMapperTest {
     private final IcdMapper mapper = new IcdMapperImpl();
 
     @Test
-    void toDTO() {
+    void toIcdSaveOrUpdateDTO() {
         Icd entity = generator.nextObject(Icd.class);
 
-        IcdDTO dto = mapper.toDTO(entity);
+        IcdSaveOrUpdateDTO dto = mapper.toIcdSaveOrUpdateDTO(entity);
+
+        assertNotNull(dto);
+        assertNotNull(dto.getName());
+        assertEquals(entity.getName(), dto.getName());
+        assertNotNull(dto.getVersion());
+        assertEquals(entity.getVersion(), dto.getVersion());
+        assertNotNull(dto.getComment());
+        assertEquals(entity.getComment(), dto.getComment());
+    }
+
+    @Test
+    void toIcdDTO() {
+        Icd entity = generator.nextObject(Icd.class);
+
+        IcdDTO dto = mapper.toIcdDTO(entity);
 
         assertNotNull(dto);
         assertNotNull(dto.getId());

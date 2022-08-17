@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,7 +28,29 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @ComponentScan("ru.gsa.biointerface.mapper")
+@RequiredArgsConstructor
 public class MvcConfig implements WebMvcConfigurer {
+
+    private final StringHttpMessageConverter stringHttpMessageConverter;
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(stringHttpMessageConverter);
+        converters.add(mappingJackson2HttpMessageConverter());
+        WebMvcConfigurer.super.configureMessageConverters(converters);
+    }
+
+    @Bean
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
+                .serializers(new LocalDateSerializer(DateTimeFormatter.ISO_DATE),
+                        new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME))
+                .deserializers(new LocalDateDeserializer(DateTimeFormatter.ISO_DATE),
+                        new LocalDateTimeDeserializer(DateTimeFormatter.ISO_DATE_TIME))
+                .serializationInclusion(JsonInclude.Include.NON_NULL);
+
+        return new MappingJackson2HttpMessageConverter(builder.build());
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -37,29 +60,5 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/favicon.ico").addResourceLocations("/WEB-INF/favicon.ico");
         WebMvcConfigurer.super.addResourceHandlers(registry);
         log.info("Add resourceHandlers");
-    }
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(getStringHttpMessageConverter());
-        converters.add(mappingJackson2HttpMessageConverter());
-        WebMvcConfigurer.super.configureMessageConverters(converters);
-    }
-
-    @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
-                .serializers(new LocalDateSerializer(DateTimeFormatter.ISO_LOCAL_DATE),
-                        new LocalDateTimeSerializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .deserializers(new LocalDateDeserializer(DateTimeFormatter.ISO_LOCAL_DATE),
-                        new LocalDateTimeDeserializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .serializationInclusion(JsonInclude.Include.NON_NULL);
-
-        return new MappingJackson2HttpMessageConverter(builder.build());
-    }
-
-    @Bean
-    public StringHttpMessageConverter getStringHttpMessageConverter() {
-        return new StringHttpMessageConverter();
     }
 }

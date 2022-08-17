@@ -76,7 +76,7 @@ public class DeviceService {
      * @return Контроллер биоинтерфейса {@link Device}
      */
     public Device save(Device request) {
-        if(repository.existsByNumber(request.getNumber())){
+        if (repository.existsByNumber(request.getNumber())) {
             throw new BadRequestException(String.format("Device(number=%s) already exists", request.getNumber()));
         }
 

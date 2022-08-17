@@ -77,7 +77,7 @@ class IcdServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Icd> pageList = entities.subList(start, end);
-            Page<Icd> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Icd> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAll(pageable)).thenReturn(entityPage);
 
             Page<Icd> entityPageTests = service.findAll(pageable);

@@ -153,7 +153,7 @@ class ExaminationServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByPatientIdAndDeviceId(null, null, pageable)).thenReturn(entityPage);
 
             Page<Examination> entityPageTests = service.findAll(null, null, pageable);
@@ -195,7 +195,7 @@ class ExaminationServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByPatientIdAndDeviceId(patientId, null, pageable)).thenReturn(entityPage);
 
             Page<Examination> entityPageTests = service.findAll(patientId, null, pageable);
@@ -225,7 +225,7 @@ class ExaminationServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByPatientIdAndDeviceId(null, deviceId, pageable)).thenReturn(entityPage);
 
             Page<Examination> entityPageTests = service.findAll(null, deviceId, pageable);
@@ -256,7 +256,7 @@ class ExaminationServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByPatientIdAndDeviceId(patientId, deviceId, pageable)).thenReturn(entityPage);
 
             Page<Examination> entityPageTests = service.findAll(patientId, deviceId, pageable);

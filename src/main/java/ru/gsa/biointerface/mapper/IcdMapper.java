@@ -15,7 +15,9 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface IcdMapper {
 
-    IcdDTO toDTO(Icd icd);
+    IcdDTO toIcdDTO(Icd icd);
+
+    IcdSaveOrUpdateDTO toIcdSaveOrUpdateDTO(Icd icd);
 
     @Mappings({
             @Mapping(target = "creationDate", ignore = true),

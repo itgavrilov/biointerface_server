@@ -62,7 +62,7 @@ public class IcdDTO extends IcdSaveOrUpdateDTO implements Serializable, Comparab
         IcdSaveOrUpdateDTO that = (IcdSaveOrUpdateDTO) o;
         int result = name.compareTo(that.name);
 
-        if(result == 0) result = version - that.version;
+        if (result == 0) result = version - that.version;
 
         return result;
     }

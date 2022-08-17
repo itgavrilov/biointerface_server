@@ -80,7 +80,7 @@ class ChannelNameServiceTest {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<ChannelName> pageList = entities.subList(start, end);
-            Page<ChannelName> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<ChannelName> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAll(pageable)).thenReturn(entityPage);
 
             Page<ChannelName> entityPageTests = service.findAll(pageable);

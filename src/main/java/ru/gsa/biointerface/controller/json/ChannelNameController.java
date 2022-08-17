@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.gsa.biointerface.domain.dto.ErrorResponse;
 import ru.gsa.biointerface.domain.dto.channelName.ChannelNameDTO;
 import ru.gsa.biointerface.domain.dto.channelName.ChannelNameSaveOrUpdateDTO;
@@ -73,9 +73,7 @@ public class ChannelNameController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = ChannelNameDTO.class))))})
-    @GetMapping(path = "/pageable",
-            produces = APPLICATION_JSON_VALUE,
-            consumes = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/pageable", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ChannelNameDTO>> getAll(Pageable pageable) {
         log.debug("REST GET /channelNames/pageable");
         Page<ChannelNameDTO> responses = service.findAll(pageable)
@@ -118,8 +116,7 @@ public class ChannelNameController {
             @Valid @RequestBody ChannelNameSaveOrUpdateDTO dto) {
         log.debug("REST POST /channelNames wish params: {}", dto);
         ChannelName entity = service.save(mapper.toEntity(dto, null));
-        URI newResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/channelNames/{id}")
+        URI newResource = UriComponentsBuilder.fromPath("/api/v1/channel-names/{id}")
                 .buildAndExpand(entity.getId()).toUri();
         log.debug("End REST POST /channelNames");
 
