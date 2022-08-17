@@ -109,8 +109,11 @@ public class Icd implements Serializable, Comparable<Object> {
     public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) return -1;
         Icd that = (Icd) o;
+        int result = name.compareTo(that.name);
 
-        return name.compareTo(that.name);
+        if (result == 0) result = version - that.version;
+
+        return result;
     }
 
     @Override

@@ -76,8 +76,7 @@ public class ExaminationsController {
             @ApiResponse(responseCode = "200", description = "successfully",
                     content = @Content(
                             array = @ArraySchema(schema = @Schema(implementation = ExaminationDTO.class))))})
-    @GetMapping(path = "/pageable",
-            produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/pageable", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<ExaminationDTO>> getAll(
             @Parameter(description = "ID patient record")
             @RequestParam(value = "patientId", required = false) UUID patientId,
@@ -98,8 +97,7 @@ public class ExaminationsController {
                     content = @Content(schema = @Schema(implementation = ExaminationDTO.class))),
             @ApiResponse(responseCode = "404", description = "object not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping(path = "/{id}",
-            produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ExaminationDTO> get(
             @Parameter(description = "Examination's ID", required = true)
             @PathVariable(value = "id") UUID id) {

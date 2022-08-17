@@ -1,5 +1,6 @@
-package ru.gsa.biointerface.service;
+package ru.gsa.biointerface.unit.service;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,12 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ru.gsa.biointerface.TestUtils;
 import ru.gsa.biointerface.domain.entity.Device;
 import ru.gsa.biointerface.domain.entity.Examination;
 import ru.gsa.biointerface.domain.entity.Patient;
 import ru.gsa.biointerface.exception.NotFoundException;
 import ru.gsa.biointerface.repository.ExaminationRepository;
+import ru.gsa.biointerface.service.DeviceService;
+import ru.gsa.biointerface.service.ExaminationService;
+import ru.gsa.biointerface.service.PatientService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static ru.gsa.biointerface.utils.DeviceUtil.getDevice;
+import static ru.gsa.biointerface.utils.ExaminationUtil.assertEqualsExamination;
+import static ru.gsa.biointerface.utils.ExaminationUtil.assertEqualsExaminationLight;
+import static ru.gsa.biointerface.utils.ExaminationUtil.getExamination;
+import static ru.gsa.biointerface.utils.ExaminationUtil.getExaminations;
+import static ru.gsa.biointerface.utils.PatientUtil.getPatient;
 
+@Tag("UnitTest")
 @ExtendWith(MockitoExtension.class)
-class ExaminationServiceUnitTest {
+class ExaminationServiceTest {
 
     @Mock
     private ExaminationRepository repository;
@@ -44,9 +54,7 @@ class ExaminationServiceUnitTest {
 
     @Test
     void findAll() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 5);
+        List<Examination> entities = getExaminations(5);
         when(repository.findAllByPatientIdAndDeviceId(null, null)).thenReturn(entities);
 
         List<Examination> entityTests = service.findAll(null, null);
@@ -57,7 +65,7 @@ class ExaminationServiceUnitTest {
             Examination entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsExamination(entity, entityTest);
         });
 
         verify(repository).findAllByPatientIdAndDeviceId(null, null);
@@ -76,13 +84,12 @@ class ExaminationServiceUnitTest {
 
     @Test
     void findAll_byPatient() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 5);
+        List<Examination> entities = getExaminations(5);
+        UUID patientId = entities.get(0).getPatientId();
 
-        when(repository.findAllByPatientIdAndDeviceId(patient.getId(), null)).thenReturn(entities);
+        when(repository.findAllByPatientIdAndDeviceId(patientId, null)).thenReturn(entities);
 
-        List<Examination> entityTests = service.findAll(patient.getId(), null);
+        List<Examination> entityTests = service.findAll(patientId, null);
 
         assertNotNull(entityTests);
 
@@ -90,20 +97,19 @@ class ExaminationServiceUnitTest {
             Examination entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsExamination(entity, entityTest);
         });
 
-        verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), null);
+        verify(repository).findAllByPatientIdAndDeviceId(patientId, null);
     }
 
     @Test
     void findAll_byDevice() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 5);
-        when(repository.findAllByPatientIdAndDeviceId(null, device.getId())).thenReturn(entities);
+        List<Examination> entities = getExaminations(5);
+        UUID deviceId = entities.get(0).getDeviceId();
+        when(repository.findAllByPatientIdAndDeviceId(null, deviceId)).thenReturn(entities);
 
-        List<Examination> entityTests = service.findAll(null, device.getId());
+        List<Examination> entityTests = service.findAll(null, deviceId);
 
         assertNotNull(entityTests);
 
@@ -111,20 +117,20 @@ class ExaminationServiceUnitTest {
             Examination entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsExamination(entity, entityTest);
         });
 
-        verify(repository).findAllByPatientIdAndDeviceId(null, device.getId());
+        verify(repository).findAllByPatientIdAndDeviceId(null, deviceId);
     }
 
     @Test
     void findAll_byPatientAndDevice() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 5);
-        when(repository.findAllByPatientIdAndDeviceId(patient.getId(), device.getId())).thenReturn(entities);
+        List<Examination> entities = getExaminations(5);
+        UUID patientId = entities.get(0).getPatientId();
+        UUID deviceId = entities.get(0).getDeviceId();
+        when(repository.findAllByPatientIdAndDeviceId(patientId, deviceId)).thenReturn(entities);
 
-        List<Examination> entityTests = service.findAll(patient.getId(), device.getId());
+        List<Examination> entityTests = service.findAll(patientId, deviceId);
 
         assertNotNull(entityTests);
 
@@ -132,24 +138,22 @@ class ExaminationServiceUnitTest {
             Examination entity = entities.stream()
                     .filter(e -> e.getId().equals(entityTest.getId()))
                     .findAny().orElseThrow();
-            assertEqualsEntity(entity, entityTest);
+            assertEqualsExamination(entity, entityTest);
         });
 
-        verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), device.getId());
+        verify(repository).findAllByPatientIdAndDeviceId(patientId, deviceId);
     }
 
     @Test
     void findAllPageable() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 15);
+        List<Examination> entities = getExaminations(15);
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
             when(repository.findAllByPatientIdAndDeviceId(null, null, pageable)).thenReturn(entityPage);
 
             Page<Examination> entityPageTests = service.findAll(null, null, pageable);
@@ -161,7 +165,7 @@ class ExaminationServiceUnitTest {
                 Examination entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsExamination(entity, entityTest);
             });
 
             verify(repository).findAllByPatientIdAndDeviceId(null, null, pageable);
@@ -183,19 +187,18 @@ class ExaminationServiceUnitTest {
 
     @Test
     void findAllPageable_byPatient() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 15);
+        List<Examination> entities = getExaminations(15);
+        UUID patientId = entities.get(0).getPatientId();
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
-            when(repository.findAllByPatientIdAndDeviceId(patient.getId(), null, pageable)).thenReturn(entityPage);
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
+            when(repository.findAllByPatientIdAndDeviceId(patientId, null, pageable)).thenReturn(entityPage);
 
-            Page<Examination> entityPageTests = service.findAll(patient.getId(), null, pageable);
+            Page<Examination> entityPageTests = service.findAll(patientId, null, pageable);
 
             assertNotNull(entityPageTests);
 
@@ -204,29 +207,28 @@ class ExaminationServiceUnitTest {
                 Examination entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsExamination(entity, entityTest);
             });
 
-            verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), null, pageable);
+            verify(repository).findAllByPatientIdAndDeviceId(patientId, null, pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
     }
 
     @Test
     void findAllPageable_byDevice() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 15);
+        List<Examination> entities = getExaminations(15);
+        UUID deviceId = entities.get(0).getDeviceId();
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
-            when(repository.findAllByPatientIdAndDeviceId(null, device.getId(), pageable)).thenReturn(entityPage);
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
+            when(repository.findAllByPatientIdAndDeviceId(null, deviceId, pageable)).thenReturn(entityPage);
 
-            Page<Examination> entityPageTests = service.findAll(null, device.getId(), pageable);
+            Page<Examination> entityPageTests = service.findAll(null, deviceId, pageable);
 
             assertNotNull(entityPageTests);
 
@@ -235,29 +237,29 @@ class ExaminationServiceUnitTest {
                 Examination entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsExamination(entity, entityTest);
             });
 
-            verify(repository).findAllByPatientIdAndDeviceId(null, device.getId(), pageable);
+            verify(repository).findAllByPatientIdAndDeviceId(null, deviceId, pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
     }
 
     @Test
     void findAllPageable_byPatientAndDevice() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        List<Examination> entities = getNewEntityList(patient, device, 15);
+        List<Examination> entities = getExaminations(15);
+        UUID patientId = entities.get(0).getPatientId();
+        UUID deviceId = entities.get(0).getDeviceId();
         Pageable pageable = PageRequest.of(0, 5);
 
         while (pageable.getPageNumber() * pageable.getPageSize() <= entities.size()) {
             int start = pageable.getPageNumber() * pageable.getPageSize();
             int end = Math.min(start + pageable.getPageSize(), entities.size());
             List<Examination> pageList = entities.subList(start, end);
-            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, pageList.size());
-            when(repository.findAllByPatientIdAndDeviceId(patient.getId(), device.getId(), pageable)).thenReturn(entityPage);
+            Page<Examination> entityPage = new PageImpl<>(pageList, pageable, entities.size());
+            when(repository.findAllByPatientIdAndDeviceId(patientId, deviceId, pageable)).thenReturn(entityPage);
 
-            Page<Examination> entityPageTests = service.findAll(patient.getId(), device.getId(), pageable);
+            Page<Examination> entityPageTests = service.findAll(patientId, deviceId, pageable);
 
             assertNotNull(entityPageTests);
 
@@ -266,24 +268,22 @@ class ExaminationServiceUnitTest {
                 Examination entity = entities.stream()
                         .filter(e -> e.getId().equals(entityTest.getId()))
                         .findAny().orElseThrow();
-                assertEqualsEntity(entity, entityTest);
+                assertEqualsExamination(entity, entityTest);
             });
 
-            verify(repository).findAllByPatientIdAndDeviceId(patient.getId(), device.getId(), pageable);
+            verify(repository).findAllByPatientIdAndDeviceId(patientId, deviceId, pageable);
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize());
         }
     }
 
     @Test
     void getById() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        Examination entity = TestUtils.getNewExamination(patient, device);
+        Examination entity = getExamination();
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         Examination entityTest = service.getById(entity.getId());
 
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsExamination(entity, entityTest);
 
         verify(repository).getOrThrow(entity.getId());
     }
@@ -300,9 +300,9 @@ class ExaminationServiceUnitTest {
 
     @Test
     void save() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        Examination entity = TestUtils.getNewExamination(patient, device);
+        Patient patient = getPatient(null, 10);
+        Device device = getDevice(8);
+        Examination entity = getExamination(patient, device);
         Examination entityClone = entity.toBuilder().build();
         when(repository.existsByPatientIdAndDeviceIdAndDatetime(
                 entityClone.getPatientId(),
@@ -314,7 +314,7 @@ class ExaminationServiceUnitTest {
 
         Examination entityTest = service.save(entityClone);
 
-        assertEqualsEntity(entity, entityTest);
+        assertEqualsExamination(entity, entityTest);
 
         verify(repository).existsByPatientIdAndDeviceIdAndDatetime(
                 entityClone.getPatientId(),
@@ -327,21 +327,21 @@ class ExaminationServiceUnitTest {
 
     @Test
     void update() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        Examination entity = TestUtils.getNewExamination(patient, device);
+        Patient patient = getPatient(null, 10);
+        Device device = getDevice(8);
+        Examination entity = getExamination(patient, device);
         Examination entityClone = entity.toBuilder().build();
 
-        Patient patientForTest = TestUtils.getNewPatient(null, 50);
-        Device deviceForTest = TestUtils.getNewDevice(4);
-        Examination entityForTest = TestUtils.getNewExamination(patientForTest, deviceForTest);
+        Patient patientForTest = getPatient(null, 50);
+        Device deviceForTest = getDevice(4);
+        Examination entityForTest = getExamination(patientForTest, deviceForTest);
         entityForTest.setId(entity.getId());
 
         when(repository.getOrThrow(entityForTest.getId())).thenReturn(entityClone);
         when(patientService.getById(entityForTest.getPatientId())).thenReturn(patient);
 
         Examination entityTest = service.update(entityForTest);
-        assertEqualsEntityWithoutIDatetimeDeviceTimestamps(entityForTest, entityTest);
+        assertEqualsExaminationLight(entityForTest, entityTest);
 
         assertEquals(entity.getId(), entityTest.getId());
         assertEquals(entity.getDatetime(), entityTest.getDatetime());
@@ -356,9 +356,9 @@ class ExaminationServiceUnitTest {
 
     @Test
     void delete() {
-        Patient patient = TestUtils.getNewPatient(null, 10);
-        Device device = TestUtils.getNewDevice(8);
-        Examination entity = TestUtils.getNewExamination(patient, device);
+        Patient patient = getPatient(null, 10);
+        Device device = getDevice(8);
+        Examination entity = getExamination(patient, device);
         when(repository.getOrThrow(entity.getId())).thenReturn(entity);
 
         assertDoesNotThrow(() -> service.delete(entity.getId()));
@@ -390,31 +390,5 @@ class ExaminationServiceUnitTest {
 
     @Test
     void isRecording() {
-    }
-
-    private List<Examination> getNewEntityList(Patient patient, Device device, int count) {
-        List<Examination> entities = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            Examination entity = TestUtils.getNewExamination(patient, device);
-            entities.add(entity);
-        }
-
-        return entities;
-    }
-
-    private void assertEqualsEntity(Examination entity, Examination test) {
-        assertEqualsEntityWithoutIDatetimeDeviceTimestamps(entity, test);
-        assertEquals(entity.getId(), test.getId());
-        assertEquals(entity.getDatetime(), test.getDatetime());
-        assertEquals(entity.getDeviceId(), test.getDeviceId());
-        assertIterableEquals(entity.getChannels(), test.getChannels());
-    }
-
-    private void assertEqualsEntityWithoutIDatetimeDeviceTimestamps(Examination entity, Examination test) {
-        assertNotNull(entity);
-        assertNotNull(test);
-        assertEquals(entity.getPatientId(), test.getPatientId());
-        assertEquals(entity.getComment(), test.getComment());
     }
 }

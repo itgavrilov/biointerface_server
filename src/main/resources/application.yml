@@ -3,6 +3,13 @@ spring:
     name: biointerface_server
   profiles:
     active: dev
+  sql:
+    init:
+      encoding: UTF-8
+  flyway:
+    schemas: main_service
+    ignore-missing-migrations: true
+    table: flyway_history
   jpa:
     generate-ddl: true
     open-in-view: true
@@ -22,19 +29,6 @@ spring:
         cache:
           use_second_level_cache: false
           provider_class: org.hibernate.cache.NoCacheProvider
-  sql:
-    init:
-      encoding: UTF-8
-  flyway:
-    schemas: main_service
-    ignore-missing-migrations: true
-    table: flyway_history
-
-  thymeleaf:
-    prefix: "/WEB-INF/templates/"
-    suffix: ".html"
-    encoding: utf-8
-    cache: false
 
 server:
   port: 8080
@@ -42,17 +36,5 @@ server:
     context-path: /
   error:
     include-stacktrace: always
-
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    path: /swagger
-
-logging:
-  level:
-    ROOT: INFO
-    org.springframework: INFO
-    ru.gsa.biointerface: DEBUG
 
 

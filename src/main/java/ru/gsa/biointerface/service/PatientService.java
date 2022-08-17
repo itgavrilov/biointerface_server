@@ -79,8 +79,8 @@ public class PatientService {
      * @return Карточка пациента {@link Patient}
      */
     public Patient save(Patient request) {
-        if(repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(request.getSecondName(),
-                request.getFirstName(), request.getPatronymic(), request.getBirthday())){
+        if (repository.existsBySecondNameAndFirstNameAndPatronymicAndBirthday(request.getSecondName(),
+                request.getFirstName(), request.getPatronymic(), request.getBirthday())) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             throw new BadRequestException(String.format(
                     "ChannelName(second name=%s, first name=%s, patronymic=%s, birthday=%s) already exists",

@@ -1,26 +1,45 @@
-package ru.gsa.biointerface.mapper;
+package ru.gsa.biointerface.unit.mapper;
 
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import ru.gsa.biointerface.domain.dto.icd.IcdDTO;
 import ru.gsa.biointerface.domain.dto.icd.IcdSaveOrUpdateDTO;
 import ru.gsa.biointerface.domain.entity.Icd;
+import ru.gsa.biointerface.mapper.IcdMapper;
+import ru.gsa.biointerface.mapper.IcdMapperImpl;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class IcdMapperUnitTest {
+@Tag("UnitTest")
+class IcdMapperTest {
 
     private final EasyRandom generator = new EasyRandom();
     private final IcdMapper mapper = new IcdMapperImpl();
 
     @Test
-    void toDTO() {
+    void toIcdSaveOrUpdateDTO() {
         Icd entity = generator.nextObject(Icd.class);
 
-        IcdDTO dto = mapper.toDTO(entity);
+        IcdSaveOrUpdateDTO dto = mapper.toIcdSaveOrUpdateDTO(entity);
+
+        assertNotNull(dto);
+        assertNotNull(dto.getName());
+        assertEquals(entity.getName(), dto.getName());
+        assertNotNull(dto.getVersion());
+        assertEquals(entity.getVersion(), dto.getVersion());
+        assertNotNull(dto.getComment());
+        assertEquals(entity.getComment(), dto.getComment());
+    }
+
+    @Test
+    void toIcdDTO() {
+        Icd entity = generator.nextObject(Icd.class);
+
+        IcdDTO dto = mapper.toIcdDTO(entity);
 
         assertNotNull(dto);
         assertNotNull(dto.getId());

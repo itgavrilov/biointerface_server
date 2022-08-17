@@ -28,4 +28,4 @@ logging:
   level:
     ROOT: INFO
     org.springframework: INFO
-    ru.gsa.biointerface: INFO
+    ru.gsa.biointerface: DEBUG

@@ -70,12 +70,19 @@ dependencies {
 //    LocalDateTime Enhance JSR-310
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
 //-----------Tests--------------------------
-    implementation('com.h2database:h2:2.1.210')
+    testRuntimeOnly('com.h2database:h2:2.1.210')
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
     testImplementation("org.jeasy:easy-random-core:5.0.0")
+//-----------Tests lombok--------------------------
+    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
+//-----------Tests Mapstruct-----------------------
+    testImplementation("org.mapstruct:mapstruct:$mapstructVersion")
+    testAnnotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+    testImplementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 }
 
 configurations.all {
